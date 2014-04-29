@@ -4,6 +4,7 @@ import (
 	"github.com/azylman/getl"
 )
 
+// A getl.Table that performs a given transformation on evern element in the input table.
 type elTransformedTable struct {
 	input     getl.Table
 	transform func(getl.Row) (getl.Row, error)
@@ -33,6 +34,7 @@ func (t elTransformedTable) Err() error {
 	return t.err
 }
 
+// A transformer is a helper struct for chaining transformations on a table.
 type transformer struct {
 	table getl.Table
 }
@@ -41,6 +43,7 @@ func (t transformer) Table() getl.Table {
 	return t.table
 }
 
+// Constructs an elTransformedTable from an input table and a transform function.
 func elTransform(table getl.Table, transform func(getl.Row) (getl.Row, error)) getl.Table {
 	return &elTransformedTable{
 		input:     table,
@@ -63,6 +66,7 @@ func Fieldmap(table getl.Table, mappings map[string][]string) getl.Table {
 }
 
 func (t *transformer) Fieldmap(mappings map[string][]string) *transformer {
+	// TODO: Should this return a new transformer instead of modifying the existing one?
 	t.table = Fieldmap(t.table, mappings)
 	return t
 }

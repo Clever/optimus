@@ -47,7 +47,7 @@ Here's one that uses chaining:
 #### type Row
 
 ```go
-type Row map[string]string
+type Row map[string]interface{}
 ```
 
 Row is a representation of a line of data in a Table.

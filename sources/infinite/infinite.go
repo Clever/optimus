@@ -26,9 +26,7 @@ func (i *infiniteTable) Stop() {
 }
 
 func (i *infiniteTable) load() {
-	defer func() {
-		i.Stop()
-	}()
+	defer i.Stop()
 	for {
 		if i.stopped {
 			break

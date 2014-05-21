@@ -26,9 +26,7 @@ func (s *sliceTable) Stop() {
 }
 
 func (s *sliceTable) load(slice []getl.Row) {
-	defer func() {
-		s.Stop()
-	}()
+	defer s.Stop()
 	for _, row := range slice {
 		if s.stopped {
 			break

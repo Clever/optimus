@@ -31,9 +31,7 @@ func (t *elTransformedTable) Stop() {
 }
 
 func (t *elTransformedTable) load() {
-	defer func() {
-		t.Stop()
-	}()
+	defer t.Stop()
 	for input := range t.input.Rows() {
 		if t.stopped {
 			break

@@ -14,9 +14,7 @@ type table struct {
 }
 
 func (t *table) load(filename string) {
-	defer func() {
-		t.Stop()
-	}()
+	defer t.Stop()
 
 	fin, err := os.Open(filename)
 	defer fin.Close()

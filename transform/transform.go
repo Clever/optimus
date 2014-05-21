@@ -37,15 +37,14 @@ func (t *elTransformedTable) load() {
 	for input := range t.input.Rows() {
 		if t.stopped {
 			break
-		}
-		if row, err := t.transform(input); err != nil {
+		} else if row, err := t.transform(input); err != nil {
 			t.err = err
-			t.Stop()
+			return
 		} else {
 			t.rows <- row
 		}
 	}
-	if t.err == nil && t.input.Err() != nil {
+	if t.input.Err() != nil {
 		t.err = t.input.Err()
 	}
 }

@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 PKG = github.com/azylman/getl
-SUBPKGS = github.com/azylman/getl/table/csv github.com/azylman/getl/transform
+SUBPKGS = github.com/azylman/getl/source/csv github.com/azylman/getl/transform
 PKGS = $(PKG) $(SUBPKGS)
 
 .PHONY: test golint README

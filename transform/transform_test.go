@@ -3,7 +3,7 @@ package transform
 import (
 	"errors"
 	"github.com/azylman/getl"
-	"github.com/azylman/getl/table/csv"
+	"github.com/azylman/getl/source/csv"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

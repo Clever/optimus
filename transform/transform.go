@@ -10,17 +10,34 @@ type elTransformedTable struct {
 	transform func(getl.Row) (getl.Row, error)
 	err       error
 	rows      chan getl.Row
+	stopped   bool
 }
 
 func (t elTransformedTable) Rows() chan getl.Row {
 	return t.rows
 }
 
+func (t elTransformedTable) Err() error {
+	return t.err
+}
+
+func (t *elTransformedTable) Stop() {
+	t.stopped = true
+	t.input.Stop()
+}
+
 func (t *elTransformedTable) load() {
+	defer func() {
+		close(t.rows)
+		t.Stop()
+	}()
 	for input := range t.input.Rows() {
+		if t.stopped {
+			break
+		}
 		if row, err := t.transform(input); err != nil {
 			t.err = err
-			break
+			t.Stop()
 		} else {
 			t.rows <- row
 		}
@@ -28,11 +45,6 @@ func (t *elTransformedTable) load() {
 	if t.err == nil && t.input.Err() != nil {
 		t.err = t.input.Err()
 	}
-	close(t.rows)
-}
-
-func (t elTransformedTable) Err() error {
-	return t.err
 }
 
 // A transformer is a helper struct for chaining transformations on a table.

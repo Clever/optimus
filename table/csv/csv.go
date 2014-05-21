@@ -8,11 +8,17 @@ import (
 )
 
 type table struct {
-	err  error
-	rows chan getl.Row
+	err     error
+	rows    chan getl.Row
+	stopped bool
 }
 
 func (t *table) load(filename string) {
+	defer func() {
+		close(t.rows)
+		t.Stop()
+	}()
+
 	fin, err := os.Open(filename)
 	defer fin.Close()
 
@@ -26,6 +32,9 @@ func (t *table) load(filename string) {
 
 	reader.FieldsPerRecord = len(headers)
 	for {
+		if t.stopped {
+			break
+		}
 		line, err := reader.Read()
 		if err != nil {
 			t.handleErr(err)
@@ -43,11 +52,14 @@ func (t table) Err() error {
 	return t.err
 }
 
+func (t *table) Stop() {
+	t.stopped = true
+}
+
 func (t *table) handleErr(err error) {
 	if err != io.EOF {
 		t.err = err
 	}
-	close(t.rows)
 }
 
 func (t table) convertLineToRow(line []string, headers []string) getl.Row {

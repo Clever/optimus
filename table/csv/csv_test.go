@@ -8,16 +8,11 @@ import (
 func TestCSV(t *testing.T) {
 	table := New("./test.csv")
 	numRows := 0
-	for row := range table.Rows() {
-		t.Logf("row: %#v", row)
+	for _ = range table.Rows() {
 		numRows++
 	}
-	if numRows != 3 {
-		t.Fatalf("expected %d rows, got %d", 3, numRows)
-	}
-	if table.Err() != nil {
-		t.Fatal(table.Err())
-	}
+	assert.Equal(t, 3, numRows)
+	assert.Nil(t, table.Err())
 }
 
 func TestStop(t *testing.T) {
@@ -27,8 +22,6 @@ func TestStop(t *testing.T) {
 	for _ = range table.Rows() {
 		numRows++
 	}
-	assert.Equal(t, numRows, 0)
-	if table.Err() != nil {
-		t.Fatal(table.Err())
-	}
+	assert.Equal(t, 0, numRows)
+	assert.Nil(t, table.Err())
 }

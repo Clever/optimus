@@ -4,23 +4,28 @@ import (
 	"errors"
 	"github.com/azylman/getl"
 	"github.com/azylman/getl/table/csv"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestFieldmap(t *testing.T) {
 	table := csv.New("./test.csv")
 	transformedTable := Fieldmap(table, map[string][]string{"header1": {"header4"}})
-	for row := range transformedTable.Rows() {
-		t.Logf("got row %#v", row)
+	numRows := 0
+	for _ = range transformedTable.Rows() {
+		numRows++
 	}
+	assert.Equal(t, 3, numRows)
 }
 
 func TestFieldmapChain(t *testing.T) {
 	table := csv.New("./test.csv")
 	transformedTable := NewTransformer(table).Fieldmap(map[string][]string{"header1": {"header4"}}).Table()
-	for row := range transformedTable.Rows() {
-		t.Logf("got row %#v", row)
+	numRows := 0
+	for _ = range transformedTable.Rows() {
+		numRows++
 	}
+	assert.Equal(t, 3, numRows)
 }
 
 type infiniteTable struct {

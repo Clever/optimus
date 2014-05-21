@@ -42,12 +42,15 @@ func (i infiniteTable) Err() error {
 }
 
 func (i *infiniteTable) Stop() {
+	if i.stopped {
+		return
+	}
 	i.stopped = true
+	close(i.rows)
 }
 
 func (i *infiniteTable) load() {
 	defer func() {
-		close(i.rows)
 		i.Stop()
 	}()
 	for {

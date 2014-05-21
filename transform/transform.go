@@ -22,13 +22,16 @@ func (t elTransformedTable) Err() error {
 }
 
 func (t *elTransformedTable) Stop() {
+	if t.stopped {
+		return
+	}
 	t.stopped = true
 	t.input.Stop()
+	close(t.rows)
 }
 
 func (t *elTransformedTable) load() {
 	defer func() {
-		close(t.rows)
 		t.Stop()
 	}()
 	for input := range t.input.Rows() {

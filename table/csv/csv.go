@@ -15,7 +15,6 @@ type table struct {
 
 func (t *table) load(filename string) {
 	defer func() {
-		close(t.rows)
 		t.Stop()
 	}()
 
@@ -53,7 +52,11 @@ func (t table) Err() error {
 }
 
 func (t *table) Stop() {
+	if t.stopped {
+		return
+	}
 	t.stopped = true
+	close(t.rows)
 }
 
 func (t *table) handleErr(err error) {

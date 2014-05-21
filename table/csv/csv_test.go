@@ -5,9 +5,10 @@ import (
 )
 
 func TestScansCSV(t *testing.T) {
-	table := NewTable("./test.csv")
+	table := New("./test.csv")
 	numRows := 0
-	for table.Scan() {
+	for row := range table.Rows() {
+		t.Logf("row: %#v", row)
 		numRows++
 	}
 	if numRows != 3 {

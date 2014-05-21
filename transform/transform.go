@@ -9,25 +9,26 @@ type elTransformedTable struct {
 	input     getl.Table
 	transform func(getl.Row) (getl.Row, error)
 	err       error
-	row       getl.Row
+	rows      chan getl.Row
 }
 
-func (t *elTransformedTable) Scan() bool {
-	if t.input.Scan() == false {
+func (t elTransformedTable) Rows() chan getl.Row {
+	return t.rows
+}
+
+func (t *elTransformedTable) load() {
+	for input := range t.input.Rows() {
+		if row, err := t.transform(input); err != nil {
+			t.err = err
+			break
+		} else {
+			t.rows <- row
+		}
+	}
+	if t.err == nil && t.input.Err() != nil {
 		t.err = t.input.Err()
-		return false
 	}
-	row, err := t.transform(t.input.Row())
-	if err != nil {
-		t.err = err
-		return false
-	}
-	t.row = row
-	return true
-}
-
-func (t elTransformedTable) Row() getl.Row {
-	return t.row
+	close(t.rows)
 }
 
 func (t elTransformedTable) Err() error {
@@ -44,11 +45,14 @@ func (t transformer) Table() getl.Table {
 }
 
 // Constructs an elTransformedTable from an input table and a transform function.
-func elTransform(table getl.Table, transform func(getl.Row) (getl.Row, error)) getl.Table {
-	return &elTransformedTable{
-		input:     table,
+func elTransform(input getl.Table, transform func(getl.Row) (getl.Row, error)) getl.Table {
+	table := &elTransformedTable{
+		input:     input,
 		transform: transform,
+		rows:      make(chan getl.Row),
 	}
+	go table.load()
+	return table
 
 }
 

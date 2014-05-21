@@ -1,7 +1,6 @@
 package csv
 
 import (
-	"bufio"
 	csvEncoding "encoding/csv"
 	"github.com/azylman/getl"
 	"io"
@@ -9,79 +8,61 @@ import (
 )
 
 type table struct {
-	filename string
-	offset   int64
-	err      error
-	row      getl.Row
-	headers  []string
+	err  error
+	rows chan getl.Row
 }
 
-func (t *table) Scan() bool {
-	// To ensure that it's impossible to leave file descriptors hanging around, we open the file,
-	// read a single record, and close it again. This means that, every time, we need to seek to
-	// where we last left off.
-	fin, err := os.Open(t.filename)
+func (t *table) load(filename string) {
+	fin, err := os.Open(filename)
 	defer fin.Close()
-	if _, err := fin.Seek(t.offset, 0); err != nil {
-		t.err = err
-		return false
+
+	reader := csvEncoding.NewReader(fin)
+
+	headers, err := reader.Read()
+	if err != nil {
+		t.handleErr(err)
+		return
 	}
-	// Internally, csv.Reader uses a bufio.Reader. This means that more data might get read than is
-	// used, making our seeks inaccurate. If we pass in an instance of bufio.Reader, it won't
-	// construct a new one, but will use that. This allows us to figure out how much data is
-	// actually used and seek appropriately.
-	buf := bufio.NewReader(fin)
-	reader := csvEncoding.NewReader(buf)
-	if t.headers == nil {
-		headers, err := reader.Read()
+
+	reader.FieldsPerRecord = len(headers)
+	for {
+		line, err := reader.Read()
 		if err != nil {
-			return t.handleErr(err)
+			t.handleErr(err)
+			return
 		}
-		t.headers = headers
+		t.rows <- t.convertLineToRow(line, headers)
 	}
-	reader.FieldsPerRecord = len(t.headers)
-	line, err := reader.Read()
-	if err != nil {
-		return t.handleErr(err)
-	}
-	t.row = t.convertLineToRow(line)
-	offset, err := fin.Seek(0, 1)
-	if err != nil {
-		return t.handleErr(err)
-	}
-	// csv.Reader actually left off at the offset of the file minus any buffered data.
-	t.offset = offset - int64(buf.Buffered())
-	return true
 }
 
-func (t table) Row() getl.Row {
-	return t.row
+func (t table) Rows() chan getl.Row {
+	return t.rows
 }
 
 func (t table) Err() error {
 	return t.err
 }
 
-func (t *table) handleErr(err error) bool {
+func (t *table) handleErr(err error) {
 	if err != io.EOF {
 		t.err = err
 	}
-	return false
+	close(t.rows)
 }
 
-func (t table) convertLineToRow(line []string) getl.Row {
+func (t table) convertLineToRow(line []string, headers []string) getl.Row {
 	row := getl.Row{}
-	for i, header := range t.headers {
+	for i, header := range headers {
 		row[header] = line[i]
 	}
 	return row
 }
 
-// NewTable returns a new Table that scans over the rows of a CSV.
-func NewTable(filename string) getl.Table {
+// New returns a new getl.Table that scans over the rows of a CSV.
+func New(filename string) getl.Table {
 	table := &table{
-		filename: filename,
-		offset:   0,
+		rows: make(chan getl.Row),
 	}
+	go table.load(filename)
 	return table
 }

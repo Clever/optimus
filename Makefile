@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 PKG := github.com/azylman/getl
-SOURCES := $(addprefix $(PKG)/source/, $(shell ls source))
+SOURCES := $(addprefix $(PKG)/sources/, $(shell ls sources))
 SUBPKGS = $(SOURCES) github.com/azylman/getl/transform
 PKGS = $(PKG) $(SUBPKGS)
 

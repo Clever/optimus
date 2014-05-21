@@ -3,8 +3,8 @@ package transform
 import (
 	"errors"
 	"github.com/azylman/getl"
-	"github.com/azylman/getl/source/csv"
-	"github.com/azylman/getl/source/infinite"
+	"github.com/azylman/getl/sources/csv"
+	"github.com/azylman/getl/sources/infinite"
 	"github.com/azylman/getl/tests"
 	"testing"
 )

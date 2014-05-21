@@ -4,28 +4,20 @@ import (
 	"errors"
 	"github.com/azylman/getl"
 	"github.com/azylman/getl/source/csv"
-	"github.com/stretchr/testify/assert"
+	"github.com/azylman/getl/tests"
 	"testing"
 )
 
 func TestFieldmap(t *testing.T) {
 	table := csv.New("./test.csv")
 	transformedTable := Fieldmap(table, map[string][]string{"header1": {"header4"}})
-	numRows := 0
-	for _ = range transformedTable.Rows() {
-		numRows++
-	}
-	assert.Equal(t, 3, numRows)
+	tests.HasRows(t, transformedTable, 3)
 }
 
 func TestFieldmapChain(t *testing.T) {
 	table := csv.New("./test.csv")
 	transformedTable := NewTransformer(table).Fieldmap(map[string][]string{"header1": {"header4"}}).Table()
-	numRows := 0
-	for _ = range transformedTable.Rows() {
-		numRows++
-	}
-	assert.Equal(t, 3, numRows)
+	tests.HasRows(t, transformedTable, 3)
 }
 
 type infiniteTable struct {
@@ -74,15 +66,9 @@ func TestTransformError(t *testing.T) {
 	out := elTransform(in, func(row getl.Row) (getl.Row, error) {
 		return nil, errors.New("some error")
 	})
-	numRows := 0
-	// Should receive no rows here because the first response was an error
-	for _ = range out.Rows() {
-		numRows++
-	}
-	assert.Equal(t, 0, numRows)
-	// Should receive no rows here because everythng should be consumed
-	for _ = range in.Rows() {
-		numRows++
-	}
-	assert.Equal(t, 0, numRows)
+	// Should receive no rows here because the first response was an error.
+	tests.Consumed(t, out)
+	// Should receive no rows here because the the transform should have consumed
+	// all the rows.
+	tests.Consumed(t, in)
 }

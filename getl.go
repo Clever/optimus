@@ -8,7 +8,9 @@ type Table interface {
 	Err() error
 	// Stop signifies that a Table should stop sending Rows down its channel.
 	// A Table is also responsible for calling Stop on any upstream Tables it knows about.
-	// Stop should be idempotent.
+	// Stop should be idempotent. It's expected that Stop will never be called by a consumer of a
+	// Table, unless that consumer is also a Table. It can be used to Stop all upstream Tables in
+	// the event of an error that needs to halt the pipeline.
 	Stop()
 }
 

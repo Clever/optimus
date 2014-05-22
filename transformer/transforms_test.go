@@ -1,10 +1,18 @@
 package transformer
 
 import (
+	"errors"
 	"github.com/azylman/getl"
+	"github.com/azylman/getl/sources/infinite"
 	"github.com/azylman/getl/sources/slice"
 	"testing"
 )
+
+var errorTransform = func(msg string) func(getl.Row) (getl.Row, error) {
+	return func(getl.Row) (getl.Row, error) {
+		return nil, errors.New(msg)
+	}
+}
 
 var transformEqualities = []tableCompareConfig{
 	{
@@ -54,6 +62,22 @@ var transformEqualities = []tableCompareConfig{
 			}
 			return slice.New(newRows)
 		},
+	},
+	{
+		name: "TableTransformErrorPassesThrough",
+		actual: func(getl.Table, interface{}) getl.Table {
+			return New(infinite.New()).RowTransform(
+				errorTransform("failed")).Fieldmap(map[string][]string{}).Table()
+		},
+		error: errors.New("failed"),
+	},
+	{
+		name: "TableTransformFirstErrorPassesThrough",
+		actual: func(getl.Table, interface{}) getl.Table {
+			return New(infinite.New()).RowTransform(
+				errorTransform("failed1")).RowTransform(errorTransform("failed2")).Table()
+		},
+		error: errors.New("failed1"),
 	},
 }
 

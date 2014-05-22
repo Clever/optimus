@@ -26,6 +26,7 @@ type tableCompareConfig struct {
 	actual   func(getl.Table, interface{}) getl.Table
 	expected func(getl.Table, interface{}) getl.Table
 	arg      interface{}
+	error    error
 }
 
 func compareTables(t *testing.T, configs []tableCompareConfig) {
@@ -35,8 +36,15 @@ func compareTables(t *testing.T, configs []tableCompareConfig) {
 				return nil
 			}
 		}
-		actual := tests.GetRows(config.actual(config.source(), config.arg))
-		expected := tests.GetRows(config.expected(config.source(), config.arg))
-		assert.Equal(t, expected, actual, "%s failed", config.name)
+		actualTable := config.actual(config.source(), config.arg)
+		actual := tests.GetRows(actualTable)
+		if config.expected != nil {
+			expected := tests.GetRows(config.expected(config.source(), config.arg))
+			assert.Equal(t, expected, actual, "%s failed", config.name)
+		} else if config.error != nil {
+			assert.Equal(t, config.error, actualTable.Err())
+		} else {
+			t.Fatalf("what are you doing?? config has neither expected nor error: %#v", config)
+		}
 	}
 }

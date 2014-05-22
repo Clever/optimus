@@ -14,7 +14,7 @@ func (t Transformer) Table() getl.Table {
 	return t.table
 }
 
-// Fieldmap returns a Transformer a field mapping transform applied.
+// Fieldmap returns a Transformer with a field mapping transform applied.
 func (t *Transformer) Fieldmap(mappings map[string][]string) *Transformer {
 	// TODO: Should this return a new transformer instead of modifying the existing one?
 	t.table = Fieldmap(t.table, mappings)

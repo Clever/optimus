@@ -58,6 +58,21 @@ var transforms = []equalityConfig{
 		},
 		arg: map[string][]string{"header1": {"header4"}},
 	},
+	{
+		name:   "RowTransform",
+		source: defaultSource,
+		chained: func(source getl.Table, arg interface{}) getl.Table {
+			transform := arg.(func(getl.Row) (getl.Row, error))
+			return New(source).RowTransform(transform).Table()
+		},
+		unchained: func(source getl.Table, arg interface{}) getl.Table {
+			transform := arg.(func(getl.Row) (getl.Row, error))
+			return RowTransform(source, transform)
+		},
+		arg: func(row getl.Row) (getl.Row, error) {
+			return getl.Row{}, nil
+		},
+	},
 }
 
 // TestEquality tests that the chained version and non-chained version of a transform

@@ -40,3 +40,18 @@ func Fieldmap(table getl.Table, mappings map[string][]string) getl.Table {
 		return newRow, nil
 	})
 }
+
+// Valuemap returns a Table that has all the Rows of the input Table with a value mapping applied.
+func Valuemap(table getl.Table, mappings map[string]map[interface{}]interface{}) getl.Table {
+	return RowTransform(table, func(row getl.Row) (getl.Row, error) {
+		newRow := getl.Row{}
+		for key, val := range row {
+			if mappings[key] == nil || mappings[key][val] == nil {
+				newRow[key] = val
+				continue
+			}
+			newRow[key] = mappings[key][val]
+		}
+		return newRow, nil
+	})
+}

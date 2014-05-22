@@ -86,6 +86,22 @@ var transformEqualities = []tableCompareConfig{
 		},
 	},
 	{
+		name: "Valuemap",
+		actual: func(getl.Table, interface{}) getl.Table {
+			mapping := map[string]map[interface{}]interface{}{
+				"header1": {"value1": "value10", "value3": "value30"},
+			}
+			return Valuemap(defaultSource(), mapping)
+		},
+		expected: func(getl.Table, interface{}) getl.Table {
+			return slice.New([]getl.Row{
+				{"header1": "value10", "header2": "value2"},
+				{"header1": "value30", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+			})
+		},
+	},
+	{
 		name: "TableTransformErrorPassesThrough",
 		actual: func(getl.Table, interface{}) getl.Table {
 			return New(infinite.New()).RowTransform(

@@ -42,6 +42,13 @@ func (t *Transformer) Select(filter func(getl.Row) (bool, error)) *Transformer {
 	return t
 }
 
+// Valuemap returns a Transformer with a value mapping applied.
+func (t *Transformer) Valuemap(mappings map[string]map[interface{}]interface{}) *Transformer {
+	// TODO: Should this return a new transformer instead of modifying the existing one?
+	t.table = Valuemap(t.table, mappings)
+	return t
+}
+
 // New returns a Transformer that allows you to chain transformations on a table.
 func New(table getl.Table) *Transformer {
 	return &Transformer{table}

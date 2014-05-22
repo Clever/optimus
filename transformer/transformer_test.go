@@ -90,6 +90,21 @@ var chainedEqualities = []tableCompareConfig{
 			return row["header1"] == "value1", nil
 		},
 	},
+	{
+		name:   "Valuemap",
+		source: defaultSource,
+		actual: func(source getl.Table, arg interface{}) getl.Table {
+			mapping := arg.(map[string]map[interface{}]interface{})
+			return New(source).Valuemap(mapping).Table()
+		},
+		expected: func(source getl.Table, arg interface{}) getl.Table {
+			mapping := arg.(map[string]map[interface{}]interface{})
+			return Valuemap(source, mapping)
+		},
+		arg: map[string]map[interface{}]interface{}{
+			"header1": {"value1": "value10", "value3": "value30"},
+		},
+	},
 }
 
 // TestEquality tests that the chained version and non-chained version of a transform

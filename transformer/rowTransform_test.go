@@ -9,10 +9,10 @@ import (
 )
 
 // TestTransformError tests that the upstream Table had all of its data consumed in the case of an
-// error from an elTransformTable.
+// error from a rowTransformTable.
 func TestTransformError(t *testing.T) {
 	in := infinite.New()
-	out := newElTransform(in, func(row getl.Row) (getl.Row, error) {
+	out := newRowTransform(in, func(row getl.Row) (getl.Row, error) {
 		return nil, errors.New("some error")
 	})
 	// Should receive no rows here because the first response was an error.

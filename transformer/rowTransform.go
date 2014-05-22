@@ -4,8 +4,8 @@ import (
 	"github.com/azylman/getl"
 )
 
-// A Table that performs a given transformation on every element in the input table.
-type elTransformedTable struct {
+// A Table that performs a given transformation on every row in the input table.
+type rowTransformedTable struct {
 	input     getl.Table
 	transform func(getl.Row) (getl.Row, error)
 	err       error
@@ -13,15 +13,15 @@ type elTransformedTable struct {
 	stopped   bool
 }
 
-func (t elTransformedTable) Rows() chan getl.Row {
+func (t rowTransformedTable) Rows() chan getl.Row {
 	return t.rows
 }
 
-func (t elTransformedTable) Err() error {
+func (t rowTransformedTable) Err() error {
 	return t.err
 }
 
-func (t *elTransformedTable) Stop() {
+func (t *rowTransformedTable) Stop() {
 	if t.stopped {
 		return
 	}
@@ -30,7 +30,7 @@ func (t *elTransformedTable) Stop() {
 	close(t.rows)
 }
 
-func (t *elTransformedTable) load() {
+func (t *rowTransformedTable) load() {
 	defer t.Stop()
 	for input := range t.input.Rows() {
 		if t.stopped {
@@ -47,9 +47,9 @@ func (t *elTransformedTable) load() {
 	}
 }
 
-// Constructs an elTransformedTable from an input table and a transform function.
-func newElTransform(input getl.Table, transform func(getl.Row) (getl.Row, error)) getl.Table {
-	table := &elTransformedTable{
+// Constructs a rowTransformedTable from an input table and a transform function.
+func newRowTransform(input getl.Table, transform func(getl.Row) (getl.Row, error)) getl.Table {
+	table := &rowTransformedTable{
 		input:     input,
 		transform: transform,
 		rows:      make(chan getl.Row),

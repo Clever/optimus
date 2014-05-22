@@ -36,11 +36,8 @@ Here's one that uses chaining:
 
     func main() {
     	begin := csv.New("example1.csv")
-    	end := transformer.New(begin)
-    		.Fieldmap(fieldMappings)
-    		.Valuemap(valueMappings)
-    		.RowTransform(arbitraryTransformFunction)
-    		.Table()
+    	end := transformer.New(begin).Fieldmap(fieldMappings).Valuemap(
+    		valueMappings).RowTransform(arbitraryTransformFunction).Table()
     	err := csv.FromTable(end, "output.csv")
     }
 

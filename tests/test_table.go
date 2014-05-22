@@ -22,10 +22,15 @@ func Consumed(t *testing.T, table getl.Table) {
 
 // HasRows tests that a table has the correct number of rows, and returns all the rows.
 func HasRows(t *testing.T, table getl.Table, expected int) []getl.Row {
+	rows := GetRows(table)
+	assert.Equal(t, expected, len(rows))
+	return rows
+}
+
+func GetRows(table getl.Table) []getl.Row {
 	rows := []getl.Row{}
 	for row := range table.Rows() {
 		rows = append(rows, row)
 	}
-	assert.Equal(t, expected, len(rows))
 	return rows
 }

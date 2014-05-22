@@ -64,6 +64,28 @@ var transformEqualities = []tableCompareConfig{
 		},
 	},
 	{
+		name: "SelectEverything",
+		actual: func(getl.Table, interface{}) getl.Table {
+			return Select(defaultSource(), func(row getl.Row) (bool, error) {
+				return true, nil
+			})
+		},
+		expected: func(getl.Table, interface{}) getl.Table {
+			return defaultSource()
+		},
+	},
+	{
+		name: "SelectNothing",
+		actual: func(getl.Table, interface{}) getl.Table {
+			return Select(defaultSource(), func(row getl.Row) (bool, error) {
+				return false, nil
+			})
+		},
+		expected: func(getl.Table, interface{}) getl.Table {
+			return slice.New([]getl.Row{})
+		},
+	},
+	{
 		name: "TableTransformErrorPassesThrough",
 		actual: func(getl.Table, interface{}) getl.Table {
 			return New(infinite.New()).RowTransform(

@@ -75,6 +75,21 @@ var chainedEqualities = []tableCompareConfig{
 			return nil
 		},
 	},
+	{
+		name:   "Select",
+		source: defaultSource,
+		actual: func(source getl.Table, arg interface{}) getl.Table {
+			filter := arg.(func(getl.Row) (bool, error))
+			return New(source).Select(filter).Table()
+		},
+		expected: func(source getl.Table, arg interface{}) getl.Table {
+			filter := arg.(func(getl.Row) (bool, error))
+			return Select(source, filter)
+		},
+		arg: func(row getl.Row) (bool, error) {
+			return row["header1"] == "value1", nil
+		},
+	},
 }
 
 // TestEquality tests that the chained version and non-chained version of a transform

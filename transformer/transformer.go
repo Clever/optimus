@@ -35,6 +35,13 @@ func (t *Transformer) TableTransform(transform func(getl.Row, chan getl.Row) err
 	return t
 }
 
+// Select returns a Transformer with a filter applied.
+func (t *Transformer) Select(filter func(getl.Row) (bool, error)) *Transformer {
+	// TODO: Should this return a new transformer instead of modifying the existing one?
+	t.table = Select(t.table, filter)
+	return t
+}
+
 // New returns a Transformer that allows you to chain transformations on a table.
 func New(table getl.Table) *Transformer {
 	return &Transformer{table}

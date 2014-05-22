@@ -29,7 +29,7 @@ func (t *Transformer) RowTransform(transform func(getl.Row) (getl.Row, error)) *
 }
 
 // TableTransform returns a Transformer with a transform applied.
-func (t *Transformer) TableTransform(transform func(getl.Row, chan getl.Row) error) *Transformer {
+func (t *Transformer) TableTransform(transform func(getl.Row, chan<- getl.Row) error) *Transformer {
 	// TODO: Should this return a new transformer instead of modifying the existing one?
 	t.table = TableTransform(t.table, transform)
 	return t

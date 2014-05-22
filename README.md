@@ -57,7 +57,7 @@ Row is a representation of a line of data in a Table.
 ```go
 type Table interface {
 	// Rows returns a channel that provides the rows.
-	Rows() chan Row
+	Rows() <-chan Row
 	// Err returns the first non-EOF error that was encountered by the Table.
 	Err() error
 	// Stop signifies that a Table should stop sending Rows down its channel.

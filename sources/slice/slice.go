@@ -9,7 +9,7 @@ type sliceTable struct {
 	stopped bool
 }
 
-func (s sliceTable) Rows() chan getl.Row {
+func (s sliceTable) Rows() <-chan getl.Row {
 	return s.rows
 }
 

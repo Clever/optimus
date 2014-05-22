@@ -47,7 +47,7 @@ var transformEqualities = []tableCompareConfig{
 	{
 		name: "TableTransform",
 		actual: func(getl.Table, interface{}) getl.Table {
-			return TableTransform(defaultSource(), func(row getl.Row, out chan getl.Row) error {
+			return TableTransform(defaultSource(), func(row getl.Row, out chan<- getl.Row) error {
 				out <- row
 				out <- getl.Row{}
 				return nil

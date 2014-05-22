@@ -61,14 +61,14 @@ var chainedEqualities = []tableCompareConfig{
 		name:   "Table",
 		source: defaultSource,
 		actual: func(source getl.Table, arg interface{}) getl.Table {
-			transform := arg.(func(getl.Row, chan getl.Row) error)
+			transform := arg.(func(getl.Row, chan<- getl.Row) error)
 			return New(source).TableTransform(transform).Table()
 		},
 		expected: func(source getl.Table, arg interface{}) getl.Table {
-			transform := arg.(func(getl.Row, chan getl.Row) error)
+			transform := arg.(func(getl.Row, chan<- getl.Row) error)
 			return TableTransform(source, transform)
 		},
-		arg: func(row getl.Row, out chan getl.Row) error {
+		arg: func(row getl.Row, out chan<- getl.Row) error {
 			out <- getl.Row{}
 			out <- getl.Row{}
 			out <- getl.Row{}

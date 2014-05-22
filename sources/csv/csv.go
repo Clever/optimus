@@ -41,7 +41,7 @@ func (t *table) load(filename string) {
 	}
 }
 
-func (t table) Rows() chan getl.Row {
+func (t table) Rows() <-chan getl.Row {
 	return t.rows
 }
 

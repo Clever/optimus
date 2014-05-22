@@ -11,7 +11,7 @@ type transformedTable struct {
 	stopped bool
 }
 
-func (t transformedTable) Rows() chan getl.Row {
+func (t transformedTable) Rows() <-chan getl.Row {
 	return t.rows
 }
 
@@ -28,7 +28,7 @@ func (t *transformedTable) Stop() {
 	close(t.rows)
 }
 
-func (t *transformedTable) load(transform func(getl.Row, chan getl.Row) error) {
+func (t *transformedTable) load(transform func(getl.Row, chan<- getl.Row) error) {
 	defer t.Stop()
 	for row := range t.input.Rows() {
 		if t.stopped {
@@ -44,7 +44,7 @@ func (t *transformedTable) load(transform func(getl.Row, chan getl.Row) error) {
 }
 
 // TableTransform returns a Table that has applies the given transform function to the output channel.
-func TableTransform(input getl.Table, transform func(getl.Row, chan getl.Row) error) getl.Table {
+func TableTransform(input getl.Table, transform func(getl.Row, chan<- getl.Row) error) getl.Table {
 	table := &transformedTable{
 		input: input,
 		rows:  make(chan getl.Row),

@@ -6,7 +6,7 @@ import (
 
 // Select returns a Table that only has Rows that pass the filter.
 func Select(table getl.Table, filter func(getl.Row) (bool, error)) getl.Table {
-	return TableTransform(table, func(row getl.Row, out chan getl.Row) error {
+	return TableTransform(table, func(row getl.Row, out chan<- getl.Row) error {
 		pass, err := filter(row)
 		if err != nil || !pass {
 			return err
@@ -18,7 +18,7 @@ func Select(table getl.Table, filter func(getl.Row) (bool, error)) getl.Table {
 
 // RowTransform returns a Table that applies a transform function to every row in the input table.
 func RowTransform(input getl.Table, transform func(getl.Row) (getl.Row, error)) getl.Table {
-	return TableTransform(input, func(in getl.Row, out chan getl.Row) error {
+	return TableTransform(input, func(in getl.Row, out chan<- getl.Row) error {
 		row, err := transform(in)
 		if err != nil {
 			return err

@@ -12,7 +12,7 @@ import (
 // error from a TableTransform.
 func TestTransformError(t *testing.T) {
 	in := infinite.New()
-	out := TableTransform(in, func(row getl.Row, out chan getl.Row) error {
+	out := TableTransform(in, func(row getl.Row, out chan<- getl.Row) error {
 		return errors.New("some error")
 	})
 	// Should receive no rows here because the first response was an error.

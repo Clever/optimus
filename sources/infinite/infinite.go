@@ -9,7 +9,7 @@ type infiniteTable struct {
 	stopped bool
 }
 
-func (i infiniteTable) Rows() chan getl.Row {
+func (i infiniteTable) Rows() <-chan getl.Row {
 	return i.rows
 }
 

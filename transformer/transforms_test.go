@@ -10,9 +10,8 @@ var transformEqualities = []tableCompareConfig{
 	{
 		name:   "Fieldmap",
 		source: defaultSource,
-		actual: func(source getl.Table, arg interface{}) getl.Table {
-			mappings := arg.(map[string][]string)
-			return Fieldmap(source, mappings)
+		actual: func(source getl.Table, _ interface{}) getl.Table {
+			return Fieldmap(source, map[string][]string{"header1": {"header4"}})
 		},
 		expected: func(getl.Table, interface{}) getl.Table {
 			return slice.New([]getl.Row{
@@ -21,14 +20,15 @@ var transformEqualities = []tableCompareConfig{
 				{"header4": "value5"},
 			})
 		},
-		arg: map[string][]string{"header1": {"header4"}},
 	},
 	{
 		name:   "RowTransform",
 		source: defaultSource,
-		actual: func(source getl.Table, arg interface{}) getl.Table {
-			transform := arg.(func(getl.Row) (getl.Row, error))
-			return RowTransform(source, transform)
+		actual: func(source getl.Table, _ interface{}) getl.Table {
+			return RowTransform(source, func(row getl.Row) (getl.Row, error) {
+				row["troll_key"] = "troll_value"
+				return row, nil
+			})
 		},
 		expected: func(getl.Table, interface{}) getl.Table {
 			rows := defaultInput()
@@ -37,9 +37,25 @@ var transformEqualities = []tableCompareConfig{
 			}
 			return slice.New(rows)
 		},
-		arg: func(row getl.Row) (getl.Row, error) {
-			row["troll_key"] = "troll_value"
-			return row, nil
+	},
+	{
+		name:   "TableTransform",
+		source: defaultSource,
+		actual: func(source getl.Table, arg interface{}) getl.Table {
+			return TableTransform(source, func(row getl.Row, out chan getl.Row) error {
+				out <- row
+				out <- getl.Row{}
+				return nil
+			})
+		},
+		expected: func(getl.Table, interface{}) getl.Table {
+			rows := defaultInput()
+			newRows := []getl.Row{}
+			for _, row := range rows {
+				newRows = append(newRows, row)
+				newRows = append(newRows, getl.Row{})
+			}
+			return slice.New(newRows)
 		},
 	},
 }

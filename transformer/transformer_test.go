@@ -28,31 +28,15 @@ func TestChaining(t *testing.T) {
 	assert.Equal(t, expected, rows)
 }
 
-type equalityConfig struct {
-	name      string
-	source    func() getl.Table
-	chained   func(getl.Table, interface{}) getl.Table
-	unchained func(getl.Table, interface{}) getl.Table
-	arg       interface{}
-}
-
-var defaultSource = func() getl.Table {
-	return slice.New([]getl.Row{
-		{"header1": "value1", "header2": "value2"},
-		{"header1": "value3", "header2": "value4"},
-		{"header1": "value5", "header2": "value6"},
-	})
-}
-
-var transforms = []equalityConfig{
+var chainedEqualities = []tableCompareConfig{
 	{
 		name:   "Fieldmap",
 		source: defaultSource,
-		chained: func(source getl.Table, arg interface{}) getl.Table {
+		actual: func(source getl.Table, arg interface{}) getl.Table {
 			mappings := arg.(map[string][]string)
 			return New(source).Fieldmap(mappings).Table()
 		},
-		unchained: func(source getl.Table, arg interface{}) getl.Table {
+		expected: func(source getl.Table, arg interface{}) getl.Table {
 			mappings := arg.(map[string][]string)
 			return Fieldmap(source, mappings)
 		},
@@ -61,11 +45,11 @@ var transforms = []equalityConfig{
 	{
 		name:   "RowTransform",
 		source: defaultSource,
-		chained: func(source getl.Table, arg interface{}) getl.Table {
+		actual: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row) (getl.Row, error))
 			return New(source).RowTransform(transform).Table()
 		},
-		unchained: func(source getl.Table, arg interface{}) getl.Table {
+		expected: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row) (getl.Row, error))
 			return RowTransform(source, transform)
 		},
@@ -76,11 +60,11 @@ var transforms = []equalityConfig{
 	{
 		name:   "Table",
 		source: defaultSource,
-		chained: func(source getl.Table, arg interface{}) getl.Table {
+		actual: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row, chan getl.Row) error)
 			return New(source).TableTransform(transform).Table()
 		},
-		unchained: func(source getl.Table, arg interface{}) getl.Table {
+		expected: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row, chan getl.Row) error)
 			return TableTransform(source, transform)
 		},
@@ -96,9 +80,5 @@ var transforms = []equalityConfig{
 // TestEquality tests that the chained version and non-chained version of a transform
 // have the same result, given the same input and options.
 func TestEquality(t *testing.T) {
-	for _, config := range transforms {
-		chained := tests.GetRows(config.chained(config.source(), config.arg))
-		unchained := tests.GetRows(config.unchained(config.source(), config.arg))
-		assert.Equal(t, chained, unchained, "%s failed", config.name)
-	}
+	compareTables(t, chainedEqualities)
 }

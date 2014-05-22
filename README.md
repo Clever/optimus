@@ -20,7 +20,7 @@ CSV file:
     func main() {
     	begin := csv.New("example1.csv")
     	step1 := transformer.Fieldmap(begin, fieldMappings)
-    	end := transformer.Valuemap(step1, valueMappings)
+    	end := transformer.RowTransform(step1, arbitraryTransformFunction)
     	err := csv.FromTable(end, "output.csv")
     }
 
@@ -37,7 +37,7 @@ Here's one that uses chaining:
     	begin := csv.New("example1.csv")
     	end := transformer.New(begin)
     		.Fieldmap(fieldMappings)
-    		.Valuemap(valueMappings)
+    		.RowTransform(arbitraryTransformFunction)
     		.Table()
     	err := csv.FromTable(end, "output.csv")
     }

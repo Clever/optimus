@@ -4,22 +4,22 @@ import (
 	"github.com/azylman/getl"
 )
 
-type tableTransformedTable struct {
+type transformedTable struct {
 	input   getl.Table
 	err     error
 	rows    chan getl.Row
 	stopped bool
 }
 
-func (t tableTransformedTable) Rows() chan getl.Row {
+func (t transformedTable) Rows() chan getl.Row {
 	return t.rows
 }
 
-func (t tableTransformedTable) Err() error {
+func (t transformedTable) Err() error {
 	return t.err
 }
 
-func (t *tableTransformedTable) Stop() {
+func (t *transformedTable) Stop() {
 	if t.stopped {
 		return
 	}
@@ -28,7 +28,7 @@ func (t *tableTransformedTable) Stop() {
 	close(t.rows)
 }
 
-func (t *tableTransformedTable) load(transform func(getl.Row, chan getl.Row) error) {
+func (t *transformedTable) load(transform func(getl.Row, chan getl.Row) error) {
 	defer t.Stop()
 	for row := range t.input.Rows() {
 		if t.stopped {
@@ -45,7 +45,7 @@ func (t *tableTransformedTable) load(transform func(getl.Row, chan getl.Row) err
 
 // TableTransform returns a Table that has applies the given transform function to the output channel.
 func TableTransform(input getl.Table, transform func(getl.Row, chan getl.Row) error) getl.Table {
-	table := &tableTransformedTable{
+	table := &transformedTable{
 		input: input,
 		rows:  make(chan getl.Row),
 	}

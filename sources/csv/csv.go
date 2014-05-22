@@ -37,7 +37,7 @@ func (t *table) load(filename string) {
 			t.handleErr(err)
 			return
 		}
-		t.rows <- t.convertLineToRow(line, headers)
+		t.rows <- convertLineToRow(line, headers)
 	}
 }
 
@@ -63,7 +63,7 @@ func (t *table) handleErr(err error) {
 	}
 }
 
-func (t table) convertLineToRow(line []string, headers []string) getl.Row {
+func convertLineToRow(line []string, headers []string) getl.Row {
 	row := getl.Row{}
 	for i, header := range headers {
 		row[header] = line[i]

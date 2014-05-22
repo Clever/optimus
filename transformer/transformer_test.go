@@ -29,13 +29,16 @@ func TestChaining(t *testing.T) {
 }
 
 type equalityConfig struct {
+	name      string
 	source    func() getl.Table
-	chained   func(getl.Table) getl.Table
-	unchained func(getl.Table) getl.Table
+	chained   func(getl.Table, interface{}) getl.Table
+	unchained func(getl.Table, interface{}) getl.Table
+	argument  interface{}
 }
 
-var transforms = map[string]equalityConfig{
-	"Fieldmap": {
+var transforms = []equalityConfig{
+	{
+		name: "Fieldmap",
 		source: func() getl.Table {
 			return slice.New([]getl.Row{
 				{"header1": "value1", "header2": "value2"},
@@ -43,21 +46,24 @@ var transforms = map[string]equalityConfig{
 				{"header1": "value5", "header2": "value6"},
 			})
 		},
-		chained: func(source getl.Table) getl.Table {
-			return New(source).Fieldmap(map[string][]string{"header1": {"header4"}}).Table()
+		chained: func(source getl.Table, argument interface{}) getl.Table {
+			mappings := argument.(map[string][]string)
+			return New(source).Fieldmap(mappings).Table()
 		},
-		unchained: func(source getl.Table) getl.Table {
-			return Fieldmap(source, map[string][]string{"header1": {"header4"}})
+		unchained: func(source getl.Table, argument interface{}) getl.Table {
+			mappings := argument.(map[string][]string)
+			return Fieldmap(source, mappings)
 		},
+		argument: map[string][]string{"header1": {"header4"}},
 	},
 }
 
 // TestEquality tests that the chained version and non-chained version of a transform
 // have the same result, given the same input and options.
 func TestEquality(t *testing.T) {
-	for name, config := range transforms {
-		chained := tests.GetRows(config.chained(config.source()))
-		unchained := tests.GetRows(config.unchained(config.source()))
-		assert.Equal(t, chained, unchained, "%s failed", name)
+	for _, config := range transforms {
+		chained := tests.GetRows(config.chained(config.source(), config.argument))
+		unchained := tests.GetRows(config.unchained(config.source(), config.argument))
+		assert.Equal(t, chained, unchained, "%s failed", config.name)
 	}
 }

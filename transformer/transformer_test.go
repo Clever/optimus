@@ -73,6 +73,24 @@ var transforms = []equalityConfig{
 			return getl.Row{}, nil
 		},
 	},
+	{
+		name:   "Table",
+		source: defaultSource,
+		chained: func(source getl.Table, arg interface{}) getl.Table {
+			transform := arg.(func(getl.Row, chan getl.Row) error)
+			return New(source).TableTransform(transform).Table()
+		},
+		unchained: func(source getl.Table, arg interface{}) getl.Table {
+			transform := arg.(func(getl.Row, chan getl.Row) error)
+			return TableTransform(source, transform)
+		},
+		arg: func(row getl.Row, out chan getl.Row) error {
+			out <- getl.Row{}
+			out <- getl.Row{}
+			out <- getl.Row{}
+			return nil
+		},
+	},
 }
 
 // TestEquality tests that the chained version and non-chained version of a transform

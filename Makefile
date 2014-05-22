@@ -6,10 +6,10 @@ PKGS = $(PKG) $(SUBPKGS)
 
 .PHONY: test golint README
 
+test: $(PKGS)
+
 golint:
 	@go get github.com/golang/lint/golint
-
-test: $(PKGS)
 
 README.md: *.go
 	@go get github.com/robertkrimen/godocdown/godocdown

@@ -8,10 +8,9 @@ import (
 
 var transformEqualities = []tableCompareConfig{
 	{
-		name:   "Fieldmap",
-		source: defaultSource,
-		actual: func(source getl.Table, _ interface{}) getl.Table {
-			return Fieldmap(source, map[string][]string{"header1": {"header4"}})
+		name: "Fieldmap",
+		actual: func(getl.Table, interface{}) getl.Table {
+			return Fieldmap(defaultSource(), map[string][]string{"header1": {"header4"}})
 		},
 		expected: func(getl.Table, interface{}) getl.Table {
 			return slice.New([]getl.Row{
@@ -22,10 +21,9 @@ var transformEqualities = []tableCompareConfig{
 		},
 	},
 	{
-		name:   "RowTransform",
-		source: defaultSource,
-		actual: func(source getl.Table, _ interface{}) getl.Table {
-			return RowTransform(source, func(row getl.Row) (getl.Row, error) {
+		name: "RowTransform",
+		actual: func(getl.Table, interface{}) getl.Table {
+			return RowTransform(defaultSource(), func(row getl.Row) (getl.Row, error) {
 				row["troll_key"] = "troll_value"
 				return row, nil
 			})
@@ -39,10 +37,9 @@ var transformEqualities = []tableCompareConfig{
 		},
 	},
 	{
-		name:   "TableTransform",
-		source: defaultSource,
-		actual: func(source getl.Table, arg interface{}) getl.Table {
-			return TableTransform(source, func(row getl.Row, out chan getl.Row) error {
+		name: "TableTransform",
+		actual: func(getl.Table, interface{}) getl.Table {
+			return TableTransform(defaultSource(), func(row getl.Row, out chan getl.Row) error {
 				out <- row
 				out <- getl.Row{}
 				return nil

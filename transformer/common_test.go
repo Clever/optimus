@@ -30,6 +30,11 @@ type tableCompareConfig struct {
 
 func compareTables(t *testing.T, configs []tableCompareConfig) {
 	for _, config := range configs {
+		if config.source == nil {
+			config.source = func() getl.Table {
+				return nil
+			}
+		}
 		actual := tests.GetRows(config.actual(config.source(), config.arg))
 		expected := tests.GetRows(config.expected(config.source(), config.arg))
 		assert.Equal(t, expected, actual, "%s failed", config.name)

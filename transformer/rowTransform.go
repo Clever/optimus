@@ -47,8 +47,8 @@ func (t *rowTransformedTable) load() {
 	}
 }
 
-// Constructs a rowTransformedTable from an input table and a transform function.
-func newRowTransform(input getl.Table, transform func(getl.Row) (getl.Row, error)) getl.Table {
+// RowTransform returns a Table that applies a transform function to every row in the input table.
+func RowTransform(input getl.Table, transform func(getl.Row) (getl.Row, error)) getl.Table {
 	table := &rowTransformedTable{
 		input:     input,
 		transform: transform,

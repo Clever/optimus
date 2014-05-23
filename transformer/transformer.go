@@ -15,42 +15,39 @@ func (t Transformer) Table() getl.Table {
 	return t.table
 }
 
-// Fieldmap returns a Transformer with a field mapping transform applied.
+// Apply applies a given TransformFunc to the Transformer.
+func (t *Transformer) Apply(transform getl.TransformFunc) *Transformer {
+	// TODO: Should this return a new transformer instead of modifying the existing one?
+	t.table = getl.Transform(t.table, transform)
+	return t
+}
+
+// Fieldmap Applies a Fieldmap transform.
 func (t *Transformer) Fieldmap(mappings map[string][]string) *Transformer {
-	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = transforms.Fieldmap(t.table, mappings)
-	return t
+	return t.Apply(transforms.Fieldmap(mappings))
 }
 
-// RowTransform returns a Transformer with a transform applied.
+// RowTransform Applies a RowTransform transform.
 func (t *Transformer) RowTransform(transform func(getl.Row) (getl.Row, error)) *Transformer {
-	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = transforms.RowTransform(t.table, transform)
-	return t
+	return t.Apply(transforms.RowTransform(transform))
 }
 
-// TableTransform returns a Transformer with a transform applied.
+// TableTransform Applies a TableTransform transform.
 func (t *Transformer) TableTransform(transform func(getl.Row, chan<- getl.Row) error) *Transformer {
-	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = transforms.TableTransform(t.table, transform)
-	return t
+	return t.Apply(transforms.TableTransform(transform))
 }
 
-// Select returns a Transformer with a filter applied.
+// Select Applies a Select transform.
 func (t *Transformer) Select(filter func(getl.Row) (bool, error)) *Transformer {
-	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = transforms.Select(t.table, filter)
-	return t
+	return t.Apply(transforms.Select(filter))
 }
 
-// Valuemap returns a Transformer with a value mapping applied.
+// Valuemap Applies a Valuemap transform.
 func (t *Transformer) Valuemap(mappings map[string]map[interface{}]interface{}) *Transformer {
-	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = transforms.Valuemap(t.table, mappings)
-	return t
+	return t.Apply(transforms.Valuemap(mappings))
 }
 
-// New returns a Transformer that allows you to chain transformations on a table.
+// New returns a Transformer that allows you to chain transformations on a Table.
 func New(table getl.Table) *Transformer {
 	return &Transformer{table}
 }

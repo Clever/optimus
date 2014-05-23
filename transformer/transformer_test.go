@@ -47,7 +47,7 @@ var chainedEqualities = []tests.TableCompareConfig{
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			mappings := arg.(map[string][]string)
-			return transforms.Fieldmap(source, mappings)
+			return getl.Transform(source, transforms.Fieldmap(mappings))
 		},
 		Arg: map[string][]string{"header1": {"header4"}},
 	},
@@ -60,7 +60,7 @@ var chainedEqualities = []tests.TableCompareConfig{
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row) (getl.Row, error))
-			return transforms.RowTransform(source, transform)
+			return getl.Transform(source, transforms.RowTransform(transform))
 		},
 		Arg: func(row getl.Row) (getl.Row, error) {
 			return getl.Row{}, nil
@@ -75,7 +75,7 @@ var chainedEqualities = []tests.TableCompareConfig{
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row, chan<- getl.Row) error)
-			return transforms.TableTransform(source, transform)
+			return getl.Transform(source, transforms.TableTransform(transform))
 		},
 		Arg: func(row getl.Row, out chan<- getl.Row) error {
 			out <- getl.Row{}
@@ -93,7 +93,7 @@ var chainedEqualities = []tests.TableCompareConfig{
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			filter := arg.(func(getl.Row) (bool, error))
-			return transforms.Select(source, filter)
+			return getl.Transform(source, transforms.Select(filter))
 		},
 		Arg: func(row getl.Row) (bool, error) {
 			return row["header1"] == "value1", nil
@@ -108,7 +108,7 @@ var chainedEqualities = []tests.TableCompareConfig{
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			mapping := arg.(map[string]map[interface{}]interface{})
-			return transforms.Valuemap(source, mapping)
+			return getl.Transform(source, transforms.Valuemap(mapping))
 		},
 		Arg: map[string]map[interface{}]interface{}{
 			"header1": {"value1": "value10", "value3": "value30"},

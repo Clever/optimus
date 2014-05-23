@@ -13,7 +13,7 @@ var transformEqualities = []tests.TableCompareConfig{
 	{
 		Name: "Fieldmap",
 		Actual: func(getl.Table, interface{}) getl.Table {
-			return Fieldmap(defaultSource(), map[string][]string{"header1": {"header4"}})
+			return getl.Transform(defaultSource(), Fieldmap(map[string][]string{"header1": {"header4"}}))
 		},
 		Expected: func(getl.Table, interface{}) getl.Table {
 			return slice.New([]getl.Row{
@@ -26,10 +26,10 @@ var transformEqualities = []tests.TableCompareConfig{
 	{
 		Name: "RowTransform",
 		Actual: func(getl.Table, interface{}) getl.Table {
-			return RowTransform(defaultSource(), func(row getl.Row) (getl.Row, error) {
+			return getl.Transform(defaultSource(), RowTransform(func(row getl.Row) (getl.Row, error) {
 				row["troll_key"] = "troll_value"
 				return row, nil
-			})
+			}))
 		},
 		Expected: func(getl.Table, interface{}) getl.Table {
 			rows := defaultInput()
@@ -42,11 +42,11 @@ var transformEqualities = []tests.TableCompareConfig{
 	{
 		Name: "TableTransform",
 		Actual: func(getl.Table, interface{}) getl.Table {
-			return TableTransform(defaultSource(), func(row getl.Row, out chan<- getl.Row) error {
+			return getl.Transform(defaultSource(), TableTransform(func(row getl.Row, out chan<- getl.Row) error {
 				out <- row
 				out <- getl.Row{}
 				return nil
-			})
+			}))
 		},
 		Expected: func(getl.Table, interface{}) getl.Table {
 			rows := defaultInput()
@@ -61,9 +61,9 @@ var transformEqualities = []tests.TableCompareConfig{
 	{
 		Name: "SelectEverything",
 		Actual: func(getl.Table, interface{}) getl.Table {
-			return Select(defaultSource(), func(row getl.Row) (bool, error) {
+			return getl.Transform(defaultSource(), Select(func(row getl.Row) (bool, error) {
 				return true, nil
-			})
+			}))
 		},
 		Expected: func(getl.Table, interface{}) getl.Table {
 			return defaultSource()
@@ -72,9 +72,9 @@ var transformEqualities = []tests.TableCompareConfig{
 	{
 		Name: "SelectNothing",
 		Actual: func(getl.Table, interface{}) getl.Table {
-			return Select(defaultSource(), func(row getl.Row) (bool, error) {
+			return getl.Transform(defaultSource(), Select(func(row getl.Row) (bool, error) {
 				return false, nil
-			})
+			}))
 		},
 		Expected: func(getl.Table, interface{}) getl.Table {
 			return slice.New([]getl.Row{})
@@ -86,7 +86,7 @@ var transformEqualities = []tests.TableCompareConfig{
 			mapping := map[string]map[interface{}]interface{}{
 				"header1": {"value1": "value10", "value3": "value30"},
 			}
-			return Valuemap(defaultSource(), mapping)
+			return getl.Transform(defaultSource(), Valuemap(mapping))
 		},
 		Expected: func(getl.Table, interface{}) getl.Table {
 			return slice.New([]getl.Row{
@@ -106,9 +106,9 @@ func TestTransforms(t *testing.T) {
 // error from a TableTransform.
 func TestTransformError(t *testing.T) {
 	in := infinite.New()
-	out := TableTransform(in, func(row getl.Row, out chan<- getl.Row) error {
+	out := getl.Transform(in, TableTransform(func(row getl.Row, out chan<- getl.Row) error {
 		return errors.New("some error")
-	})
+	}))
 	// Should receive no rows here because the first response was an error.
 	tests.Consumed(t, out)
 	// Should receive no rows here because the the transform should have consumed

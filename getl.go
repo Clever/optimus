@@ -16,3 +16,12 @@ type Table interface {
 
 // Row is a representation of a line of data in a Table.
 type Row map[string]interface{}
+
+// TransformFunc is a function that can be applied to a Table to transform it.
+type TransformFunc func(<-chan Row, chan<- Row) error
+
+// Transform returns a new Table that provides all the Rows of the input Table transformed with the TransformFunc.
+func Transform(source Table, transform TransformFunc) Table {
+	// TODO
+	return source
+}

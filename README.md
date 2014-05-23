@@ -4,6 +4,8 @@
 
 Package getl provides methods for manipulating tables of data.
 
+NOTE: The API is currently very unstable.
+
 
 ### Example
 
@@ -13,16 +15,17 @@ CSV file:
     package getl
 
     import(
+    	"github.com/azylman/getl"
     	"github.com/azylman/getl/sources/csv"
-    	"github.com/azylman/getl/transformer"
+    	"github.com/azylman/getl/transforms"
     )
 
     func main() {
-    	begin := csv.New("example1.csv")
-    	step1 := transformer.Fieldmap(begin, fieldMappings)
-    	step2 := transformer.Valuemap(step1, valueMappings)
-    	end := transformer.RowTransform(step2, arbitraryTransformFunction)
-    	err := csv.FromTable(end, "output.csv")
+    	begin := csv.NewSource("example1.csv")
+    	step1 := getl.Transform(begin, transforms.Fieldmap(fieldMappings))
+    	step2 := getl.Transform(step1, transforms.Valuemap(valueMappings))
+    	end := getl.Transform(step2, transforms.Row(arbitraryTransformFunction))
+    	err := csv.NewSink(end, "output.csv")
     }
 
 Here's one that uses chaining:
@@ -30,15 +33,16 @@ Here's one that uses chaining:
     package getl
 
     import(
+    	"github.com/azylman/getl"
     	"github.com/azylman/getl/sources/csv"
     	"github.com/azylman/getl/transformer"
     )
 
     func main() {
-    	begin := csv.New("example1.csv")
+    	begin := csv.NewSource("example1.csv")
     	end := transformer.New(begin).Fieldmap(fieldMappings).Valuemap(
     		valueMappings).RowTransform(arbitraryTransformFunction).Table()
-    	err := csv.FromTable(end, "output.csv")
+    	err := csv.NewSink(end, "output.csv")
     }
 
 ## Usage
@@ -69,3 +73,19 @@ type Table interface {
 ```
 
 Table is a representation of a table of data.
+
+#### func  Transform
+
+```go
+func Transform(source Table, transform TransformFunc) Table
+```
+Transform returns a new Table that provides all the Rows of the input Table
+transformed with the TransformFunc.
+
+#### type TransformFunc
+
+```go
+type TransformFunc func(<-chan Row, chan<- Row) error
+```
+
+TransformFunc is a function that can be applied to a Table to transform it.

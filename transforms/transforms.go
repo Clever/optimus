@@ -1,4 +1,4 @@
-package transformer
+package transforms
 
 import (
 	"github.com/azylman/getl"

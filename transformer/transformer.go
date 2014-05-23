@@ -2,6 +2,7 @@ package transformer
 
 import (
 	"github.com/azylman/getl"
+	"github.com/azylman/getl/transforms"
 )
 
 // A Transformer allows you to easily chain multiple transforms on a table.
@@ -17,35 +18,35 @@ func (t Transformer) Table() getl.Table {
 // Fieldmap returns a Transformer with a field mapping transform applied.
 func (t *Transformer) Fieldmap(mappings map[string][]string) *Transformer {
 	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = Fieldmap(t.table, mappings)
+	t.table = transforms.Fieldmap(t.table, mappings)
 	return t
 }
 
 // RowTransform returns a Transformer with a transform applied.
 func (t *Transformer) RowTransform(transform func(getl.Row) (getl.Row, error)) *Transformer {
 	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = RowTransform(t.table, transform)
+	t.table = transforms.RowTransform(t.table, transform)
 	return t
 }
 
 // TableTransform returns a Transformer with a transform applied.
 func (t *Transformer) TableTransform(transform func(getl.Row, chan<- getl.Row) error) *Transformer {
 	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = TableTransform(t.table, transform)
+	t.table = transforms.TableTransform(t.table, transform)
 	return t
 }
 
 // Select returns a Transformer with a filter applied.
 func (t *Transformer) Select(filter func(getl.Row) (bool, error)) *Transformer {
 	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = Select(t.table, filter)
+	t.table = transforms.Select(t.table, filter)
 	return t
 }
 
 // Valuemap returns a Transformer with a value mapping applied.
 func (t *Transformer) Valuemap(mappings map[string]map[interface{}]interface{}) *Transformer {
 	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = Valuemap(t.table, mappings)
+	t.table = transforms.Valuemap(t.table, mappings)
 	return t
 }
 

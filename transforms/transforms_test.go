@@ -1,4 +1,4 @@
-package transformer
+package transforms
 
 import (
 	"errors"
@@ -8,12 +8,6 @@ import (
 	"github.com/azylman/getl/tests"
 	"testing"
 )
-
-var errorTransform = func(msg string) func(getl.Row) (getl.Row, error) {
-	return func(getl.Row) (getl.Row, error) {
-		return nil, errors.New(msg)
-	}
-}
 
 var transformEqualities = []tests.TableCompareConfig{
 	{
@@ -101,22 +95,6 @@ var transformEqualities = []tests.TableCompareConfig{
 				{"header1": "value5", "header2": "value6"},
 			})
 		},
-	},
-	{
-		Name: "TableTransformErrorPassesThrough",
-		Actual: func(getl.Table, interface{}) getl.Table {
-			return New(infinite.New()).RowTransform(
-				errorTransform("failed")).Fieldmap(map[string][]string{}).Table()
-		},
-		Error: errors.New("failed"),
-	},
-	{
-		Name: "TableTransformFirstErrorPassesThrough",
-		Actual: func(getl.Table, interface{}) getl.Table {
-			return New(infinite.New()).RowTransform(
-				errorTransform("failed1")).RowTransform(errorTransform("failed2")).Table()
-		},
-		Error: errors.New("failed1"),
 	},
 }
 

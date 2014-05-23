@@ -1,12 +1,21 @@
 package transformer
 
 import (
+	"errors"
 	"github.com/azylman/getl"
+	"github.com/azylman/getl/sources/infinite"
 	"github.com/azylman/getl/sources/slice"
 	"github.com/azylman/getl/tests"
+	"github.com/azylman/getl/transforms"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+var errorTransform = func(msg string) func(getl.Row) (getl.Row, error) {
+	return func(getl.Row) (getl.Row, error) {
+		return nil, errors.New(msg)
+	}
+}
 
 // Test that chaining together multiple transforms behaves as expected
 func TestChaining(t *testing.T) {
@@ -38,7 +47,7 @@ var chainedEqualities = []tests.TableCompareConfig{
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			mappings := arg.(map[string][]string)
-			return Fieldmap(source, mappings)
+			return transforms.Fieldmap(source, mappings)
 		},
 		Arg: map[string][]string{"header1": {"header4"}},
 	},
@@ -51,7 +60,7 @@ var chainedEqualities = []tests.TableCompareConfig{
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row) (getl.Row, error))
-			return RowTransform(source, transform)
+			return transforms.RowTransform(source, transform)
 		},
 		Arg: func(row getl.Row) (getl.Row, error) {
 			return getl.Row{}, nil
@@ -66,7 +75,7 @@ var chainedEqualities = []tests.TableCompareConfig{
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row, chan<- getl.Row) error)
-			return TableTransform(source, transform)
+			return transforms.TableTransform(source, transform)
 		},
 		Arg: func(row getl.Row, out chan<- getl.Row) error {
 			out <- getl.Row{}
@@ -84,7 +93,7 @@ var chainedEqualities = []tests.TableCompareConfig{
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			filter := arg.(func(getl.Row) (bool, error))
-			return Select(source, filter)
+			return transforms.Select(source, filter)
 		},
 		Arg: func(row getl.Row) (bool, error) {
 			return row["header1"] == "value1", nil
@@ -99,11 +108,27 @@ var chainedEqualities = []tests.TableCompareConfig{
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			mapping := arg.(map[string]map[interface{}]interface{})
-			return Valuemap(source, mapping)
+			return transforms.Valuemap(source, mapping)
 		},
 		Arg: map[string]map[interface{}]interface{}{
 			"header1": {"value1": "value10", "value3": "value30"},
 		},
+	},
+	{
+		Name: "TableTransformErrorPassesThrough",
+		Actual: func(getl.Table, interface{}) getl.Table {
+			return New(infinite.New()).RowTransform(
+				errorTransform("failed")).Fieldmap(map[string][]string{}).Table()
+		},
+		Error: errors.New("failed"),
+	},
+	{
+		Name: "TableTransformFirstErrorPassesThrough",
+		Actual: func(getl.Table, interface{}) getl.Table {
+			return New(infinite.New()).RowTransform(
+				errorTransform("failed1")).RowTransform(errorTransform("failed2")).Table()
+		},
+		Error: errors.New("failed1"),
 	},
 }
 

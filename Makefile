@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 PKG := github.com/azylman/getl
-SOURCES := $(addprefix $(PKG)/sources/, $(shell ls sources))
-SUBPKGS = $(SOURCES) github.com/azylman/getl/transformer
+SUBPKG_NAMES := $(addprefix sources/, $(shell ls sources)) transformer transforms
+SUBPKGS = $(addprefix $(PKG)/, $(SUBPKG_NAMES))
 PKGS = $(PKG) $(SUBPKGS)
 
 .PHONY: test golint README

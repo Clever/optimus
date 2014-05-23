@@ -34,3 +34,32 @@ func GetRows(table getl.Table) []getl.Row {
 	}
 	return rows
 }
+
+type TableCompareConfig struct {
+	Name     string
+	Source   func() getl.Table
+	Actual   func(getl.Table, interface{}) getl.Table
+	Expected func(getl.Table, interface{}) getl.Table
+	Arg      interface{}
+	Error    error
+}
+
+func CompareTables(t *testing.T, configs []TableCompareConfig) {
+	for _, config := range configs {
+		if config.Source == nil {
+			config.Source = func() getl.Table {
+				return nil
+			}
+		}
+		actualTable := config.Actual(config.Source(), config.Arg)
+		actual := GetRows(actualTable)
+		if config.Expected != nil {
+			expected := GetRows(config.Expected(config.Source(), config.Arg))
+			assert.Equal(t, expected, actual, "%s failed", config.Name)
+		} else if config.Error != nil {
+			assert.Equal(t, config.Error, actualTable.Err())
+		} else {
+			t.Fatalf("what are you doing?? config has neither expected nor error: %#v", config)
+		}
+	}
+}

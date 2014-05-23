@@ -28,47 +28,47 @@ func TestChaining(t *testing.T) {
 	assert.Equal(t, expected, rows)
 }
 
-var chainedEqualities = []tableCompareConfig{
+var chainedEqualities = []tests.TableCompareConfig{
 	{
-		name:   "Fieldmap",
-		source: defaultSource,
-		actual: func(source getl.Table, arg interface{}) getl.Table {
+		Name:   "Fieldmap",
+		Source: defaultSource,
+		Actual: func(source getl.Table, arg interface{}) getl.Table {
 			mappings := arg.(map[string][]string)
 			return New(source).Fieldmap(mappings).Table()
 		},
-		expected: func(source getl.Table, arg interface{}) getl.Table {
+		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			mappings := arg.(map[string][]string)
 			return Fieldmap(source, mappings)
 		},
-		arg: map[string][]string{"header1": {"header4"}},
+		Arg: map[string][]string{"header1": {"header4"}},
 	},
 	{
-		name:   "RowTransform",
-		source: defaultSource,
-		actual: func(source getl.Table, arg interface{}) getl.Table {
+		Name:   "RowTransform",
+		Source: defaultSource,
+		Actual: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row) (getl.Row, error))
 			return New(source).RowTransform(transform).Table()
 		},
-		expected: func(source getl.Table, arg interface{}) getl.Table {
+		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row) (getl.Row, error))
 			return RowTransform(source, transform)
 		},
-		arg: func(row getl.Row) (getl.Row, error) {
+		Arg: func(row getl.Row) (getl.Row, error) {
 			return getl.Row{}, nil
 		},
 	},
 	{
-		name:   "Table",
-		source: defaultSource,
-		actual: func(source getl.Table, arg interface{}) getl.Table {
+		Name:   "Table",
+		Source: defaultSource,
+		Actual: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row, chan<- getl.Row) error)
 			return New(source).TableTransform(transform).Table()
 		},
-		expected: func(source getl.Table, arg interface{}) getl.Table {
+		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row, chan<- getl.Row) error)
 			return TableTransform(source, transform)
 		},
-		arg: func(row getl.Row, out chan<- getl.Row) error {
+		Arg: func(row getl.Row, out chan<- getl.Row) error {
 			out <- getl.Row{}
 			out <- getl.Row{}
 			out <- getl.Row{}
@@ -76,32 +76,32 @@ var chainedEqualities = []tableCompareConfig{
 		},
 	},
 	{
-		name:   "Select",
-		source: defaultSource,
-		actual: func(source getl.Table, arg interface{}) getl.Table {
+		Name:   "Select",
+		Source: defaultSource,
+		Actual: func(source getl.Table, arg interface{}) getl.Table {
 			filter := arg.(func(getl.Row) (bool, error))
 			return New(source).Select(filter).Table()
 		},
-		expected: func(source getl.Table, arg interface{}) getl.Table {
+		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			filter := arg.(func(getl.Row) (bool, error))
 			return Select(source, filter)
 		},
-		arg: func(row getl.Row) (bool, error) {
+		Arg: func(row getl.Row) (bool, error) {
 			return row["header1"] == "value1", nil
 		},
 	},
 	{
-		name:   "Valuemap",
-		source: defaultSource,
-		actual: func(source getl.Table, arg interface{}) getl.Table {
+		Name:   "Valuemap",
+		Source: defaultSource,
+		Actual: func(source getl.Table, arg interface{}) getl.Table {
 			mapping := arg.(map[string]map[interface{}]interface{})
 			return New(source).Valuemap(mapping).Table()
 		},
-		expected: func(source getl.Table, arg interface{}) getl.Table {
+		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			mapping := arg.(map[string]map[interface{}]interface{})
 			return Valuemap(source, mapping)
 		},
-		arg: map[string]map[interface{}]interface{}{
+		Arg: map[string]map[interface{}]interface{}{
 			"header1": {"value1": "value10", "value3": "value30"},
 		},
 	},
@@ -110,5 +110,5 @@ var chainedEqualities = []tableCompareConfig{
 // TestEquality tests that the chained version and non-chained version of a transform
 // have the same result, given the same input and options.
 func TestEquality(t *testing.T) {
-	compareTables(t, chainedEqualities)
+	tests.CompareTables(t, chainedEqualities)
 }

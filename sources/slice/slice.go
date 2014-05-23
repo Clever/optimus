@@ -22,11 +22,11 @@ func (s *sliceTable) Stop() {
 		return
 	}
 	s.stopped = true
-	close(s.rows)
 }
 
 func (s *sliceTable) load(slice []getl.Row) {
 	defer s.Stop()
+	defer close(s.rows)
 	for _, row := range slice {
 		if s.stopped {
 			break

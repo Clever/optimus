@@ -22,11 +22,11 @@ func (i *infiniteTable) Stop() {
 		return
 	}
 	i.stopped = true
-	close(i.rows)
 }
 
 func (i *infiniteTable) load() {
 	defer i.Stop()
+	defer close(i.rows)
 	for {
 		if i.stopped {
 			break

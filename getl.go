@@ -22,6 +22,105 @@ type TransformFunc func(<-chan Row, chan<- Row) error
 
 // Transform returns a new Table that provides all the Rows of the input Table transformed with the TransformFunc.
 func Transform(source Table, transform TransformFunc) Table {
-	// TODO
-	return source
+	return newTransformedTable(source, transform)
+}
+
+type transformedTable struct {
+	source  Table
+	err     error
+	rows    chan Row
+	stopped bool
+}
+
+func (t transformedTable) Rows() <-chan Row {
+	return t.rows
+}
+
+func (t transformedTable) Err() error {
+	return t.err
+}
+
+func (t *transformedTable) Stop() {
+	if t.stopped {
+		return
+	}
+	t.stopped = true
+	t.source.Stop()
+}
+
+func drain(c <-chan Row) {
+	for _ = range c {
+		// Drain everything left in the channel
+	}
+}
+
+func (t *transformedTable) load(transform TransformFunc) {
+	// A level of indirection is necessary between the i/o channels and the TransformFunc so that
+	// the TransformFunc doesn't need to know about the stop state of any of the Tables.
+	in := make(chan Row)
+	out := make(chan Row)
+	errChan := make(chan error)
+	doneChan := make(chan struct{})
+
+	stop := func() {
+		if t.stopped {
+			return
+		}
+		t.Stop()
+		drain(t.source.Rows())
+		drain(out)
+		close(t.rows)
+	}
+	defer stop()
+
+	go func() {
+		defer close(errChan)
+		defer close(out)
+		if err := transform(in, out); err != nil {
+			errChan <- err
+		}
+	}()
+	go func() {
+		defer func() {
+			doneChan <- struct{}{}
+		}()
+		for row := range out {
+			if t.stopped {
+				continue
+			}
+			t.rows <- row
+		}
+	}()
+
+	go func() {
+		defer func() {
+			doneChan <- struct{}{}
+		}()
+		defer close(in)
+		for row := range t.source.Rows() {
+			if t.stopped {
+				continue
+			}
+			in <- row
+		}
+	}()
+	for err := range errChan {
+		stop()
+		t.err = err
+	}
+	// Wait for all channels to finish
+	<-doneChan // Once to make sure we've consumed the output of the TransformFunc
+	<-doneChan // Once to make sure we've consumed the output of the source Table
+	if t.source.Err() != nil {
+		t.err = t.source.Err()
+	}
+}
+
+func newTransformedTable(source Table, transform TransformFunc) Table {
+	table := &transformedTable{
+		source: source,
+		rows:   make(chan Row),
+	}
+	go table.load(transform)
+	return table
 }

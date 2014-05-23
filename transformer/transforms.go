@@ -4,6 +4,19 @@ import (
 	"github.com/azylman/getl"
 )
 
+// TableTransform returns a Table that has applies the given transform function to the output channel.
+func TableTransform(input getl.Table, transform func(getl.Row, chan<- getl.Row) error) getl.Table {
+	wrappedTransform := func(in <-chan getl.Row, out chan<- getl.Row) error {
+		for row := range in {
+			if err := transform(row, out); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	return getl.Transform(input, wrappedTransform)
+}
+
 // Select returns a Table that only has Rows that pass the filter.
 func Select(table getl.Table, filter func(getl.Row) (bool, error)) getl.Table {
 	return TableTransform(table, func(row getl.Row, out chan<- getl.Row) error {

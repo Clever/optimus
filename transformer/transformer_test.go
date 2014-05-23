@@ -11,6 +11,18 @@ import (
 	"testing"
 )
 
+var defaultInput = func() []getl.Row {
+	return []getl.Row{
+		{"header1": "value1", "header2": "value2"},
+		{"header1": "value3", "header2": "value4"},
+		{"header1": "value5", "header2": "value6"},
+	}
+}
+
+var defaultSource = func() getl.Table {
+	return slice.New(defaultInput())
+}
+
 var errorTransform = func(msg string) func(getl.Row) (getl.Row, error) {
 	return func(getl.Row) (getl.Row, error) {
 		return nil, errors.New(msg)

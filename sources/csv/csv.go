@@ -71,8 +71,8 @@ func convertLineToRow(line []string, headers []string) getl.Row {
 	return row
 }
 
-// New returns a new getl.Table that scans over the rows of a CSV.
-func New(filename string) getl.Table {
+// NewSource returns a new getl.Table that scans over the rows of a CSV.
+func NewSource(filename string) getl.Table {
 	table := &table{
 		rows: make(chan getl.Row),
 	}

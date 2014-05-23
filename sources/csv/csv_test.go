@@ -6,12 +6,12 @@ import (
 	"testing"
 )
 
-func TestCSV(t *testing.T) {
-	table := New("./test.csv")
+func TestCSVSource(t *testing.T) {
+	table := NewSource("./test.csv")
 	tests.HasRows(t, table, 3)
 	assert.Nil(t, table.Err())
 }
 
 func TestStop(t *testing.T) {
-	tests.Stop(t, New("./test.csv"))
+	tests.Stop(t, NewSource("./test.csv"))
 }

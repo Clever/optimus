@@ -19,11 +19,11 @@ CSV file:
     )
 
     func main() {
-    	begin := csv.NewSource("example1.csv")
+    	begin := csv.Source("example1.csv")
     	step1 := getl.Transform(begin, transforms.Fieldmap(fieldMappings))
     	step2 := getl.Transform(step1, transforms.Valuemap(valueMappings))
     	end := getl.Transform(step2, transforms.Row(arbitraryTransformFunction))
-    	err := csv.NewSink(end, "output.csv")
+    	err := csv.Sink(end, "output.csv")
     }
 
 Here's one that uses chaining:
@@ -37,10 +37,10 @@ Here's one that uses chaining:
     )
 
     func main() {
-    	begin := csv.NewSource("example1.csv")
+    	begin := csv.Source("example1.csv")
     	end := transformer.New(begin).Fieldmap(fieldMappings).Valuemap(
     		valueMappings).RowTransform(arbitraryTransformFunction).Table()
-    	err := csv.NewSink(end, "output.csv")
+    	err := csv.Sink(end, "output.csv")
     }
 
 ## Usage

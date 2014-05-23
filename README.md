@@ -4,8 +4,6 @@
 
 Package getl provides methods for manipulating tables of data.
 
-NOTE: The API is currently very unstable.
-
 
 ### Example
 

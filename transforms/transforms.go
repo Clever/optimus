@@ -40,6 +40,17 @@ func Map(transform func(getl.Row) (getl.Row, error)) getl.TransformFunc {
 	})
 }
 
+// Each returns a Table that passes through all the Rows from the source table, invoking a function
+// for each.
+func Each(fn func(getl.Row) error) {
+	return Map(func(row getl.Row) (getl.Row, error) {
+		if err := fn(row); err != nil {
+			return err
+		}
+		return row
+	})
+}
+
 // Fieldmap returns a Table that has all the Rows of the input Table with the field mapping applied.
 func Fieldmap(mappings map[string][]string) getl.TransformFunc {
 	return Map(func(row getl.Row) (getl.Row, error) {

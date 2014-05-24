@@ -22,7 +22,7 @@ CSV file:
     	begin := csv.Source("example1.csv")
     	step1 := getl.Transform(begin, transforms.Fieldmap(fieldMappings))
     	step2 := getl.Transform(step1, transforms.Valuemap(valueMappings))
-    	end := getl.Transform(step2, transforms.Row(arbitraryTransformFunction))
+    	end := getl.Transform(step2, transforms.Map(arbitraryTransformFunction))
     	err := csv.Sink(end, "output.csv")
     }
 
@@ -39,7 +39,7 @@ Here's one that uses chaining:
     func main() {
     	begin := csv.Source("example1.csv")
     	end := transformer.New(begin).Fieldmap(fieldMappings).Valuemap(
-    		valueMappings).RowTransform(arbitraryTransformFunction).Table()
+    		valueMappings).Map(arbitraryTransformFunction).Table()
     	err := csv.Sink(end, "output.csv")
     }
 

@@ -42,12 +42,12 @@ func Map(transform func(getl.Row) (getl.Row, error)) getl.TransformFunc {
 
 // Each returns a Table that passes through all the Rows from the source table, invoking a function
 // for each.
-func Each(fn func(getl.Row) error) {
+func Each(fn func(getl.Row) error) getl.TransformFunc {
 	return Map(func(row getl.Row) (getl.Row, error) {
 		if err := fn(row); err != nil {
-			return err
+			return nil, err
 		}
-		return row
+		return row, nil
 	})
 }
 

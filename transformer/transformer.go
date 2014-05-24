@@ -27,9 +27,9 @@ func (t *Transformer) Fieldmap(mappings map[string][]string) *Transformer {
 	return t.Apply(transforms.Fieldmap(mappings))
 }
 
-// RowTransform Applies a RowTransform transform.
-func (t *Transformer) RowTransform(transform func(getl.Row) (getl.Row, error)) *Transformer {
-	return t.Apply(transforms.RowTransform(transform))
+// Map Applies a Map transform.
+func (t *Transformer) Map(transform func(getl.Row) (getl.Row, error)) *Transformer {
+	return t.Apply(transforms.Map(transform))
 }
 
 // TableTransform Applies a TableTransform transform.

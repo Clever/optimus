@@ -36,9 +36,9 @@ var transformEqualities = []tests.TableCompareConfig{
 		},
 	},
 	{
-		Name: "RowTransform",
+		Name: "Map",
 		Actual: func(getl.Table, interface{}) getl.Table {
-			return getl.Transform(defaultSource(), RowTransform(func(row getl.Row) (getl.Row, error) {
+			return getl.Transform(defaultSource(), Map(func(row getl.Row) (getl.Row, error) {
 				row["troll_key"] = "troll_value"
 				return row, nil
 			}))

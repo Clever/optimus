@@ -28,8 +28,8 @@ func Select(filter func(getl.Row) (bool, error)) getl.TransformFunc {
 	})
 }
 
-// RowTransform returns a Table that applies a transform function to every row in the input table.
-func RowTransform(transform func(getl.Row) (getl.Row, error)) getl.TransformFunc {
+// Map returns a Table that applies a transform function to every row in the input table.
+func Map(transform func(getl.Row) (getl.Row, error)) getl.TransformFunc {
 	return TableTransform(func(in getl.Row, out chan<- getl.Row) error {
 		row, err := transform(in)
 		if err != nil {
@@ -42,7 +42,7 @@ func RowTransform(transform func(getl.Row) (getl.Row, error)) getl.TransformFunc
 
 // Fieldmap returns a Table that has all the Rows of the input Table with the field mapping applied.
 func Fieldmap(mappings map[string][]string) getl.TransformFunc {
-	return RowTransform(func(row getl.Row) (getl.Row, error) {
+	return Map(func(row getl.Row) (getl.Row, error) {
 		newRow := getl.Row{}
 		for key, vals := range mappings {
 			for _, val := range vals {
@@ -55,7 +55,7 @@ func Fieldmap(mappings map[string][]string) getl.TransformFunc {
 
 // Valuemap returns a Table that has all the Rows of the input Table with a value mapping applied.
 func Valuemap(mappings map[string]map[interface{}]interface{}) getl.TransformFunc {
-	return RowTransform(func(row getl.Row) (getl.Row, error) {
+	return Map(func(row getl.Row) (getl.Row, error) {
 		newRow := getl.Row{}
 		for key, val := range row {
 			if mappings[key] == nil || mappings[key][val] == nil {

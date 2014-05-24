@@ -64,15 +64,15 @@ var chainedEqualities = []tests.TableCompareConfig{
 		Arg: map[string][]string{"header1": {"header4"}},
 	},
 	{
-		Name:   "RowTransform",
+		Name:   "Map",
 		Source: defaultSource,
 		Actual: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row) (getl.Row, error))
-			return New(source).RowTransform(transform).Table()
+			return New(source).Map(transform).Table()
 		},
 		Expected: func(source getl.Table, arg interface{}) getl.Table {
 			transform := arg.(func(getl.Row) (getl.Row, error))
-			return getl.Transform(source, transforms.RowTransform(transform))
+			return getl.Transform(source, transforms.Map(transform))
 		},
 		Arg: func(row getl.Row) (getl.Row, error) {
 			return getl.Row{}, nil
@@ -129,7 +129,7 @@ var chainedEqualities = []tests.TableCompareConfig{
 	{
 		Name: "TableTransformErrorPassesThrough",
 		Actual: func(getl.Table, interface{}) getl.Table {
-			return New(infinite.New()).RowTransform(
+			return New(infinite.New()).Map(
 				errorTransform("failed")).Fieldmap(map[string][]string{}).Table()
 		},
 		Error: errors.New("failed"),
@@ -137,8 +137,8 @@ var chainedEqualities = []tests.TableCompareConfig{
 	{
 		Name: "TableTransformFirstErrorPassesThrough",
 		Actual: func(getl.Table, interface{}) getl.Table {
-			return New(infinite.New()).RowTransform(
-				errorTransform("failed1")).RowTransform(errorTransform("failed2")).Table()
+			return New(infinite.New()).Map(
+				errorTransform("failed1")).Map(errorTransform("failed2")).Table()
 		},
 		Error: errors.New("failed1"),
 	},

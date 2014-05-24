@@ -28,7 +28,7 @@ func Select(filter func(getl.Row) (bool, error)) getl.TransformFunc {
 	})
 }
 
-// Map returns a Table that applies a transform function to every row in the input table.
+// Map returns a Table that returns the results of calling the transform function for every row.
 func Map(transform func(getl.Row) (getl.Row, error)) getl.TransformFunc {
 	return TableTransform(func(in getl.Row, out chan<- getl.Row) error {
 		row, err := transform(in)

@@ -3,7 +3,7 @@ package csv
 import (
 	"errors"
 	"github.com/azylman/getl"
-	"github.com/azylman/getl/sources/csv"
+	"github.com/azylman/getl/sources/json"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"strings"
@@ -19,13 +19,13 @@ func readFile(filename string) ([]string, error) {
 	return lines, nil
 }
 
-func TestCSVSink(t *testing.T) {
-	source := csv.New("./data.csv")
-	err := New(source, "./data_write.csv")
+func TestJSONSink(t *testing.T) {
+	source := json.New("./data.json")
+	err := New(source, "./data_write.json")
 	assert.Nil(t, err)
-	expected, err := readFile("./data_write.csv")
+	expected, err := readFile("./data_write.json")
 	assert.Nil(t, err)
-	actual, err := readFile("./data.csv")
+	actual, err := readFile("./data.json")
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -50,8 +50,8 @@ func newErrorTable() getl.Table {
 	return table
 }
 
-func TestCSVSinkError(t *testing.T) {
+func TestJSONSinkError(t *testing.T) {
 	source := newErrorTable()
-	err := New(source, "./data_write.csv")
+	err := New(source, "./data_write.json")
 	assert.Equal(t, err, errors.New("failed"))
 }

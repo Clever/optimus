@@ -1,4 +1,4 @@
-package csv
+package json
 
 import (
 	"github.com/azylman/getl"
@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-func TestCSVSource(t *testing.T) {
-	table := New("./data.csv")
+func TestJSONSource(t *testing.T) {
+	table := New("./data.json")
 	expected := []getl.Row{
 		{"header1": "field1", "header2": "field2", "header3": "field3"},
 		{"header1": "field4", "header2": "field5", "header3": "field6"},
@@ -19,5 +19,5 @@ func TestCSVSource(t *testing.T) {
 }
 
 func TestStop(t *testing.T) {
-	tests.Stop(t, New("./data.csv"))
+	tests.Stop(t, New("./data.json"))
 }

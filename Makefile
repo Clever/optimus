@@ -8,7 +8,7 @@ PKGS = $(PKG) $(SUBPKGS)
 
 .PHONY: test golint README
 
-test: $(PKGS)
+test: docs $(PKGS)
 
 golint:
 	@go get github.com/golang/lint/golint
@@ -16,7 +16,6 @@ golint:
 README.md: *.go
 	@go get github.com/robertkrimen/godocdown/godocdown
 	@godocdown $(PKG) > README.md
-README: README.md
 
 $(PKGS): golint README
 	@go get -d -t $@
@@ -33,3 +32,9 @@ else
 	@echo "TESTING..."
 	@go test $@ -test.v
 endif
+
+docs: $(addsuffix /README.md, $(SUBPKG_NAMES)) README.md
+%/README.md: PATH := $(PATH):$(GOPATH)/bin
+%/README.md: %/*.go
+	@go get github.com/robertkrimen/godocdown/godocdown
+	@godocdown github.com/azylman/getl/$(shell dirname $@) > $@

@@ -15,11 +15,11 @@ Here's an example program that performs a set of field and value mappings on a C
 	)
 
 	func main() {
-		begin := csv.Source("example1.csv")
+		begin := csvSource.New("example1.csv")
 		step1 := getl.Transform(begin, transforms.Fieldmap(fieldMappings))
 		step2 := getl.Transform(step1, transforms.Valuemap(valueMappings))
 		end := getl.Transform(step2, transforms.Map(arbitraryTransformFunction))
-		err := csv.Sink(end, "output.csv")
+		err := csvSink.New(end, "output.csv")
 	}
 
 Here's one that uses chaining:
@@ -28,15 +28,16 @@ Here's one that uses chaining:
 
 	import(
 		"github.com/azylman/getl"
-		"github.com/azylman/getl/sources/csv"
+		csvSource "github.com/azylman/getl/sources/csv"
+		csvSink "github.com/azylman/getl/sinks/csv"
 		"github.com/azylman/getl/transformer"
 	)
 
 	func main() {
-		begin := csvSource.Source("example1.csv")
+		begin := csvSource.New("example1.csv")
 		end := transformer.New(begin).Fieldmap(fieldMappings).Valuemap(
 			valueMappings).Map(arbitraryTransformFunction).Table()
-		err := csvSink.Sink(end, "output.csv")
+		err := csvSink.New(end, "output.csv")
 	}
 
 */

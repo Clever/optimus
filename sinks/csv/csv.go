@@ -23,8 +23,8 @@ func convertRowToHeader(row getl.Row) []string {
 	return header
 }
 
-// Sink writes all of the Rows in a Table to a CSV file.
-func Sink(source getl.Table, filename string) error {
+// New writes all of the Rows in a Table to a CSV file.
+func New(source getl.Table, filename string) error {
 	fout, err := os.Create(filename)
 	defer fout.Close()
 	if err != nil {

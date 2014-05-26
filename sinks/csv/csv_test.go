@@ -18,8 +18,8 @@ func readFile(filename string) ([]string, error) {
 }
 
 func TestCSVSink(t *testing.T) {
-	source := csv.Source("./test.csv")
-	err := Sink(source, "./test_write.csv")
+	source := csv.New("./test.csv")
+	err := New(source, "./test_write.csv")
 	assert.Nil(t, err)
 	expected, err := readFile("./test_write.csv")
 	assert.Nil(t, err)

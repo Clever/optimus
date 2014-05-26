@@ -24,7 +24,7 @@ func (i *infiniteTable) Stop() {
 	i.stopped = true
 }
 
-func (i *infiniteTable) load() {
+func (i *infiniteTable) start() {
 	defer i.Stop()
 	defer close(i.rows)
 	for {
@@ -38,6 +38,6 @@ func (i *infiniteTable) load() {
 // New creates a new Table that infinitely sends empty rows.
 func New() getl.Table {
 	table := &infiniteTable{rows: make(chan getl.Row)}
-	go table.load()
+	go table.start()
 	return table
 }

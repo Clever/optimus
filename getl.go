@@ -54,7 +54,7 @@ func drain(c <-chan Row) {
 	}
 }
 
-func (t *transformedTable) load(transform TransformFunc) {
+func (t *transformedTable) start(transform TransformFunc) {
 	// A level of indirection is necessary between the i/o channels and the TransformFunc so that
 	// the TransformFunc doesn't need to know about the stop state of any of the Tables.
 	in := make(chan Row)
@@ -121,6 +121,6 @@ func newTransformedTable(source Table, transform TransformFunc) Table {
 		source: source,
 		rows:   make(chan Row),
 	}
-	go table.load(transform)
+	go table.start(transform)
 	return table
 }

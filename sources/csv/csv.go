@@ -13,7 +13,7 @@ type table struct {
 	stopped bool
 }
 
-func (t *table) load(filename string) {
+func (t *table) start(filename string) {
 	defer t.Stop()
 	defer close(t.rows)
 
@@ -76,6 +76,6 @@ func New(filename string) getl.Table {
 	table := &table{
 		rows: make(chan getl.Row),
 	}
-	go table.load(filename)
+	go table.start(filename)
 	return table
 }

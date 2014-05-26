@@ -24,7 +24,7 @@ func (s *sliceTable) Stop() {
 	s.stopped = true
 }
 
-func (s *sliceTable) load(slice []getl.Row) {
+func (s *sliceTable) start(slice []getl.Row) {
 	defer s.Stop()
 	defer close(s.rows)
 	for _, row := range slice {
@@ -38,6 +38,6 @@ func (s *sliceTable) load(slice []getl.Row) {
 // New creates a new Table that sends all the contents of an input slice of Rows.
 func New(slice []getl.Row) getl.Table {
 	table := &sliceTable{rows: make(chan getl.Row)}
-	go table.load(slice)
+	go table.start(slice)
 	return table
 }

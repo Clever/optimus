@@ -9,7 +9,8 @@ Here's an example program that performs a set of field and value mappings on a C
 
 	import(
 		"github.com/azylman/getl"
-		"github.com/azylman/getl/sources/csv"
+		csvSource "github.com/azylman/getl/sources/csv"
+		csvSink "github.com/azylman/getl/sinks/csv"
 		"github.com/azylman/getl/transforms"
 	)
 
@@ -32,10 +33,10 @@ Here's one that uses chaining:
 	)
 
 	func main() {
-		begin := csv.Source("example1.csv")
+		begin := csvSource.Source("example1.csv")
 		end := transformer.New(begin).Fieldmap(fieldMappings).Valuemap(
 			valueMappings).Map(arbitraryTransformFunction).Table()
-		err := csv.Sink(end, "output.csv")
+		err := csvSink.Sink(end, "output.csv")
 	}
 
 */

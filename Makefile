@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 PKG := github.com/azylman/getl
-SUBPKG_NAMES := $(addprefix sources/, $(shell ls sources)) transformer transforms
+SUBPKG_NAMES := $(addprefix sources/, $(shell ls sources)) $(addprefix sinks/, $(shell ls sinks)) transformer transforms
 SUBPKGS = $(addprefix $(PKG)/, $(SUBPKG_NAMES))
 PKGS = $(PKG) $(SUBPKGS)
 

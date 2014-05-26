@@ -45,6 +45,9 @@ func New(source getl.Table, filename string) error {
 			return err
 		}
 	}
+	if source.Err() != nil {
+		return source.Err()
+	}
 	writer.Flush()
 	if writer.Error() != nil {
 		return writer.Error()

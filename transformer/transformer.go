@@ -32,6 +32,11 @@ func (t *Transformer) Map(transform func(getl.Row) (getl.Row, error)) *Transform
 	return t.Apply(transforms.Map(transform))
 }
 
+// Each Applies an Each transform.
+func (t *Transformer) Each(transform func(getl.Row) error) *Transformer {
+	return t.Apply(transforms.Each(transform))
+}
+
 // TableTransform Applies a TableTransform transform.
 func (t *Transformer) TableTransform(transform func(getl.Row, chan<- getl.Row) error) *Transformer {
 	return t.Apply(transforms.TableTransform(transform))

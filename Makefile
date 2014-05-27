@@ -37,4 +37,4 @@ docs: $(addsuffix /README.md, $(SUBPKG_NAMES)) README.md
 %/README.md: PATH := $(PATH):$(GOPATH)/bin
 %/README.md: %/*.go
 	@go get github.com/robertkrimen/godocdown/godocdown
-	@godocdown github.com/azylman/getl/$(shell dirname $@) > $@
+	@godocdown $(PKG)/$(shell dirname $@) > $@

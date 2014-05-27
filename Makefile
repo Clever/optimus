@@ -31,6 +31,7 @@ ifeq ($(COVERAGE),1)
 else
 	@echo "TESTING..."
 	@go test $@ -test.v
+	@echo ""
 endif
 
 docs: $(addsuffix /README.md, $(SUBPKG_NAMES)) README.md

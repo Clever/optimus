@@ -1,15 +1,15 @@
 package slice
 
 import (
-	"github.com/azylman/getl"
+	"github.com/azylman/optimus"
 )
 
 type sliceTable struct {
-	rows    chan getl.Row
+	rows    chan optimus.Row
 	stopped bool
 }
 
-func (s sliceTable) Rows() <-chan getl.Row {
+func (s sliceTable) Rows() <-chan optimus.Row {
 	return s.rows
 }
 
@@ -24,7 +24,7 @@ func (s *sliceTable) Stop() {
 	s.stopped = true
 }
 
-func (s *sliceTable) start(slice []getl.Row) {
+func (s *sliceTable) start(slice []optimus.Row) {
 	defer s.Stop()
 	defer close(s.rows)
 	for _, row := range slice {
@@ -36,8 +36,8 @@ func (s *sliceTable) start(slice []getl.Row) {
 }
 
 // New creates a new Table that sends all the contents of an input slice of Rows.
-func New(slice []getl.Row) getl.Table {
-	table := &sliceTable{rows: make(chan getl.Row)}
+func New(slice []optimus.Row) optimus.Table {
+	table := &sliceTable{rows: make(chan optimus.Row)}
 	go table.start(slice)
 	return table
 }

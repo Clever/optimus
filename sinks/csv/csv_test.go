@@ -2,8 +2,8 @@ package csv
 
 import (
 	"errors"
-	"github.com/azylman/getl"
-	"github.com/azylman/getl/sources/csv"
+	"github.com/azylman/optimus"
+	"github.com/azylman/optimus/sources/csv"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"strings"
@@ -31,21 +31,21 @@ func TestCSVSink(t *testing.T) {
 }
 
 type errorTable struct {
-	rows chan getl.Row
+	rows chan optimus.Row
 }
 
 func (e errorTable) Err() error {
 	return errors.New("failed")
 }
 
-func (e errorTable) Rows() <-chan getl.Row {
+func (e errorTable) Rows() <-chan optimus.Row {
 	return e.rows
 }
 
 func (e errorTable) Stop() {}
 
-func newErrorTable() getl.Table {
-	table := &errorTable{rows: make(chan getl.Row)}
+func newErrorTable() optimus.Table {
+	table := &errorTable{rows: make(chan optimus.Row)}
 	close(table.rows)
 	return table
 }

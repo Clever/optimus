@@ -3,18 +3,18 @@ package json
 import (
 	"bufio"
 	"encoding/json"
-	"github.com/azylman/getl"
+	"github.com/azylman/optimus"
 	"io"
 	"os"
 )
 
 type table struct {
 	err     error
-	rows    chan getl.Row
+	rows    chan optimus.Row
 	stopped bool
 }
 
-func (t table) Rows() <-chan getl.Row {
+func (t table) Rows() <-chan optimus.Row {
 	return t.rows
 }
 
@@ -51,7 +51,7 @@ func (t *table) start(filename string) {
 		if t.stopped {
 			break
 		}
-		var row getl.Row
+		var row optimus.Row
 		if err := json.Unmarshal(scanner.Bytes(), &row); err != nil {
 			t.err = err
 			return
@@ -65,9 +65,9 @@ func (t *table) start(filename string) {
 }
 
 // New returns a new Table that scans over the rows of a file of newline-separate JSON objects.
-func New(filename string) getl.Table {
+func New(filename string) optimus.Table {
 	table := &table{
-		rows: make(chan getl.Row),
+		rows: make(chan optimus.Row),
 	}
 	go table.start(filename)
 	return table

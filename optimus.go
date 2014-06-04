@@ -1,4 +1,4 @@
-package getl
+package optimus
 
 // Table is a representation of a table of data.
 type Table interface {

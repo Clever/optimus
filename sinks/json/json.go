@@ -2,12 +2,12 @@ package csv
 
 import (
 	"encoding/json"
-	"github.com/azylman/getl"
+	"github.com/azylman/optimus"
 	"os"
 )
 
 // New writes all of the Rows in a Table as newline-separate JSON objects.
-func New(source getl.Table, filename string) error {
+func New(source optimus.Table, filename string) error {
 	fout, err := os.Create(filename)
 	defer fout.Close()
 	if err != nil {

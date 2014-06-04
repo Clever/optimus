@@ -1,7 +1,7 @@
 package infinite
 
 import (
-	"github.com/azylman/getl/tests"
+	"github.com/azylman/optimus/tests"
 	"testing"
 )
 

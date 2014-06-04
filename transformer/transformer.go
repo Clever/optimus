@@ -1,24 +1,24 @@
 package transformer
 
 import (
-	"github.com/azylman/getl"
-	"github.com/azylman/getl/transforms"
+	"github.com/azylman/optimus"
+	"github.com/azylman/optimus/transforms"
 )
 
 // A Transformer allows you to easily chain multiple transforms on a table.
 type Transformer struct {
-	table getl.Table
+	table optimus.Table
 }
 
 // Table returns the terminating Table in a Transformer chain.
-func (t Transformer) Table() getl.Table {
+func (t Transformer) Table() optimus.Table {
 	return t.table
 }
 
 // Apply applies a given TransformFunc to the Transformer.
-func (t *Transformer) Apply(transform getl.TransformFunc) *Transformer {
+func (t *Transformer) Apply(transform optimus.TransformFunc) *Transformer {
 	// TODO: Should this return a new transformer instead of modifying the existing one?
-	t.table = getl.Transform(t.table, transform)
+	t.table = optimus.Transform(t.table, transform)
 	return t
 }
 
@@ -28,22 +28,22 @@ func (t *Transformer) Fieldmap(mappings map[string][]string) *Transformer {
 }
 
 // Map Applies a Map transform.
-func (t *Transformer) Map(transform func(getl.Row) (getl.Row, error)) *Transformer {
+func (t *Transformer) Map(transform func(optimus.Row) (optimus.Row, error)) *Transformer {
 	return t.Apply(transforms.Map(transform))
 }
 
 // Each Applies an Each transform.
-func (t *Transformer) Each(transform func(getl.Row) error) *Transformer {
+func (t *Transformer) Each(transform func(optimus.Row) error) *Transformer {
 	return t.Apply(transforms.Each(transform))
 }
 
 // TableTransform Applies a TableTransform transform.
-func (t *Transformer) TableTransform(transform func(getl.Row, chan<- getl.Row) error) *Transformer {
+func (t *Transformer) TableTransform(transform func(optimus.Row, chan<- optimus.Row) error) *Transformer {
 	return t.Apply(transforms.TableTransform(transform))
 }
 
 // Select Applies a Select transform.
-func (t *Transformer) Select(filter func(getl.Row) (bool, error)) *Transformer {
+func (t *Transformer) Select(filter func(optimus.Row) (bool, error)) *Transformer {
 	return t.Apply(transforms.Select(filter))
 }
 
@@ -53,6 +53,6 @@ func (t *Transformer) Valuemap(mappings map[string]map[interface{}]interface{}) 
 }
 
 // New returns a Transformer that allows you to chain transformations on a Table.
-func New(table getl.Table) *Transformer {
+func New(table optimus.Table) *Transformer {
 	return &Transformer{table}
 }

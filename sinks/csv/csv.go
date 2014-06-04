@@ -3,11 +3,11 @@ package csv
 import (
 	"encoding/csv"
 	"fmt"
-	"github.com/azylman/getl"
+	"github.com/azylman/optimus"
 	"os"
 )
 
-func convertRowToRecord(row getl.Row, headers []string) []string {
+func convertRowToRecord(row optimus.Row, headers []string) []string {
 	record := []string{}
 	for _, header := range headers {
 		record = append(record, fmt.Sprintf("%v", row[header]))
@@ -15,7 +15,7 @@ func convertRowToRecord(row getl.Row, headers []string) []string {
 	return record
 }
 
-func convertRowToHeader(row getl.Row) []string {
+func convertRowToHeader(row optimus.Row) []string {
 	header := []string{}
 	for key := range row {
 		header = append(header, key)
@@ -24,7 +24,7 @@ func convertRowToHeader(row getl.Row) []string {
 }
 
 // New writes all of the Rows in a Table to a CSV file.
-func New(source getl.Table, filename string) error {
+func New(source optimus.Table, filename string) error {
 	fout, err := os.Create(filename)
 	defer fout.Close()
 	if err != nil {

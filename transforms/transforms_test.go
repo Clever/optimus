@@ -2,33 +2,33 @@ package transforms
 
 import (
 	"errors"
-	"github.com/azylman/getl"
-	"github.com/azylman/getl/sources/infinite"
-	"github.com/azylman/getl/sources/slice"
-	"github.com/azylman/getl/tests"
+	"github.com/azylman/optimus"
+	"github.com/azylman/optimus/sources/infinite"
+	"github.com/azylman/optimus/sources/slice"
+	"github.com/azylman/optimus/tests"
 	"testing"
 )
 
-var defaultInput = func() []getl.Row {
-	return []getl.Row{
+var defaultInput = func() []optimus.Row {
+	return []optimus.Row{
 		{"header1": "value1", "header2": "value2"},
 		{"header1": "value3", "header2": "value4"},
 		{"header1": "value5", "header2": "value6"},
 	}
 }
 
-var defaultSource = func() getl.Table {
+var defaultSource = func() optimus.Table {
 	return slice.New(defaultInput())
 }
 
 var transformEqualities = []tests.TableCompareConfig{
 	{
 		Name: "Fieldmap",
-		Actual: func(getl.Table, interface{}) getl.Table {
-			return getl.Transform(defaultSource(), Fieldmap(map[string][]string{"header1": {"header4"}}))
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Fieldmap(map[string][]string{"header1": {"header4"}}))
 		},
-		Expected: func(getl.Table, interface{}) getl.Table {
-			return slice.New([]getl.Row{
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
 				{"header4": "value1"},
 				{"header4": "value3"},
 				{"header4": "value5"},
@@ -37,13 +37,13 @@ var transformEqualities = []tests.TableCompareConfig{
 	},
 	{
 		Name: "Map",
-		Actual: func(getl.Table, interface{}) getl.Table {
-			return getl.Transform(defaultSource(), Map(func(row getl.Row) (getl.Row, error) {
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Map(func(row optimus.Row) (optimus.Row, error) {
 				row["troll_key"] = "troll_value"
 				return row, nil
 			}))
 		},
-		Expected: func(getl.Table, interface{}) getl.Table {
+		Expected: func(optimus.Table, interface{}) optimus.Table {
 			rows := defaultInput()
 			for _, row := range rows {
 				row["troll_key"] = "troll_value"
@@ -53,55 +53,55 @@ var transformEqualities = []tests.TableCompareConfig{
 	},
 	{
 		Name: "TableTransform",
-		Actual: func(getl.Table, interface{}) getl.Table {
-			return getl.Transform(defaultSource(), TableTransform(func(row getl.Row, out chan<- getl.Row) error {
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), TableTransform(func(row optimus.Row, out chan<- optimus.Row) error {
 				out <- row
-				out <- getl.Row{}
+				out <- optimus.Row{}
 				return nil
 			}))
 		},
-		Expected: func(getl.Table, interface{}) getl.Table {
+		Expected: func(optimus.Table, interface{}) optimus.Table {
 			rows := defaultInput()
-			newRows := []getl.Row{}
+			newRows := []optimus.Row{}
 			for _, row := range rows {
 				newRows = append(newRows, row)
-				newRows = append(newRows, getl.Row{})
+				newRows = append(newRows, optimus.Row{})
 			}
 			return slice.New(newRows)
 		},
 	},
 	{
 		Name: "SelectEverything",
-		Actual: func(getl.Table, interface{}) getl.Table {
-			return getl.Transform(defaultSource(), Select(func(row getl.Row) (bool, error) {
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Select(func(row optimus.Row) (bool, error) {
 				return true, nil
 			}))
 		},
-		Expected: func(getl.Table, interface{}) getl.Table {
+		Expected: func(optimus.Table, interface{}) optimus.Table {
 			return defaultSource()
 		},
 	},
 	{
 		Name: "SelectNothing",
-		Actual: func(getl.Table, interface{}) getl.Table {
-			return getl.Transform(defaultSource(), Select(func(row getl.Row) (bool, error) {
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Select(func(row optimus.Row) (bool, error) {
 				return false, nil
 			}))
 		},
-		Expected: func(getl.Table, interface{}) getl.Table {
-			return slice.New([]getl.Row{})
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{})
 		},
 	},
 	{
 		Name: "Valuemap",
-		Actual: func(getl.Table, interface{}) getl.Table {
+		Actual: func(optimus.Table, interface{}) optimus.Table {
 			mapping := map[string]map[interface{}]interface{}{
 				"header1": {"value1": "value10", "value3": "value30"},
 			}
-			return getl.Transform(defaultSource(), Valuemap(mapping))
+			return optimus.Transform(defaultSource(), Valuemap(mapping))
 		},
-		Expected: func(getl.Table, interface{}) getl.Table {
-			return slice.New([]getl.Row{
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
 				{"header1": "value10", "header2": "value2"},
 				{"header1": "value30", "header2": "value4"},
 				{"header1": "value5", "header2": "value6"},
@@ -118,7 +118,7 @@ func TestTransforms(t *testing.T) {
 // error from a TableTransform.
 func TestTransformError(t *testing.T) {
 	in := infinite.New()
-	out := getl.Transform(in, TableTransform(func(row getl.Row, out chan<- getl.Row) error {
+	out := optimus.Transform(in, TableTransform(func(row optimus.Row, out chan<- optimus.Row) error {
 		return errors.New("some error")
 	}))
 	// Should receive no rows here because the first response was an error.

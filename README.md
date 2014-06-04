@@ -1,8 +1,8 @@
-# getl
+# optimus
 --
-    import "github.com/azylman/getl"
+    import "github.com/azylman/optimus"
 
-Package getl provides methods for manipulating tables of data.
+Package optimus provides methods for manipulating tables of data.
 
 
 ### Example
@@ -10,32 +10,32 @@ Package getl provides methods for manipulating tables of data.
 Here's an example program that performs a set of field and value mappings on a
 CSV file:
 
-    package getl
+    package optimus
 
     import(
-    	"github.com/azylman/getl"
-    	csvSource "github.com/azylman/getl/sources/csv"
-    	csvSink "github.com/azylman/getl/sinks/csv"
-    	"github.com/azylman/getl/transforms"
+    	"github.com/azylman/optimus"
+    	csvSource "github.com/azylman/optimus/sources/csv"
+    	csvSink "github.com/azylman/optimus/sinks/csv"
+    	"github.com/azylman/optimus/transforms"
     )
 
     func main() {
     	begin := csvSource.New("example1.csv")
-    	step1 := getl.Transform(begin, transforms.Fieldmap(fieldMappings))
-    	step2 := getl.Transform(step1, transforms.Valuemap(valueMappings))
-    	end := getl.Transform(step2, transforms.Map(arbitraryTransformFunction))
+    	step1 := optimus.Transform(begin, transforms.Fieldmap(fieldMappings))
+    	step2 := optimus.Transform(step1, transforms.Valuemap(valueMappings))
+    	end := optimus.Transform(step2, transforms.Map(arbitraryTransformFunction))
     	err := csvSink.New(end, "output.csv")
     }
 
 Here's one that uses chaining:
 
-    package getl
+    package optimus
 
     import(
-    	"github.com/azylman/getl"
-    	csvSource "github.com/azylman/getl/sources/csv"
-    	csvSink "github.com/azylman/getl/sinks/csv"
-    	"github.com/azylman/getl/transformer"
+    	"github.com/azylman/optimus"
+    	csvSource "github.com/azylman/optimus/sources/csv"
+    	csvSink "github.com/azylman/optimus/sinks/csv"
+    	"github.com/azylman/optimus/transformer"
     )
 
     func main() {

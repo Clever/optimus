@@ -1,14 +1,14 @@
 package tests
 
 import (
-	"github.com/azylman/getl"
+	"github.com/azylman/optimus"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 // Stop tests that a Table correctly implements Stop.
 // It assumes that it is invoked with a newly-created Table.
-func Stop(t *testing.T, table getl.Table) {
+func Stop(t *testing.T, table optimus.Table) {
 	table.Stop()
 	Consumed(t, table)
 	assert.Nil(t, table.Err())
@@ -16,19 +16,19 @@ func Stop(t *testing.T, table getl.Table) {
 
 // Consumed tests that a table has been completely consumed:
 // that is to say, there are no more remaining Rows to read.
-func Consumed(t *testing.T, table getl.Table) {
+func Consumed(t *testing.T, table optimus.Table) {
 	HasRows(t, table, 0)
 }
 
 // HasRows tests that a table has the correct number of rows, and returns all the rows.
-func HasRows(t *testing.T, table getl.Table, expected int) []getl.Row {
+func HasRows(t *testing.T, table optimus.Table, expected int) []optimus.Row {
 	rows := GetRows(table)
 	assert.Equal(t, expected, len(rows), "expected %d rows, found %d: %#v", expected, len(rows), rows)
 	return rows
 }
 
-func GetRows(table getl.Table) []getl.Row {
-	rows := []getl.Row{}
+func GetRows(table optimus.Table) []optimus.Row {
+	rows := []optimus.Row{}
 	for row := range table.Rows() {
 		rows = append(rows, row)
 	}
@@ -37,9 +37,9 @@ func GetRows(table getl.Table) []getl.Row {
 
 type TableCompareConfig struct {
 	Name     string
-	Source   func() getl.Table
-	Actual   func(getl.Table, interface{}) getl.Table
-	Expected func(getl.Table, interface{}) getl.Table
+	Source   func() optimus.Table
+	Actual   func(optimus.Table, interface{}) optimus.Table
+	Expected func(optimus.Table, interface{}) optimus.Table
 	Arg      interface{}
 	Error    error
 }
@@ -47,7 +47,7 @@ type TableCompareConfig struct {
 func CompareTables(t *testing.T, configs []TableCompareConfig) {
 	for _, config := range configs {
 		if config.Source == nil {
-			config.Source = func() getl.Table {
+			config.Source = func() optimus.Table {
 				return nil
 			}
 		}

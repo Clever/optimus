@@ -2,14 +2,14 @@ package csv
 
 import (
 	"encoding/csv"
-	"github.com/azylman/getl"
+	"github.com/azylman/optimus"
 	"io"
 	"os"
 )
 
 type table struct {
 	err     error
-	rows    chan getl.Row
+	rows    chan optimus.Row
 	stopped bool
 }
 
@@ -42,7 +42,7 @@ func (t *table) start(filename string) {
 	}
 }
 
-func (t table) Rows() <-chan getl.Row {
+func (t table) Rows() <-chan optimus.Row {
 	return t.rows
 }
 
@@ -63,8 +63,8 @@ func (t *table) handleErr(err error) {
 	}
 }
 
-func convertLineToRow(line []string, headers []string) getl.Row {
-	row := getl.Row{}
+func convertLineToRow(line []string, headers []string) optimus.Row {
+	row := optimus.Row{}
 	for i, header := range headers {
 		row[header] = line[i]
 	}
@@ -72,9 +72,9 @@ func convertLineToRow(line []string, headers []string) getl.Row {
 }
 
 // New returns a new Table that scans over the rows of a CSV.
-func New(filename string) getl.Table {
+func New(filename string) optimus.Table {
 	table := &table{
-		rows: make(chan getl.Row),
+		rows: make(chan optimus.Row),
 	}
 	go table.start(filename)
 	return table

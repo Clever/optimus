@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-PKG := github.com/azylman/getl
+PKG := github.com/azylman/optimus
 SOURCES := $(shell ls sources)
 SINKS := $(shell ls sinks)
 SUBPKG_NAMES := $(addprefix sources/, $(SOURCES)) $(addprefix sinks/, $(SINKS)) transformer transforms

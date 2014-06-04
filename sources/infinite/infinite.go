@@ -1,15 +1,15 @@
 package infinite
 
 import (
-	"github.com/azylman/getl"
+	"github.com/azylman/optimus"
 )
 
 type infiniteTable struct {
-	rows    chan getl.Row
+	rows    chan optimus.Row
 	stopped bool
 }
 
-func (i infiniteTable) Rows() <-chan getl.Row {
+func (i infiniteTable) Rows() <-chan optimus.Row {
 	return i.rows
 }
 
@@ -36,8 +36,8 @@ func (i *infiniteTable) start() {
 }
 
 // New creates a new Table that infinitely sends empty rows.
-func New() getl.Table {
-	table := &infiniteTable{rows: make(chan getl.Row)}
+func New() optimus.Table {
+	table := &infiniteTable{rows: make(chan optimus.Row)}
 	go table.start()
 	return table
 }

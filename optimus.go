@@ -75,6 +75,7 @@ func (t *transformedTable) start(transform TransformFunc) {
 	}
 	defer stop()
 
+	// Once the transform function has returned, close out and error channels
 	go func() {
 		defer close(errChan)
 		defer close(out)
@@ -82,6 +83,7 @@ func (t *transformedTable) start(transform TransformFunc) {
 			errChan <- err
 		}
 	}()
+	// Copy from the TransformFunc's out channel to the Table's out channel, then signal done
 	go func() {
 		defer func() {
 			doneChan <- struct{}{}
@@ -94,6 +96,7 @@ func (t *transformedTable) start(transform TransformFunc) {
 		}
 	}()
 
+	// Copy from the Table's source to the TransformFunc's in channel, then signal done
 	go func() {
 		defer func() {
 			doneChan <- struct{}{}

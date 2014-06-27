@@ -5,6 +5,13 @@
 
 ## Usage
 
+```go
+const (
+	LeftJoin  = 1
+	InnerJoin = 2
+)
+```
+
 #### func  Each
 
 ```go
@@ -20,6 +27,12 @@ func Fieldmap(mappings map[string][]string) optimus.TransformFunc
 ```
 Fieldmap returns a Table that has all the Rows of the input Table with the field
 mapping applied.
+
+#### func  Join
+
+```go
+func Join(rightTable optimus.Table, leftHeader string, rightHeader string, joinType int) optimus.TransformFunc
+```
 
 #### func  Map
 

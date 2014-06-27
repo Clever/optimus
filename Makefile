@@ -2,7 +2,7 @@ SHELL := /bin/bash
 PKG := github.com/azylman/optimus
 SOURCES := $(shell ls sources)
 SINKS := $(shell ls sinks)
-SUBPKG_NAMES := $(addprefix sources/, $(SOURCES)) $(addprefix sinks/, $(SINKS)) transformer transforms combiner
+SUBPKG_NAMES := $(addprefix sources/, $(SOURCES)) $(addprefix sinks/, $(SINKS)) transformer transforms
 SUBPKGS = $(addprefix $(PKG)/, $(SUBPKG_NAMES))
 PKGS = $(PKG) $(SUBPKGS)
 

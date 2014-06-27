@@ -78,3 +78,56 @@ func Valuemap(mappings map[string]map[interface{}]interface{}) optimus.Transform
 		return newRow, nil
 	})
 }
+
+const (
+	LeftJoin  = 1
+	InnerJoin = 2
+)
+
+func Join(rightTable optimus.Table, leftHeader string, rightHeader string, joinType int) optimus.TransformFunc {
+	hash := make(map[interface{}][]optimus.Row)
+
+	// possibly go routine
+	// Build has from right table
+	for row := range rightTable.Rows() {
+		// Initialize if dne
+		if val := hash[row[rightHeader]]; val == nil {
+			hash[row[rightHeader]] = []optimus.Row{}
+		}
+		hash[row[rightHeader]] = append(hash[row[rightHeader]], row)
+	}
+
+	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		if rightTable.Err() != nil {
+			println("Right table error found...")
+			return rightTable.Err()
+		}
+
+		for leftRow := range in {
+			// if value is in the hash
+			if rightRows := hash[leftRow[leftHeader]]; rightRows != nil {
+				// for each row for that hash value
+				for _, rightRow := range rightRows {
+					// join and send it to the out channel
+					out <- mergeRows(leftRow, rightRow)
+				}
+			} else {
+				if joinType == LeftJoin {
+					out <- leftRow
+				}
+			}
+		}
+		return nil
+	}
+}
+
+func mergeRows(src optimus.Row, dst optimus.Row) optimus.Row {
+	output := optimus.Row{}
+	for k, v := range src {
+		output[k] = v
+	}
+	for k, v := range dst {
+		output[k] = v
+	}
+	return output
+}

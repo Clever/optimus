@@ -227,9 +227,9 @@ func TestLeftOverwritesRight(t *testing.T) {
 	assert.Equal(t, expected, rows)
 }
 
-// TODO: This error isn't being through yet, so the test is failing.
+// TODO: This error isn't being passed through yet, so the test is failing.
 // func TestRightTableTransformError(t *testing.T) {
-// leftTable := slice.New([]optimus.Row{
+// 	leftTable := slice.New([]optimus.Row{
 // 		{"header1": "value1", "header2": "value2"},
 // 	})
 // 	rightTable := slice.New([]optimus.Row{})
@@ -245,7 +245,7 @@ func TestLeftOverwritesRight(t *testing.T) {
 // 	}
 
 // 	// Should receive no rows here because the first response was an error.
-// 	tests.Consumed(t, table)
+// 	tests.Consumed(t, leftTable)
 // 	// Should receive no rows here because the the transform should have consumed
 // 	// all the rows.
 // 	tests.Consumed(t, rightTable)

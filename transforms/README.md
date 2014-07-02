@@ -7,7 +7,9 @@
 
 ```go
 const (
-	LeftJoin  = 1
+	// LeftJoin - Always add row from Left table, even if no corresponding rows found in Right table)
+	LeftJoin = 1
+	// InnerJoin - Only add row from Left table if corresponding row(s) found in Right table)
 	InnerJoin = 2
 )
 ```
@@ -33,6 +35,8 @@ mapping applied.
 ```go
 func Join(rightTable optimus.Table, leftHeader string, rightHeader string, joinType int) optimus.TransformFunc
 ```
+Join returns a Table that combines fields with another table, joining via
+joinType
 
 #### func  Map
 

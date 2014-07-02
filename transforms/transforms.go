@@ -81,9 +81,9 @@ func Valuemap(mappings map[string]map[interface{}]interface{}) optimus.Transform
 
 const (
 	// LeftJoin - Always add row from Left table, even if no corresponding rows found in Right table)
-	LeftJoin = 1
+	LeftJoin = iota
 	// InnerJoin - Only add row from Left table if corresponding row(s) found in Right table)
-	InnerJoin = 2
+	InnerJoin
 )
 
 // Join returns a Table that combines fields with another table, joining via joinType

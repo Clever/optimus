@@ -227,6 +227,25 @@ func TestLeftOverwritesRight(t *testing.T) {
 	assert.Equal(t, expected, rows)
 }
 
+func TestLeftJoin(t *testing.T) {
+	expected := []optimus.Row{
+		{"header1": "value1", "header2": "value3", "header3": "value1", "header4": "value5"},
+		{"header1": "value2", "header2": "value4"},
+	}
+	leftTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value3"},
+		{"header1": "value2", "header2": "value4"},
+	})
+	rightTable := slice.New([]optimus.Row{
+		{"header3": "value1", "header4": "value5"},
+	})
+
+	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", LeftJoin))
+
+	rows := tests.HasRows(t, combinedTable, 2)
+	assert.Equal(t, expected, rows)
+}
+
 // TODO: This error isn't being passed through yet, so the test is failing.
 // func TestRightTableTransformError(t *testing.T) {
 // 	leftTable := slice.New([]optimus.Row{

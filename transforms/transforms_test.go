@@ -246,29 +246,28 @@ func TestLeftJoin(t *testing.T) {
 	assert.Equal(t, expected, rows)
 }
 
-// TODO: This error isn't being passed through yet, so the test is failing.
-// func TestRightTableTransformError(t *testing.T) {
-// 	leftTable := slice.New([]optimus.Row{
-// 		{"header1": "value1", "header2": "value2"},
-// 	})
-// 	rightTable := slice.New([]optimus.Row{})
+func TestRightTableTransformError(t *testing.T) {
+	leftTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+	})
+	rightTable := slice.New([]optimus.Row{{"": ""}})
 
-// 	// Returns an error immediately
-// 	rightTable = optimus.Transform(rightTable, TableTransform(func(row optimus.Row, out chan<- optimus.Row) error {
-// 		return errors.New("some error")
-// 	}))
-// 	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", InnerJoin))
+	// Returns an error immediately
+	rightTable = optimus.Transform(rightTable, TableTransform(func(row optimus.Row, out chan<- optimus.Row) error {
+		return errors.New("some error")
+	}))
+	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", InnerJoin))
 
-// 	if combinedTable.Err() == nil {
-// 		t.Fatal("Expected RightTable to report an error")
-// 	}
+	// Should receive no rows here because the first response was an error.
+	tests.Consumed(t, combinedTable)
+	// Should receive no rows here because the the transform should have consumed
+	// all the rows.
+	tests.Consumed(t, rightTable)
 
-// 	// Should receive no rows here because the first response was an error.
-// 	tests.Consumed(t, leftTable)
-// 	// Should receive no rows here because the the transform should have consumed
-// 	// all the rows.
-// 	tests.Consumed(t, rightTable)
-// }
+	if combinedTable.Err() == nil {
+		t.Fatal("Expected RightTable to report an error")
+	}
+}
 
 func TestTransforms(t *testing.T) {
 	tests.CompareTables(t, transformEqualities)

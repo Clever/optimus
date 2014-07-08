@@ -90,17 +90,21 @@ const (
 func Join(rightTable optimus.Table, leftHeader string, rightHeader string, joinType int) optimus.TransformFunc {
 	hash := make(map[interface{}][]optimus.Row)
 
-	// TODO: use go routine here
-	// Build has from right table
-	for row := range rightTable.Rows() {
-		// Initialize if dne
-		if val := hash[row[rightHeader]]; val == nil {
-			hash[row[rightHeader]] = []optimus.Row{}
+	// Build hash from right table
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for row := range rightTable.Rows() {
+			// Initialize if dne
+			if val := hash[row[rightHeader]]; val == nil {
+				hash[row[rightHeader]] = []optimus.Row{}
+			}
+			hash[row[rightHeader]] = append(hash[row[rightHeader]], row)
 		}
-		hash[row[rightHeader]] = append(hash[row[rightHeader]], row)
-	}
+	}()
 
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		<-done
 		if rightTable.Err() != nil {
 			return rightTable.Err()
 		}

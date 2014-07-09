@@ -5,6 +5,13 @@
 
 ## Usage
 
+```go
+var JoinType = joinStruct{Left: joinType{0}, Inner: joinType{1}}
+```
+Left: Always add row from Left table, even if no corresponding rows found in
+Right table) Inner: Only add row from Left table if corresponding row(s) found
+in Right table)
+
 #### func  Each
 
 ```go
@@ -20,6 +27,14 @@ func Fieldmap(mappings map[string][]string) optimus.TransformFunc
 ```
 Fieldmap returns a Table that has all the Rows of the input Table with the field
 mapping applied.
+
+#### func  Join
+
+```go
+func Join(rightTable optimus.Table, leftHeader string, rightHeader string, join joinType) optimus.TransformFunc
+```
+Join returns a Table that combines fields with another table, joining via
+joinType
 
 #### func  Map
 

@@ -126,7 +126,7 @@ func TestJoinOneToOne(t *testing.T) {
 		{"header3": "value5", "header4": "value9"},
 	})
 
-	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", InnerJoin))
+	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", JoinType.Inner))
 
 	rows := tests.HasRows(t, combinedTable, 3)
 	assert.Equal(t, expected, rows)
@@ -145,7 +145,7 @@ func TestJoinOneToNone(t *testing.T) {
 		{"header3": "value3", "header4": "value8"},
 		{"header3": "value5", "header4": "value9"},
 	})
-	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", InnerJoin))
+	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", JoinType.Inner))
 	rows := tests.HasRows(t, combinedTable, 2)
 	assert.Equal(t, expected, rows)
 }
@@ -164,7 +164,7 @@ func TestJoinOneToMany(t *testing.T) {
 		{"header3": "value1", "header4": "value8"},
 		{"header3": "value1", "header4": "value9"},
 	})
-	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", InnerJoin))
+	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", JoinType.Inner))
 	rows := tests.HasRows(t, combinedTable, 2)
 	assert.Equal(t, expected, rows)
 }
@@ -182,7 +182,7 @@ func TestJoinManyToOne(t *testing.T) {
 		{"header3": "value1", "header4": "value8"},
 	})
 
-	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", InnerJoin))
+	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", JoinType.Inner))
 
 	rows := tests.HasRows(t, combinedTable, 2)
 	assert.Equal(t, expected, rows)
@@ -204,7 +204,7 @@ func TestJoinManyToMany(t *testing.T) {
 		{"header3": "value1", "header4": "value5"},
 	})
 
-	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", InnerJoin))
+	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", JoinType.Inner))
 
 	rows := tests.HasRows(t, combinedTable, 4)
 	assert.Equal(t, expected, rows)
@@ -221,7 +221,7 @@ func TestLeftOverwritesRight(t *testing.T) {
 		{"header3": "value1", "header1": "value3"},
 	})
 
-	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", InnerJoin))
+	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", JoinType.Inner))
 
 	rows := tests.HasRows(t, combinedTable, 1)
 	assert.Equal(t, expected, rows)
@@ -240,7 +240,7 @@ func TestLeftJoin(t *testing.T) {
 		{"header3": "value1", "header4": "value5"},
 	})
 
-	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", LeftJoin))
+	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", JoinType.Left))
 
 	rows := tests.HasRows(t, combinedTable, 2)
 	assert.Equal(t, expected, rows)
@@ -256,7 +256,7 @@ func TestRightTableTransformError(t *testing.T) {
 	rightTable = optimus.Transform(rightTable, TableTransform(func(row optimus.Row, out chan<- optimus.Row) error {
 		return errors.New("some error")
 	}))
-	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", InnerJoin))
+	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", JoinType.Inner))
 
 	// Should receive no rows here because the first response was an error.
 	tests.Consumed(t, combinedTable)

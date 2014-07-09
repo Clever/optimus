@@ -79,15 +79,20 @@ func Valuemap(mappings map[string]map[interface{}]interface{}) optimus.Transform
 	})
 }
 
-const (
-	// LeftJoin - Always add row from Left table, even if no corresponding rows found in Right table)
-	LeftJoin = iota
-	// InnerJoin - Only add row from Left table if corresponding row(s) found in Right table)
-	InnerJoin
-)
+type joinStruct struct {
+	Left, Inner joinType
+}
+
+type joinType struct {
+	int
+}
+
+// Left: Always add row from Left table, even if no corresponding rows found in Right table)
+// Inner: Only add row from Left table if corresponding row(s) found in Right table)
+var JoinType = joinStruct{Left: joinType{0}, Inner: joinType{1}}
 
 // Join returns a Table that combines fields with another table, joining via joinType
-func Join(rightTable optimus.Table, leftHeader string, rightHeader string, joinType int) optimus.TransformFunc {
+func Join(rightTable optimus.Table, leftHeader string, rightHeader string, join joinType) optimus.TransformFunc {
 	hash := make(map[interface{}][]optimus.Row)
 
 	// Build hash from right table
@@ -118,7 +123,7 @@ func Join(rightTable optimus.Table, leftHeader string, rightHeader string, joinT
 					out <- mergeRows(leftRow, rightRow)
 				}
 			} else {
-				if joinType == LeftJoin {
+				if join == JoinType.Left {
 					out <- leftRow
 				}
 			}

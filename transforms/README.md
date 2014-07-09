@@ -6,13 +6,11 @@
 ## Usage
 
 ```go
-const (
-	// LeftJoin - Always add row from Left table, even if no corresponding rows found in Right table)
-	LeftJoin = iota
-	// InnerJoin - Only add row from Left table if corresponding row(s) found in Right table)
-	InnerJoin
-)
+var JoinType = joinStruct{Left: joinType{0}, Inner: joinType{1}}
 ```
+Left: Always add row from Left table, even if no corresponding rows found in
+Right table) Inner: Only add row from Left table if corresponding row(s) found
+in Right table)
 
 #### func  Each
 
@@ -33,7 +31,7 @@ mapping applied.
 #### func  Join
 
 ```go
-func Join(rightTable optimus.Table, leftHeader string, rightHeader string, joinType int) optimus.TransformFunc
+func Join(rightTable optimus.Table, leftHeader string, rightHeader string, join joinType) optimus.TransformFunc
 ```
 Join returns a Table that combines fields with another table, joining via
 joinType

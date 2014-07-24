@@ -52,6 +52,11 @@ func (t *Transformer) Valuemap(mappings map[string]map[interface{}]interface{}) 
 	return t.Apply(transforms.Valuemap(mappings))
 }
 
+// Reduce Applies a Reduce transform.
+func (t *Transformer) Reduce(fn func(optimus.Row, optimus.Row) error) *Transformer {
+	return t.Apply(transforms.Reduce(fn))
+}
+
 // New returns a Transformer that allows you to chain transformations on a Table.
 func New(table optimus.Table) *Transformer {
 	return &Transformer{table}

@@ -44,6 +44,13 @@ func Map(transform func(optimus.Row) (optimus.Row, error)) optimus.TransformFunc
 Map returns a Table that returns the results of calling the transform function
 for every row.
 
+#### func  Reduce
+
+```go
+func Reduce(fn func(accum, item optimus.Row) error) optimus.TransformFunc
+```
+Reduce returns a Table that has all the rows reduced into a single row.
+
 #### func  Select
 
 ```go

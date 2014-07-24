@@ -49,6 +49,13 @@ func (t *Transformer) Map(transform func(optimus.Row) (optimus.Row, error)) *Tra
 ```
 Map Applies a Map transform.
 
+#### func (*Transformer) Reduce
+
+```go
+func (t *Transformer) Reduce(fn func(optimus.Row, optimus.Row) error) *Transformer
+```
+Reduce Applies a Reduce transform.
+
 #### func (*Transformer) Select
 
 ```go

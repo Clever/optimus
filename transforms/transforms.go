@@ -142,3 +142,17 @@ func mergeRows(src optimus.Row, dst optimus.Row) optimus.Row {
 	}
 	return output
 }
+
+// Reduce returns a Table that has all the rows reduced into a single row.
+func Reduce(fn func(accum, item optimus.Row) error) optimus.TransformFunc {
+	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		accum := optimus.Row{}
+		for row := range in {
+			if err := fn(accum, row); err != nil {
+				return err
+			}
+		}
+		out <- accum
+		return nil
+	}
+}

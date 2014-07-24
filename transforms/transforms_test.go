@@ -109,6 +109,26 @@ var transformEqualities = []tests.TableCompareConfig{
 			})
 		},
 	},
+	{
+		Name: "Reduce",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Reduce(func(accum, item optimus.Row) error {
+				for key, val := range item {
+					if _, ok := accum[key]; !ok {
+						accum[key] = ""
+					}
+					accum[key] = accum[key].(string) + val.(string)
+				}
+				return nil
+			}))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{{
+				"header1": "value1value3value5",
+				"header2": "value2value4value6",
+			}})
+		},
+	},
 }
 
 // Test that chaining together multiple transforms behaves as expected

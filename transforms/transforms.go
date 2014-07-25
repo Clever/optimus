@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// TableTransform returns a Table that has applies the given transform function to the output channel.
+// TableTransform returns a TransformFunc that applies the given transform function.
 func TableTransform(transform func(optimus.Row, chan<- optimus.Row) error) optimus.TransformFunc {
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
 		for row := range in {
@@ -17,7 +17,7 @@ func TableTransform(transform func(optimus.Row, chan<- optimus.Row) error) optim
 	}
 }
 
-// Select returns a Table that only has Rows that pass the filter.
+// Select returns a TransformFunc that removes any rows that don't pass the filter.
 func Select(filter func(optimus.Row) (bool, error)) optimus.TransformFunc {
 	return TableTransform(func(row optimus.Row, out chan<- optimus.Row) error {
 		pass, err := filter(row)
@@ -29,7 +29,7 @@ func Select(filter func(optimus.Row) (bool, error)) optimus.TransformFunc {
 	})
 }
 
-// Map returns a Table that returns the results of calling the transform function for every row.
+// Map returns a TransformFunc that transforms every row with the given function.
 func Map(transform func(optimus.Row) (optimus.Row, error)) optimus.TransformFunc {
 	return TableTransform(func(in optimus.Row, out chan<- optimus.Row) error {
 		row, err := transform(in)
@@ -41,8 +41,8 @@ func Map(transform func(optimus.Row) (optimus.Row, error)) optimus.TransformFunc
 	})
 }
 
-// Each returns a Table that passes through all the Rows from the source table, invoking a function
-// for each.
+// Each returns a TransformFunc that makes no changes to the table, but calls the given function
+// on every Row.
 func Each(fn func(optimus.Row) error) optimus.TransformFunc {
 	return Map(func(row optimus.Row) (optimus.Row, error) {
 		if err := fn(row); err != nil {
@@ -52,7 +52,7 @@ func Each(fn func(optimus.Row) error) optimus.TransformFunc {
 	})
 }
 
-// Fieldmap returns a Table that has all the Rows of the input Table with the field mapping applied.
+// Fieldmap returns a TransformFunc that applies a field mapping to every Row.
 func Fieldmap(mappings map[string][]string) optimus.TransformFunc {
 	return Map(func(row optimus.Row) (optimus.Row, error) {
 		newRow := optimus.Row{}
@@ -65,7 +65,7 @@ func Fieldmap(mappings map[string][]string) optimus.TransformFunc {
 	})
 }
 
-// Valuemap returns a Table that has all the Rows of the input Table with a value mapping applied.
+// Valuemap returns a TransformFunc that applies a value mapping to every Row.
 func Valuemap(mappings map[string]map[interface{}]interface{}) optimus.TransformFunc {
 	return Map(func(row optimus.Row) (optimus.Row, error) {
 		newRow := optimus.Row{}
@@ -92,7 +92,7 @@ type joinType struct {
 // Inner: Only add row from Left table if corresponding row(s) found in Right table)
 var JoinType = joinStruct{Left: joinType{0}, Inner: joinType{1}}
 
-// Join returns a Table that combines fields with another table, joining via joinType
+// Join returns a TransformFunc that joins Rows with another table using the specified join type.
 func Join(rightTable optimus.Table, leftHeader string, rightHeader string, join joinType) optimus.TransformFunc {
 	hash := make(map[interface{}][]optimus.Row)
 
@@ -144,7 +144,7 @@ func mergeRows(src optimus.Row, dst optimus.Row) optimus.Row {
 	return output
 }
 
-// Reduce returns a Table that has all the rows reduced into a single row.
+// Reduce returns a TransformFunc that reduces all the Rows to a single Row.
 func Reduce(fn func(accum, item optimus.Row) error) optimus.TransformFunc {
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
 		accum := optimus.Row{}
@@ -158,7 +158,7 @@ func Reduce(fn func(accum, item optimus.Row) error) optimus.TransformFunc {
 	}
 }
 
-// Concurrent returns a Table that with the given TransformFunc applied with some level of
+// Concurrent returns a TransformFunc that applies the given TransformFunc with some level of
 // concurrency.
 func Concurrent(fn optimus.TransformFunc, concurrency int) optimus.TransformFunc {
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {

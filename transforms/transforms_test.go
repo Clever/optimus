@@ -110,6 +110,22 @@ var transformEqualities = []tests.TableCompareConfig{
 		},
 	},
 	{
+		Name: "Concurrent",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			mapping := map[string]map[interface{}]interface{}{
+				"header1": {"value1": "value10", "value3": "value30"},
+			}
+			return optimus.Transform(defaultSource(), Concurrent(Valuemap(mapping), 100))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header1": "value10", "header2": "value2"},
+				{"header1": "value30", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+			})
+		},
+	},
+	{
 		Name: "Reduce",
 		Actual: func(optimus.Table, interface{}) optimus.Table {
 			return optimus.Transform(defaultSource(), Reduce(func(accum, item optimus.Row) error {

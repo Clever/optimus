@@ -2,6 +2,7 @@ package transforms
 
 import (
 	"github.com/azylman/optimus"
+	"sync"
 )
 
 // TableTransform returns a Table that has applies the given transform function to the output channel.
@@ -153,6 +154,32 @@ func Reduce(fn func(accum, item optimus.Row) error) optimus.TransformFunc {
 			}
 		}
 		out <- accum
+		return nil
+	}
+}
+
+// Concurrent returns a Table that with the given TransformFunc applied with some level of
+// concurrency.
+func Concurrent(fn optimus.TransformFunc, concurrency int) optimus.TransformFunc {
+	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		wg := sync.WaitGroup{}
+		wg.Add(concurrency)
+		errs := make(chan error)
+		for i := 0; i < concurrency; i++ {
+			go func() {
+				defer wg.Done()
+				if err := fn(in, out); err != nil {
+					errs <- err
+				}
+			}()
+		}
+		go func() {
+			wg.Wait()
+			close(errs)
+		}()
+		for err := range errs {
+			return err
+		}
 		return nil
 	}
 }

@@ -12,6 +12,14 @@ Left: Always add row from Left table, even if no corresponding rows found in
 Right table) Inner: Only add row from Left table if corresponding row(s) found
 in Right table)
 
+#### func  Concurrent
+
+```go
+func Concurrent(fn optimus.TransformFunc, concurrency int) optimus.TransformFunc
+```
+Concurrent returns a Table that with the given TransformFunc applied with some
+level of concurrency.
+
 #### func  Each
 
 ```go

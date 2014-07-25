@@ -28,12 +28,12 @@ func (t *Transformer) Apply(transform optimus.TransformFunc) *Transformer
 ```
 Apply applies a given TransformFunc to the Transformer.
 
-#### func (*Transformer) Concurrent
+#### func (*Transformer) Concurrently
 
 ```go
-func (t *Transformer) Concurrent(fn optimus.TransformFunc, concurrency int) *Transformer
+func (t *Transformer) Concurrently(fn optimus.TransformFunc, concurrency int) *Transformer
 ```
-Concurrent Applies a Concurrent transform.
+Concurrently Applies a Concurrent transform.
 
 #### func (*Transformer) Each
 

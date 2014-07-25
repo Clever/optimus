@@ -158,9 +158,9 @@ func Reduce(fn func(accum, item optimus.Row) error) optimus.TransformFunc {
 	}
 }
 
-// Concurrent returns a TransformFunc that applies the given TransformFunc with some level of
+// Concurrently returns a TransformFunc that applies the given TransformFunc with some level of
 // concurrency.
-func Concurrent(fn optimus.TransformFunc, concurrency int) optimus.TransformFunc {
+func Concurrently(fn optimus.TransformFunc, concurrency int) optimus.TransformFunc {
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
 		wg := sync.WaitGroup{}
 		wg.Add(concurrency)

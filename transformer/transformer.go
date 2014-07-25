@@ -57,9 +57,9 @@ func (t *Transformer) Reduce(fn func(optimus.Row, optimus.Row) error) *Transform
 	return t.Apply(transforms.Reduce(fn))
 }
 
-// Concurrent Applies a Concurrent transform.
-func (t *Transformer) Concurrent(fn optimus.TransformFunc, concurrency int) *Transformer {
-	return t.Apply(transforms.Concurrent(fn, concurrency))
+// Concurrently Applies a Concurrent transform.
+func (t *Transformer) Concurrently(fn optimus.TransformFunc, concurrency int) *Transformer {
+	return t.Apply(transforms.Concurrently(fn, concurrency))
 }
 
 // New returns a Transformer that allows you to chain transformations on a Table.

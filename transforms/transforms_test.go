@@ -145,6 +145,71 @@ var transformEqualities = []tests.TableCompareConfig{
 			}})
 		},
 	},
+	{
+		Name: "ConcatOne",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Concat(defaultSource()))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+			})
+		},
+	},
+	{
+		Name: "ConcatTwo",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Concat(defaultSource(), defaultSource()))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+			})
+		},
+	},
+	{
+		Name: "ConcatFive",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(),
+				Concat(defaultSource(), defaultSource(), defaultSource(), defaultSource(),
+					defaultSource()))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+			})
+		},
+	},
 }
 
 // Test that chaining together multiple transforms behaves as expected

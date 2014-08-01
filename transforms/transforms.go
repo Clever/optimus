@@ -183,3 +183,21 @@ func Concurrently(fn optimus.TransformFunc, concurrency int) optimus.TransformFu
 		return nil
 	}
 }
+
+// Concat returns a TransformFunc that concatenates all the Rows in the input Tables, in order.
+func Concat(tables ...optimus.Table) optimus.TransformFunc {
+	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		for row := range in {
+			out <- row
+		}
+		for _, table := range tables {
+			for row := range table.Rows() {
+				out <- row
+			}
+			if table.Err() != nil {
+				return table.Err()
+			}
+		}
+		return nil
+	}
+}

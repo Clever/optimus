@@ -28,6 +28,13 @@ func (t *Transformer) Apply(transform optimus.TransformFunc) *Transformer
 ```
 Apply applies a given TransformFunc to the Transformer.
 
+#### func (*Transformer) Concat
+
+```go
+func (t *Transformer) Concat(tables ...optimus.Table) *Transformer
+```
+Concat Applies a Concat transform.
+
 #### func (*Transformer) Concurrently
 
 ```go

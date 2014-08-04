@@ -162,7 +162,7 @@ var transformEqualities = []tests.TableCompareConfig{
 		},
 	},
 	{
-		Name: "ConcatTwo",
+		Name: "ConcatTwoInOrder",
 		Actual: func(optimus.Table, interface{}) optimus.Table {
 			newSource10 := slice.New([]optimus.Row{
 				{"header1": "value10", "header2": "value20"},

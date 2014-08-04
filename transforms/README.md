@@ -12,6 +12,14 @@ Left: Always add row from Left table, even if no corresponding rows found in
 Right table) Inner: Only add row from Left table if corresponding row(s) found
 in Right table)
 
+#### func  Concat
+
+```go
+func Concat(tables ...optimus.Table) optimus.TransformFunc
+```
+Concat returns a TransformFunc that concatenates all the Rows in the input
+Tables, in order.
+
 #### func  Concurrently
 
 ```go

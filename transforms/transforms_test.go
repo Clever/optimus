@@ -145,6 +145,82 @@ var transformEqualities = []tests.TableCompareConfig{
 			}})
 		},
 	},
+	{
+		Name: "ConcatOne",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Concat(defaultSource()))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+			})
+		},
+	},
+	{
+		Name: "ConcatTwoInOrder",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			newSource10 := slice.New([]optimus.Row{
+				{"header1": "value10", "header2": "value20"},
+				{"header1": "value30", "header2": "value40"},
+				{"header1": "value50", "header2": "value60"},
+			})
+			newSource100 := slice.New([]optimus.Row{
+				{"header1": "value100", "header2": "value200"},
+				{"header1": "value300", "header2": "value400"},
+				{"header1": "value500", "header2": "value600"},
+			})
+
+			return optimus.Transform(defaultSource(), Concat(newSource10, newSource100))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value10", "header2": "value20"},
+				{"header1": "value30", "header2": "value40"},
+				{"header1": "value50", "header2": "value60"},
+				{"header1": "value100", "header2": "value200"},
+				{"header1": "value300", "header2": "value400"},
+				{"header1": "value500", "header2": "value600"},
+			})
+		},
+	},
+	{
+		Name: "ConcatFive",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(),
+				Concat(defaultSource(), defaultSource(), defaultSource(), defaultSource(),
+					defaultSource()))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+				{"header1": "value1", "header2": "value2"},
+				{"header1": "value3", "header2": "value4"},
+				{"header1": "value5", "header2": "value6"},
+			})
+		},
+	},
 }
 
 // Test that chaining together multiple transforms behaves as expected

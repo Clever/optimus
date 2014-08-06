@@ -1,12 +1,11 @@
 package gearman
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/Clever/gearman"
 	"github.com/Clever/gearman/job"
+	gearmanUtils "github.com/Clever/gearman/utils"
 	"github.com/azylman/optimus"
-	"io/ioutil"
 )
 
 type table struct {
@@ -31,13 +30,16 @@ func (t *table) Stop() {
 }
 
 type getData struct {
-	bytes.Buffer
 	handler func([]byte)
 }
 
 func (rw *getData) Write(p []byte) (int, error) {
 	rw.handler(p)
 	return len(p), nil // Discard all data, assume the handler is taking care of it
+}
+
+func (rw *getData) Close() error {
+	return nil
 }
 
 func (t *table) start(client gearman.Client, fn string, workload []byte,
@@ -54,7 +56,8 @@ func (t *table) start(client gearman.Client, fn string, workload []byte,
 		}
 		t.rows <- row
 	}}
-	j, err := client.Submit(fn, workload, data, nil)
+	warnings := gearmanUtils.NewBuffer()
+	j, err := client.Submit(fn, workload, data, warnings)
 	if err != nil {
 		t.err = err
 		return
@@ -62,12 +65,7 @@ func (t *table) start(client gearman.Client, fn string, workload []byte,
 	state := j.Run()
 
 	if state == job.Failed {
-		warnings, err := ioutil.ReadAll(j.Warnings())
-		if err != nil {
-			t.err = err
-		} else {
-			t.err = fmt.Errorf("gearman job '%s' failed with warnings: %s", fn, warnings)
-		}
+		t.err = fmt.Errorf("gearman job '%s' failed with warnings: %s", fn, warnings.Bytes())
 	}
 }
 

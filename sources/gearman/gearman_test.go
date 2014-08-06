@@ -21,7 +21,7 @@ func (c *mockClient) Close() error {
 	return nil
 }
 
-func (c *mockClient) Submit(fn string, payload []byte, data, warnings io.ReadWriter) (job.Job, error) {
+func (c *mockClient) Submit(fn string, payload []byte, data, warnings io.WriteCloser) (job.Job, error) {
 	_ = c.Mock.Called(fn, payload, data, warnings)
 	packetChan := make(chan *packet.Packet)
 	c.chans = append(c.chans, packetChan)
@@ -35,14 +35,14 @@ func handlePacket(handle string, kind int, arguments [][]byte) *packet.Packet {
 	}
 	arguments = append([][]byte{[]byte(handle)}, arguments...)
 	return &packet.Packet{
-		Type:      packet.PacketType(kind),
+		Type:      packet.Type(kind),
 		Arguments: arguments,
 	}
 }
 
 func TestGearmanSource(t *testing.T) {
 	c := &mockClient{Mock: &mock.Mock{}, chans: []chan *packet.Packet{}}
-	c.On("Submit", "function", []byte("workload"), mock.Anything, nil).Return(nil, nil).Once()
+	c.On("Submit", "function", []byte("workload"), mock.Anything, mock.Anything).Return(nil, nil).Once()
 	numCalls := 0
 	table := New(c, "function", []byte("workload"), func(in []byte) (optimus.Row, error) {
 		numCalls++
@@ -65,7 +65,7 @@ func TestGearmanSource(t *testing.T) {
 
 func TestGearmanSourceFail(t *testing.T) {
 	c := &mockClient{Mock: &mock.Mock{}, chans: []chan *packet.Packet{}}
-	c.On("Submit", "function", []byte("workload"), mock.Anything, nil).Return(nil, nil).Once()
+	c.On("Submit", "function", []byte("workload"), mock.Anything, mock.Anything).Return(nil, nil).Once()
 	table := New(c, "function", []byte("workload"), func(in []byte) (optimus.Row, error) {
 		t.Fatal("never expected converter to be called")
 		return nil, nil

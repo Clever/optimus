@@ -52,6 +52,21 @@ func (t *Transformer) Valuemap(mappings map[string]map[interface{}]interface{}) 
 	return t.Apply(transforms.Valuemap(mappings))
 }
 
+// Reduce Applies a Reduce transform.
+func (t *Transformer) Reduce(fn func(optimus.Row, optimus.Row) error) *Transformer {
+	return t.Apply(transforms.Reduce(fn))
+}
+
+// Concurrently Applies a Concurrent transform.
+func (t *Transformer) Concurrently(fn optimus.TransformFunc, concurrency int) *Transformer {
+	return t.Apply(transforms.Concurrently(fn, concurrency))
+}
+
+// Concat Applies a Concat transform.
+func (t *Transformer) Concat(tables ...optimus.Table) *Transformer {
+	return t.Apply(transforms.Concat(tables...))
+}
+
 // New returns a Transformer that allows you to chain transformations on a Table.
 func New(table optimus.Table) *Transformer {
 	return &Transformer{table}

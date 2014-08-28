@@ -28,6 +28,20 @@ func (t *Transformer) Apply(transform optimus.TransformFunc) *Transformer
 ```
 Apply applies a given TransformFunc to the Transformer.
 
+#### func (*Transformer) Concat
+
+```go
+func (t *Transformer) Concat(tables ...optimus.Table) *Transformer
+```
+Concat Applies a Concat transform.
+
+#### func (*Transformer) Concurrently
+
+```go
+func (t *Transformer) Concurrently(fn optimus.TransformFunc, concurrency int) *Transformer
+```
+Concurrently Applies a Concurrent transform.
+
 #### func (*Transformer) Each
 
 ```go
@@ -48,6 +62,13 @@ Fieldmap Applies a Fieldmap transform.
 func (t *Transformer) Map(transform func(optimus.Row) (optimus.Row, error)) *Transformer
 ```
 Map Applies a Map transform.
+
+#### func (*Transformer) Reduce
+
+```go
+func (t *Transformer) Reduce(fn func(optimus.Row, optimus.Row) error) *Transformer
+```
+Reduce Applies a Reduce transform.
 
 #### func (*Transformer) Select
 

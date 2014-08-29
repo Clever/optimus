@@ -3,7 +3,7 @@ package csv
 import (
 	"encoding/csv"
 	"fmt"
-	"github.com/azylman/optimus"
+	"gopkg.in/azylman/optimus.v1"
 	"os"
 )
 

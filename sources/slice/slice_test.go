@@ -1,8 +1,8 @@
 package slice
 
 import (
-	"github.com/azylman/optimus"
-	"github.com/azylman/optimus/tests"
+	"gopkg.in/azylman/optimus.v1"
+	"gopkg.in/azylman/optimus.v1/tests"
 	"testing"
 )
 

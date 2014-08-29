@@ -2,6 +2,7 @@ package transforms
 
 import (
 	"errors"
+	"fmt"
 	"github.com/azylman/optimus"
 	"github.com/azylman/optimus/sources/infinite"
 	"github.com/azylman/optimus/sources/slice"
@@ -381,6 +382,18 @@ func TestRightTableTransformError(t *testing.T) {
 	}
 }
 
+func hashByHeader(row optimus.Row, header string) (interface{}, error) {
+	if val, ok := row[header]; !ok {
+		return nil, fmt.Errorf("could not find a value for header '%s' in row %s", header, row)
+	} else {
+		return val, nil
+	}
+}
+
+func singleHeaderHash(row optimus.Row) (interface{}, error) {
+	return hashByHeader(row, "header1")
+}
+
 func TestUniqueReturnsOne(t *testing.T) {
 	expected := []optimus.Row{
 		{"header1": "value1", "header2": "value2"},
@@ -388,7 +401,21 @@ func TestUniqueReturnsOne(t *testing.T) {
 	inputTable := slice.New([]optimus.Row{
 		{"header1": "value1", "header2": "value2"},
 	})
-	actualTable := optimus.Transform(inputTable, Unique("header1"))
+	actualTable := optimus.Transform(inputTable, Unique(singleHeaderHash))
+
+	actual := tests.HasRows(t, actualTable, 1)
+	assert.Equal(t, expected, actual)
+}
+
+func TestUniqueRemovesDuplicates(t *testing.T) {
+	expected := []optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+	}
+	inputTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+		{"header1": "value1", "header2": "value2"},
+	})
+	actualTable := optimus.Transform(inputTable, Unique(singleHeaderHash))
 
 	actual := tests.HasRows(t, actualTable, 1)
 	assert.Equal(t, expected, actual)
@@ -402,36 +429,58 @@ func TestUniqueForSingleHeader(t *testing.T) {
 		{"header1": "value1", "header2": "value2"},
 		{"header1": "value1", "header2": "value3"},
 	})
-	actualTable := optimus.Transform(inputTable, Unique("header1"))
+	actualTable := optimus.Transform(inputTable, Unique(singleHeaderHash))
 
 	actual := tests.HasRows(t, actualTable, 1)
 	assert.Equal(t, expected, actual)
+}
+
+func invalidHeaderHash(row optimus.Row) (interface{}, error) {
+	return hashByHeader(row, "invalidHeader")
 }
 
 func TestUniqueErrorForInvalidHeader(t *testing.T) {
 	inputTable := slice.New([]optimus.Row{
 		{"header1": "value1", "header2": "value2"},
 	})
-	actualTable := optimus.Transform(inputTable, Unique("invalidHeader"))
+	actualTable := optimus.Transform(inputTable, Unique(invalidHeaderHash))
 	tests.Consumed(t, actualTable)
 	if actualTable.Err() == nil {
 		t.Fatal("Expected actualTable to report an error")
 	}
 }
 
-// // Test that chaining together multiple transforms behaves as expected
-// func TestUniqueForMultipleHeaders(t *testing.T) {
-// 	inputTable := slice.New([]optimus.Row{
-// 		{"header1": "value1", "header2": "value2"},
-// 	})
-// 	expected := []optimus.Row{
-// 		{"header1": "value1", "header2": "value2"},
-// 	}
-// 	actual := optimus.Transform(Unique(inputTable, []string{"header1,header2"}))
+type multiHeader struct {
+	val1 interface{}
+	val2 interface{}
+}
 
-// 	rows := tests.HasRows(t, combinedTable, 1)
-// 	assert.Equal(t, expected, rows)
-// }
+func multiHeaderHash(row optimus.Row) (interface{}, error) {
+	if val1, ok := row["header1"]; !ok {
+		return nil, fmt.Errorf("could not find a value for header 'header1' in row %s", row)
+	} else if val2, ok := row["header2"]; !ok {
+		return nil, fmt.Errorf("could not find a value for header 'header2' in row %s", row)
+	} else {
+		// return nil, nil
+		hash := multiHeader{val1: val1, val2: val2}
+		return hash, nil
+	}
+}
+
+// Test that chaining together multiple transforms behaves as expected
+func TestUniqueForMultipleHeaders(t *testing.T) {
+	expected := []optimus.Row{
+		{"header1": "value1", "header2": "value2", "header3": "value1"},
+	}
+	inputTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2", "header3": "value1"},
+		{"header1": "value1", "header2": "value2", "header3": "value2"},
+	})
+	actualTable := optimus.Transform(inputTable, Unique(multiHeaderHash))
+
+	actual := tests.HasRows(t, actualTable, 1)
+	assert.Equal(t, expected, actual)
+}
 
 func TestTransforms(t *testing.T) {
 	tests.CompareTables(t, transformEqualities)

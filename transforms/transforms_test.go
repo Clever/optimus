@@ -394,16 +394,20 @@ func singleHeaderHash(row optimus.Row) (interface{}, error) {
 	return hashByHeader(row, "header1")
 }
 
-func TestUniqueReturnsOne(t *testing.T) {
+func TestUniqueReturnsMultiple(t *testing.T) {
 	expected := []optimus.Row{
 		{"header1": "value1", "header2": "value2"},
+		{"header1": "value2", "header2": "value4"},
+		{"header1": "value3", "header2": "value6"},
 	}
 	inputTable := slice.New([]optimus.Row{
 		{"header1": "value1", "header2": "value2"},
+		{"header1": "value2", "header2": "value4"},
+		{"header1": "value3", "header2": "value6"},
 	})
 	actualTable := optimus.Transform(inputTable, Unique(singleHeaderHash))
 
-	actual := tests.HasRows(t, actualTable, 1)
+	actual := tests.HasRows(t, actualTable, 3)
 	assert.Equal(t, expected, actual)
 }
 

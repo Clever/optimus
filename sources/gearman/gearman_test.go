@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/Clever/gearman/job"
 	"github.com/Clever/gearman/packet"
-	"github.com/azylman/optimus"
-	"github.com/azylman/optimus/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"gopkg.in/azylman/optimus.v1"
+	"gopkg.in/azylman/optimus.v1/tests"
 	"io"
 	"testing"
 )

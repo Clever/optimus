@@ -1,8 +1,8 @@
 package transformer
 
 import (
-	"github.com/azylman/optimus"
-	"github.com/azylman/optimus/transforms"
+	"gopkg.in/azylman/optimus.v1"
+	"gopkg.in/azylman/optimus.v1/transforms"
 )
 
 // A Transformer allows you to easily chain multiple transforms on a table.

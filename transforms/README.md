@@ -1,6 +1,6 @@
 # transforms
 --
-    import "github.com/azylman/optimus/transforms"
+    import "gopkg.in/azylman/optimus.v1/transforms"
 
 
 ## Usage
@@ -80,9 +80,25 @@ func TableTransform(transform func(optimus.Row, chan<- optimus.Row) error) optim
 TableTransform returns a TransformFunc that applies the given transform
 function.
 
+#### func  Unique
+
+```go
+func Unique(hash UniqueHash) optimus.TransformFunc
+```
+Unique returns a TransformFunc that returns Rows that are unique, according to
+the specified hash. No order is guaranteed for the unique row which is returned.
+
 #### func  Valuemap
 
 ```go
 func Valuemap(mappings map[string]map[interface{}]interface{}) optimus.TransformFunc
 ```
 Valuemap returns a TransformFunc that applies a value mapping to every Row.
+
+#### type UniqueHash
+
+```go
+type UniqueHash func(optimus.Row) (interface{}, error)
+```
+
+UniqueHash takes an optimus.Row and returns a hashed value

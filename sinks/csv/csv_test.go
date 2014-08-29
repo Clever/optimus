@@ -2,9 +2,9 @@ package csv
 
 import (
 	"errors"
-	"github.com/azylman/optimus"
-	"github.com/azylman/optimus/sources/csv"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/azylman/optimus.v1"
+	"gopkg.in/azylman/optimus.v1/sources/csv"
 	"io/ioutil"
 	"strings"
 	"testing"

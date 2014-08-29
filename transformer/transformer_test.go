@@ -2,12 +2,12 @@ package transformer
 
 import (
 	"errors"
-	"github.com/azylman/optimus"
-	"github.com/azylman/optimus/sources/infinite"
-	"github.com/azylman/optimus/sources/slice"
-	"github.com/azylman/optimus/tests"
-	"github.com/azylman/optimus/transforms"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/azylman/optimus.v1"
+	"gopkg.in/azylman/optimus.v1/sources/infinite"
+	"gopkg.in/azylman/optimus.v1/sources/slice"
+	"gopkg.in/azylman/optimus.v1/tests"
+	"gopkg.in/azylman/optimus.v1/transforms"
 	"testing"
 )
 

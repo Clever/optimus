@@ -1,7 +1,7 @@
 package infinite
 
 import (
-	"github.com/azylman/optimus/tests"
+	"gopkg.in/azylman/optimus.v1/tests"
 	"testing"
 )
 

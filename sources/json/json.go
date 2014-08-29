@@ -3,7 +3,7 @@ package json
 import (
 	"bufio"
 	"encoding/json"
-	"github.com/azylman/optimus"
+	"gopkg.in/azylman/optimus.v1"
 	"io"
 	"os"
 )

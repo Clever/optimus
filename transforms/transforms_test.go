@@ -3,11 +3,11 @@ package transforms
 import (
 	"errors"
 	"fmt"
-	"github.com/azylman/optimus"
-	"github.com/azylman/optimus/sources/infinite"
-	"github.com/azylman/optimus/sources/slice"
-	"github.com/azylman/optimus/tests"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/azylman/optimus.v1"
+	"gopkg.in/azylman/optimus.v1/sources/infinite"
+	"gopkg.in/azylman/optimus.v1/sources/slice"
+	"gopkg.in/azylman/optimus.v1/tests"
 	"testing"
 )
 

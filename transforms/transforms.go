@@ -1,7 +1,7 @@
 package transforms
 
 import (
-	"github.com/azylman/optimus"
+	"gopkg.in/azylman/optimus.v1"
 	"gopkg.in/fatih/set.v0"
 	"sync"
 )

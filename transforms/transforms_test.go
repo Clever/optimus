@@ -381,6 +381,58 @@ func TestRightTableTransformError(t *testing.T) {
 	}
 }
 
+func TestUniqueReturnsOne(t *testing.T) {
+	expected := []optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+	}
+	inputTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+	})
+	actualTable := optimus.Transform(inputTable, Unique("header1"))
+
+	actual := tests.HasRows(t, actualTable, 1)
+	assert.Equal(t, expected, actual)
+}
+
+func TestUniqueForSingleHeader(t *testing.T) {
+	expected := []optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+	}
+	inputTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+		{"header1": "value1", "header2": "value3"},
+	})
+	actualTable := optimus.Transform(inputTable, Unique("header1"))
+
+	actual := tests.HasRows(t, actualTable, 1)
+	assert.Equal(t, expected, actual)
+}
+
+func TestUniqueErrorForInvalidHeader(t *testing.T) {
+	inputTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+	})
+	actualTable := optimus.Transform(inputTable, Unique("invalidHeader"))
+	tests.Consumed(t, actualTable)
+	if actualTable.Err() == nil {
+		t.Fatal("Expected actualTable to report an error")
+	}
+}
+
+// // Test that chaining together multiple transforms behaves as expected
+// func TestUniqueForMultipleHeaders(t *testing.T) {
+// 	inputTable := slice.New([]optimus.Row{
+// 		{"header1": "value1", "header2": "value2"},
+// 	})
+// 	expected := []optimus.Row{
+// 		{"header1": "value1", "header2": "value2"},
+// 	}
+// 	actual := optimus.Transform(Unique(inputTable, []string{"header1,header2"}))
+
+// 	rows := tests.HasRows(t, combinedTable, 1)
+// 	assert.Equal(t, expected, rows)
+// }
+
 func TestTransforms(t *testing.T) {
 	tests.CompareTables(t, transformEqualities)
 }

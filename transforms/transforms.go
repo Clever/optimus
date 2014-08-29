@@ -1,6 +1,7 @@
 package transforms
 
 import (
+	"fmt"
 	"github.com/azylman/optimus"
 	"sync"
 )
@@ -196,6 +197,40 @@ func Concat(tables ...optimus.Table) optimus.TransformFunc {
 			}
 			if table.Err() != nil {
 				return table.Err()
+			}
+		}
+		return nil
+	}
+}
+
+// Unique returns a TransformFunc that Rows that are unique for the given headers.
+// No order is guaranteed for the unique row which is returned.
+func Unique(headers string) optimus.TransformFunc {
+	set := make(map[interface{}]bool)
+	var existsInSet = func(row optimus.Row) (bool, error) {
+		// Check if value for specified header exists in given row
+		// If not, it's an invalid header to Unique-ify on
+		if valueForRow, ok := row[headers]; !ok {
+			return false, fmt.Errorf("failed to find header '%s' in row %s", headers, row)
+		} else {
+			// Check if value exists in set
+			if _, alreadyExists := set[valueForRow]; alreadyExists {
+				return true, nil
+			} else {
+				set[valueForRow] = true
+				return false, nil
+			}
+		}
+
+		return false, nil
+	}
+
+	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		for row := range in {
+			if existsInSet, err := existsInSet(row); err != nil {
+				return err
+			} else if !existsInSet {
+				out <- row
 			}
 		}
 		return nil

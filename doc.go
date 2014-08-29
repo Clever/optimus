@@ -8,10 +8,10 @@ Here's an example program that performs a set of field and value mappings on a C
 	package optimus
 
 	import(
-		"github.com/azylman/optimus"
-		csvSource "github.com/azylman/optimus/sources/csv"
-		csvSink "github.com/azylman/optimus/sinks/csv"
-		"github.com/azylman/optimus/transforms"
+		"gopkg.in/azylman/optimus.v1"
+		csvSource "gopkg.in/azylman/optimus.v1/sources/csv"
+		csvSink "gopkg.in/azylman/optimus.v1/sinks/csv"
+		"gopkg.in/azylman/optimus.v1/transforms"
 	)
 
 	func main() {
@@ -27,10 +27,10 @@ Here's one that uses chaining:
 	package optimus
 
 	import(
-		"github.com/azylman/optimus"
-		csvSource "github.com/azylman/optimus/sources/csv"
-		csvSink "github.com/azylman/optimus/sinks/csv"
-		"github.com/azylman/optimus/transformer"
+		"gopkg.in/azylman/optimus.v1"
+		csvSource "gopkg.in/azylman/optimus.v1/sources/csv"
+		csvSink "gopkg.in/azylman/optimus.v1/sinks/csv"
+		"gopkg.in/azylman/optimus.v1/transformer"
 	)
 
 	func main() {

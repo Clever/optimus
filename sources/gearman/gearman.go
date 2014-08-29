@@ -5,7 +5,7 @@ import (
 	"github.com/Clever/gearman"
 	"github.com/Clever/gearman/job"
 	gearmanUtils "github.com/Clever/gearman/utils"
-	"github.com/azylman/optimus"
+	"gopkg.in/azylman/optimus.v1"
 )
 
 type table struct {

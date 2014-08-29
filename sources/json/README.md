@@ -1,6 +1,6 @@
 # json
 --
-    import "github.com/azylman/optimus/sources/json"
+    import "gopkg.in/azylman/optimus.v1/sources/json"
 
 
 ## Usage

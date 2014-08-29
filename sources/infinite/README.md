@@ -1,6 +1,6 @@
 # infinite
 --
-    import "github.com/azylman/optimus/sources/infinite"
+    import "gopkg.in/azylman/optimus.v1/sources/infinite"
 
 
 ## Usage

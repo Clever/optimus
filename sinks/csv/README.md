@@ -11,4 +11,4 @@
 func New(source optimus.Table, filename string) error
 ```
 New writes all of the Rows in a Table to a CSV file. It assumes that all Rows
-have the same headers.
+have the same headers. Columns are written in alphabetical order.

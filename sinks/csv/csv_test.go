@@ -38,6 +38,14 @@ func TestNilValues(t *testing.T) {
 	assert.Equal(t, actual, []string{"field1,field2", `val1,""`, ""})
 }
 
+func TestAlphabetical(t *testing.T) {
+	source := slice.New([]optimus.Row{{"a": "0", "b": "0", "c": "0", "d": "0", "e": "0", "f": "0"}})
+	assert.Nil(t, New(source, "./data_write.csv"))
+	actual, err := readFile("./data_write.csv")
+	assert.Nil(t, err)
+	assert.Equal(t, actual[0], "a,b,c,d,e,f")
+}
+
 type errorTable struct {
 	rows chan optimus.Row
 }

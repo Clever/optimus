@@ -385,9 +385,8 @@ func TestRightTableTransformError(t *testing.T) {
 func hashByHeader(row optimus.Row, header string) (interface{}, error) {
 	if val, ok := row[header]; !ok {
 		return nil, fmt.Errorf("could not find a value for header '%s' in row %s", header, row)
-	} else {
-		return val, nil
 	}
+	return val, nil
 }
 
 func singleHeaderHash(row optimus.Row) (interface{}, error) {

@@ -210,18 +210,15 @@ type UniqueHash func(optimus.Row) (interface{}, error)
 // No order is guaranteed for the unique row which is returned.
 func Unique(hash UniqueHash) optimus.TransformFunc {
 	set := set.New()
-
-	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
-		for row := range in {
-			hashedRow, err := hash(row)
-			if err != nil {
-				return err
-			}
-			if !set.Has(hashedRow) {
-				set.Add(hashedRow)
-				out <- row
-			}
+	return Select(func(row optimus.Row) (bool, error) {
+		hashedRow, err := hash(row)
+		if err != nil {
+			return false, err
 		}
-		return nil
-	}
+		if !set.Has(hashedRow) {
+			set.Add(hashedRow)
+			return true, nil
+		}
+		return false, nil
+	})
 }

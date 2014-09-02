@@ -2,10 +2,10 @@ package gearman
 
 import (
 	"fmt"
-	"github.com/Clever/gearman/job"
-	"github.com/Clever/gearman/packet"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"gopkg.in/Clever/gearman.v1/job"
+	"gopkg.in/Clever/gearman.v1/packet"
 	"gopkg.in/azylman/optimus.v1"
 	"gopkg.in/azylman/optimus.v1/tests"
 	"io"

@@ -2,9 +2,9 @@ package gearman
 
 import (
 	"fmt"
-	"github.com/Clever/gearman"
-	"github.com/Clever/gearman/job"
-	gearmanUtils "github.com/Clever/gearman/utils"
+	"gopkg.in/Clever/gearman.v1"
+	"gopkg.in/Clever/gearman.v1/job"
+	gearmanUtils "gopkg.in/Clever/gearman.v1/utils"
 	"gopkg.in/azylman/optimus.v1"
 )
 

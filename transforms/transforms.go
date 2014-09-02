@@ -2,6 +2,7 @@ package transforms
 
 import (
 	"gopkg.in/azylman/optimus.v1"
+	"gopkg.in/fatih/set.v0"
 	"sync"
 )
 
@@ -200,4 +201,24 @@ func Concat(tables ...optimus.Table) optimus.TransformFunc {
 		}
 		return nil
 	}
+}
+
+// UniqueHash takes an optimus.Row and returns a hashed value
+type UniqueHash func(optimus.Row) (interface{}, error)
+
+// Unique returns a TransformFunc that returns Rows that are unique, according to the specified hash.
+// No order is guaranteed for the unique row which is returned.
+func Unique(hash UniqueHash) optimus.TransformFunc {
+	set := set.New()
+	return Select(func(row optimus.Row) (bool, error) {
+		hashedRow, err := hash(row)
+		if err != nil {
+			return false, err
+		}
+		if !set.Has(hashedRow) {
+			set.Add(hashedRow)
+			return true, nil
+		}
+		return false, nil
+	})
 }

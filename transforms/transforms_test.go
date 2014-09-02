@@ -2,6 +2,7 @@ package transforms
 
 import (
 	"errors"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/azylman/optimus.v1"
 	"gopkg.in/azylman/optimus.v1/sources/infinite"
@@ -379,6 +380,110 @@ func TestRightTableTransformError(t *testing.T) {
 	if combinedTable.Err() == nil {
 		t.Fatal("Expected RightTable to report an error")
 	}
+}
+
+func hashByHeader(row optimus.Row, header string) (interface{}, error) {
+	val, ok := row[header]
+	if !ok {
+		return nil, fmt.Errorf("could not find a value for header '%s' in row %s", header, row)
+	}
+	return val, nil
+}
+
+func singleHeaderHash(row optimus.Row) (interface{}, error) {
+	return hashByHeader(row, "header1")
+}
+
+func TestUniqueReturnsMultiple(t *testing.T) {
+	expected := []optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+		{"header1": "value2", "header2": "value4"},
+		{"header1": "value3", "header2": "value6"},
+	}
+	inputTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+		{"header1": "value2", "header2": "value4"},
+		{"header1": "value3", "header2": "value6"},
+	})
+	actualTable := optimus.Transform(inputTable, Unique(singleHeaderHash))
+
+	actual := tests.HasRows(t, actualTable, 3)
+	assert.Equal(t, expected, actual)
+}
+
+func TestUniqueRemovesDuplicates(t *testing.T) {
+	expected := []optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+	}
+	inputTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+		{"header1": "value1", "header2": "value2"},
+	})
+	actualTable := optimus.Transform(inputTable, Unique(singleHeaderHash))
+
+	actual := tests.HasRows(t, actualTable, 1)
+	assert.Equal(t, expected, actual)
+}
+
+func TestUniqueForSingleHeader(t *testing.T) {
+	expected := []optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+	}
+	inputTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+		{"header1": "value1", "header2": "value3"},
+	})
+	actualTable := optimus.Transform(inputTable, Unique(singleHeaderHash))
+
+	actual := tests.HasRows(t, actualTable, 1)
+	assert.Equal(t, expected, actual)
+}
+
+func invalidHeaderHash(row optimus.Row) (interface{}, error) {
+	return hashByHeader(row, "invalidHeader")
+}
+
+func TestUniqueErrorForInvalidHeader(t *testing.T) {
+	inputTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2"},
+	})
+	actualTable := optimus.Transform(inputTable, Unique(invalidHeaderHash))
+	tests.Consumed(t, actualTable)
+	if actualTable.Err() == nil {
+		t.Fatal("Expected actualTable to report an error")
+	}
+}
+
+type multiHeader struct {
+	val1 interface{}
+	val2 interface{}
+}
+
+func multiHeaderHash(row optimus.Row) (interface{}, error) {
+	if val1, ok := row["header1"]; !ok {
+		return nil, fmt.Errorf("could not find a value for header 'header1' in row %s", row)
+	} else if val2, ok := row["header2"]; !ok {
+		return nil, fmt.Errorf("could not find a value for header 'header2' in row %s", row)
+	} else {
+		// return nil, nil
+		hash := multiHeader{val1: val1, val2: val2}
+		return hash, nil
+	}
+}
+
+// Test that chaining together multiple transforms behaves as expected
+func TestUniqueForMultipleHeaders(t *testing.T) {
+	expected := []optimus.Row{
+		{"header1": "value1", "header2": "value2", "header3": "value1"},
+	}
+	inputTable := slice.New([]optimus.Row{
+		{"header1": "value1", "header2": "value2", "header3": "value1"},
+		{"header1": "value1", "header2": "value2", "header3": "value2"},
+	})
+	actualTable := optimus.Transform(inputTable, Unique(multiHeaderHash))
+
+	actual := tests.HasRows(t, actualTable, 1)
+	assert.Equal(t, expected, actual)
 }
 
 func TestTransforms(t *testing.T) {

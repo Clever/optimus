@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/azylman/optimus.v1"
 	"gopkg.in/azylman/optimus.v1/sources/csv"
+	"gopkg.in/azylman/optimus.v1/sources/slice"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -21,13 +22,20 @@ func readFile(filename string) ([]string, error) {
 
 func TestCSVSink(t *testing.T) {
 	source := csv.New("./data.csv")
-	err := New(source, "./data_write.csv")
-	assert.Nil(t, err)
+	assert.Nil(t, New(source, "./data_write.csv"))
 	expected, err := readFile("./data_write.csv")
 	assert.Nil(t, err)
 	actual, err := readFile("./data.csv")
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
+}
+
+func TestNilValues(t *testing.T) {
+	source := slice.New([]optimus.Row{{"field1": "val1", "field2": nil}})
+	assert.Nil(t, New(source, "./data_write.csv"))
+	actual, err := readFile("./data_write.csv")
+	assert.Nil(t, err)
+	assert.Equal(t, actual, []string{"field1,field2", `val1,""`, ""})
 }
 
 type errorTable struct {

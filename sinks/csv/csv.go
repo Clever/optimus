@@ -10,6 +10,9 @@ import (
 func convertRowToRecord(row optimus.Row, headers []string) []string {
 	record := []string{}
 	for _, header := range headers {
+		if row[header] == nil {
+			row[header] = ""
+		}
 		record = append(record, fmt.Sprintf("%v", row[header]))
 	}
 	return record

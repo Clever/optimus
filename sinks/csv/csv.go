@@ -10,6 +10,9 @@ import (
 func convertRowToRecord(row optimus.Row, headers []string) []string {
 	record := []string{}
 	for _, header := range headers {
+		if row[header] == nil {
+			row[header] = ""
+		}
 		record = append(record, fmt.Sprintf("%v", row[header]))
 	}
 	return record
@@ -23,7 +26,8 @@ func convertRowToHeader(row optimus.Row) []string {
 	return header
 }
 
-// New writes all of the Rows in a Table to a CSV file.
+// New writes all of the Rows in a Table to a CSV file. It assumes that all Rows have the same
+// headers.
 func New(source optimus.Table, filename string) error {
 	fout, err := os.Create(filename)
 	defer fout.Close()

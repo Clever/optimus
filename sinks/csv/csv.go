@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gopkg.in/azylman/optimus.v1"
 	"os"
+	"sort"
 )
 
 func convertRowToRecord(row optimus.Row, headers []string) []string {
@@ -27,7 +28,7 @@ func convertRowToHeader(row optimus.Row) []string {
 }
 
 // New writes all of the Rows in a Table to a CSV file. It assumes that all Rows have the same
-// headers.
+// headers. Columns are written in alphabetical order.
 func New(source optimus.Table, filename string) error {
 	fout, err := os.Create(filename)
 	defer fout.Close()
@@ -40,6 +41,7 @@ func New(source optimus.Table, filename string) error {
 	for row := range source.Rows() {
 		if !wroteHeader {
 			headers = convertRowToHeader(row)
+			sort.Strings(headers)
 			if err := writer.Write(headers); err != nil {
 				return err
 			}

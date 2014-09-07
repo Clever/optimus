@@ -58,8 +58,8 @@ var transformEqualities = []tests.TableCompareConfig{
 		Expected: func(optimus.Table, interface{}) optimus.Table {
 			return slice.New([]optimus.Row{
 				{"header4": "value1", "header6": "value1"},
-				{"header4": "value3", "header6": "value1"},
-				{"header4": "value5", "header6": "value1"},
+				{"header4": "value3", "header6": "value3"},
+				{"header4": "value5", "header6": "value5"},
 			})
 		},
 	},

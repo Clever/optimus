@@ -1,8 +1,8 @@
 package tests
 
 import (
-	"gopkg.in/azylman/optimus.v1"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/azylman/optimus.v1"
 	"testing"
 )
 
@@ -55,7 +55,11 @@ func CompareTables(t *testing.T, configs []TableCompareConfig) {
 		actual := GetRows(actualTable)
 		if config.Expected != nil {
 			expected := GetRows(config.Expected(config.Source(), config.Arg))
-			assert.Equal(t, expected, actual, "%s failed", config.Name)
+			for idx, expectedRow := range expected {
+				for field_name, _ := range expectedRow {
+					assert.Equal(t, expected[idx][field_name], actual[idx][field_name], "%s failed", config.Name)
+				}
+			}
 		} else if config.Error != nil {
 			assert.Equal(t, config.Error, actualTable.Err())
 		} else {

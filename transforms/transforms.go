@@ -59,7 +59,9 @@ func Fieldmap(mappings map[string][]string) optimus.TransformFunc {
 		newRow := optimus.Row{}
 		for key, vals := range mappings {
 			for _, val := range vals {
-				newRow[val] = row[key]
+				if oldRowVal, ok := row[key]; ok {
+					newRow[val] = oldRowVal
+				}
 			}
 		}
 		return newRow, nil

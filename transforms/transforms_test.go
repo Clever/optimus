@@ -25,9 +25,48 @@ var defaultSource = func() optimus.Table {
 
 var transformEqualities = []tests.TableCompareConfig{
 	{
-		Name: "Fieldmap",
+		Name: "Fieldmap-MapSome",
 		Actual: func(optimus.Table, interface{}) optimus.Table {
 			return optimus.Transform(defaultSource(), Fieldmap(map[string][]string{"header1": {"header4"}}))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header4": "value1"},
+				{"header4": "value3"},
+				{"header4": "value5"},
+			})
+		},
+	},
+	{
+		Name: "Fieldmap-MapAll",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Fieldmap(map[string][]string{"header1": {"header4"}, "header2": {"header5"}}))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header4": "value1", "header5": "value2"},
+				{"header4": "value3", "header5": "value4"},
+				{"header4": "value5", "header5": "value6"},
+			})
+		},
+	},
+	{
+		Name: "Fieldmap-MapOneToMany",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Fieldmap(map[string][]string{"header1": {"header4", "header6"}}))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header4": "value1", "header6": "value1"},
+				{"header4": "value3", "header6": "value1"},
+				{"header4": "value5", "header6": "value1"},
+			})
+		},
+	},
+	{
+		Name: "Fieldmap-IgnoreInvalidMap",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+			return optimus.Transform(defaultSource(), Fieldmap(map[string][]string{"header1": {"header4"}, "headerFake": {"headerDoesntMap"}}))
 		},
 		Expected: func(optimus.Table, interface{}) optimus.Table {
 			return slice.New([]optimus.Row{

@@ -1,14 +1,21 @@
 package csv
 
 import (
+	"bytes"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/azylman/optimus.v1"
 	"gopkg.in/azylman/optimus.v1/tests"
 	"testing"
 )
 
+var csvData = `header1,header2,header3
+field1,field2,field3
+field4,field5,field6
+field7,field8,field9
+`
+
 func TestCSVSource(t *testing.T) {
-	table := New("./data.csv")
+	table := New(bytes.NewBufferString(csvData))
 	expected := []optimus.Row{
 		{"header1": "field1", "header2": "field2", "header3": "field3"},
 		{"header1": "field4", "header2": "field5", "header3": "field6"},
@@ -19,5 +26,5 @@ func TestCSVSource(t *testing.T) {
 }
 
 func TestStop(t *testing.T) {
-	tests.Stop(t, New("./data.csv"))
+	tests.Stop(t, New(bytes.NewBufferString(csvData)))
 }

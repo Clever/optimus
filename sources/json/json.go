@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"gopkg.in/azylman/optimus.v1"
 	"io"
-	"os"
 )
 
 type table struct {
@@ -35,18 +34,11 @@ func (t *table) handleErr(err error) {
 	}
 }
 
-func (t *table) start(filename string) {
+func (t *table) start(in io.Reader) {
 	defer t.Stop()
 	defer close(t.rows)
 
-	fin, err := os.Open(filename)
-	if err != nil {
-		t.err = err
-		return
-	}
-	defer fin.Close()
-
-	scanner := bufio.NewScanner(fin)
+	scanner := bufio.NewScanner(in)
 	for scanner.Scan() {
 		if t.stopped {
 			break
@@ -65,10 +57,10 @@ func (t *table) start(filename string) {
 }
 
 // New returns a new Table that scans over the rows of a file of newline-separate JSON objects.
-func New(filename string) optimus.Table {
+func New(in io.Reader) optimus.Table {
 	table := &table{
 		rows: make(chan optimus.Row),
 	}
-	go table.start(filename)
+	go table.start(in)
 	return table
 }

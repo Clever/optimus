@@ -8,6 +8,6 @@
 #### func  New
 
 ```go
-func New(filename string) optimus.Sink
+func New(out io.Writer) optimus.Sink
 ```
 New writes all of the Rows in a Table as newline-separate JSON objects.

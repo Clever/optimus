@@ -1,33 +1,25 @@
 package csv
 
 import (
+	"bytes"
 	"errors"
 	"github.com/stretchr/testify/assert"
 	errorSource "gopkg.in/azylman/optimus.v1/sources/error"
 	"gopkg.in/azylman/optimus.v1/sources/json"
-	"io/ioutil"
-	"strings"
 	"testing"
 )
 
-func readFile(filename string) ([]string, error) {
-	content, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	lines := strings.Split(string(content), "\n")
-	return lines, nil
-}
+var jsonData = `{"header1":"field1","header2":"field2","header3":"field3"}
+{"header1":"field4","header2":"field5","header3":"field6"}
+{"header1":"field7","header2":"field8","header3":"field9"}
+`
 
 func TestJSONSink(t *testing.T) {
-	assert.Nil(t, New("./data_write.json")(json.New("./data.json")))
-	expected, err := readFile("./data_write.json")
-	assert.Nil(t, err)
-	actual, err := readFile("./data.json")
-	assert.Nil(t, err)
-	assert.Equal(t, expected, actual)
+	actual := &bytes.Buffer{}
+	assert.Nil(t, New(actual)(json.New(bytes.NewBufferString(jsonData))))
+	assert.Equal(t, actual.String(), jsonData)
 }
 
 func TestJSONSinkError(t *testing.T) {
-	assert.EqualError(t, New("./data_write.json")(errorSource.New(errors.New("failed"))), "failed")
+	assert.EqualError(t, New(&bytes.Buffer{})(errorSource.New(errors.New("failed"))), "failed")
 }

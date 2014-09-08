@@ -8,7 +8,7 @@
 #### func  New
 
 ```go
-func New(source optimus.Table, filename string) error
+func New(filename string) optimus.Sink
 ```
 New writes all of the Rows in a Table to a CSV file. It assumes that all Rows
 have the same headers. Columns are written in alphabetical order.

@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"gopkg.in/azylman/optimus.v1"
 	"io"
-	"os"
 )
 
 type table struct {
@@ -13,14 +12,11 @@ type table struct {
 	stopped bool
 }
 
-func (t *table) start(filename string) {
+func (t *table) start(in io.Reader) {
 	defer t.Stop()
 	defer close(t.rows)
 
-	fin, err := os.Open(filename)
-	defer fin.Close()
-
-	reader := csv.NewReader(fin)
+	reader := csv.NewReader(in)
 
 	headers, err := reader.Read()
 	if err != nil {
@@ -72,10 +68,10 @@ func convertLineToRow(line []string, headers []string) optimus.Row {
 }
 
 // New returns a new Table that scans over the rows of a CSV.
-func New(filename string) optimus.Table {
+func New(in io.Reader) optimus.Table {
 	table := &table{
 		rows: make(chan optimus.Row),
 	}
-	go table.start(filename)
+	go table.start(in)
 	return table
 }

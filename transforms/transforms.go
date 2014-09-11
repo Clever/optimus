@@ -1,7 +1,7 @@
 package transforms
 
 import (
-	"gopkg.in/Clever/optimus.v2"
+	"gopkg.in/Clever/optimus.v3"
 	"gopkg.in/fatih/set.v0"
 	"sync"
 )

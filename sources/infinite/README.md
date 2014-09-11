@@ -1,6 +1,6 @@
 # infinite
 --
-    import "gopkg.in/Clever/optimus.v2/sources/infinite"
+    import "gopkg.in/Clever/optimus.v3/sources/infinite"
 
 
 ## Usage

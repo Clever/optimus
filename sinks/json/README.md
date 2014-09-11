@@ -1,6 +1,6 @@
 # csv
 --
-    import "gopkg.in/Clever/optimus.v2/sinks/json"
+    import "gopkg.in/Clever/optimus.v3/sinks/json"
 
 
 ## Usage

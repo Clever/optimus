@@ -1,8 +1,8 @@
 package slice
 
 import (
-	"gopkg.in/Clever/optimus.v2"
-	"gopkg.in/Clever/optimus.v2/tests"
+	"gopkg.in/Clever/optimus.v3"
+	"gopkg.in/Clever/optimus.v3/tests"
 	"testing"
 )
 

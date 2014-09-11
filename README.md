@@ -1,6 +1,6 @@
 # optimus
 --
-    import "gopkg.in/Clever/optimus.v2"
+    import "gopkg.in/Clever/optimus.v3"
 
 Package optimus provides methods for manipulating tables of data.
 
@@ -13,10 +13,10 @@ CSV file:
     package optimus
 
     import(
-    	csvSource "gopkg.in/Clever/optimus.v2/sources/csv"
-    	csvSink "gopkg.in/Clever/optimus.v2/sinks/csv"
-    	"gopkg.in/Clever/optimus.v2"
-    	"gopkg.in/Clever/optimus.v2/transforms"
+    	csvSource "gopkg.in/Clever/optimus.v3/sources/csv"
+    	csvSink "gopkg.in/Clever/optimus.v3/sinks/csv"
+    	"gopkg.in/Clever/optimus.v3"
+    	"gopkg.in/Clever/optimus.v3/transforms"
     	"os"
     )
 
@@ -36,10 +36,10 @@ Here's one that uses chaining:
     package optimus
 
     import(
-    	csvSource "gopkg.in/Clever/optimus.v2/sources/csv"
-    	csvSink "gopkg.in/Clever/optimus.v2/sinks/csv"
-    	"gopkg.in/Clever/optimus.v2"
-    	"gopkg.in/Clever/optimus.v2/transformer"
+    	csvSource "gopkg.in/Clever/optimus.v3/sources/csv"
+    	csvSink "gopkg.in/Clever/optimus.v3/sinks/csv"
+    	"gopkg.in/Clever/optimus.v3"
+    	"gopkg.in/Clever/optimus.v3/transformer"
     	"os"
     )
 

@@ -1,7 +1,7 @@
 package infinite
 
 import (
-	"gopkg.in/Clever/optimus.v2/tests"
+	"gopkg.in/Clever/optimus.v3/tests"
 	"testing"
 )
 

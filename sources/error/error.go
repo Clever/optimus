@@ -1,7 +1,7 @@
 package error
 
 import (
-	"gopkg.in/Clever/optimus.v2"
+	"gopkg.in/Clever/optimus.v3"
 )
 
 type errorTable struct {

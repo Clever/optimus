@@ -3,11 +3,11 @@ package transformer
 import (
 	"errors"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/Clever/optimus.v2"
-	"gopkg.in/Clever/optimus.v2/sources/infinite"
-	"gopkg.in/Clever/optimus.v2/sources/slice"
-	"gopkg.in/Clever/optimus.v2/tests"
-	"gopkg.in/Clever/optimus.v2/transforms"
+	"gopkg.in/Clever/optimus.v3"
+	"gopkg.in/Clever/optimus.v3/sources/infinite"
+	"gopkg.in/Clever/optimus.v3/sources/slice"
+	"gopkg.in/Clever/optimus.v3/tests"
+	"gopkg.in/Clever/optimus.v3/transforms"
 	"testing"
 )
 

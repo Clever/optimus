@@ -1,6 +1,6 @@
 # transforms
 --
-    import "gopkg.in/Clever/optimus.v2/transforms"
+    import "gopkg.in/Clever/optimus.v3/transforms"
 
 
 ## Usage

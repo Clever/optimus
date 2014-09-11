@@ -1,6 +1,6 @@
 # transformer
 --
-    import "gopkg.in/azylman/optimus.v2/transformer"
+    import "gopkg.in/Clever/optimus.v2/transformer"
 
 
 ## Usage

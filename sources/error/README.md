@@ -1,6 +1,6 @@
 # error
 --
-    import "gopkg.in/azylman/optimus.v2/sources/error"
+    import "gopkg.in/Clever/optimus.v2/sources/error"
 
 
 ## Usage

@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-PKG := gopkg.in/azylman/optimus.v2
+PKG := gopkg.in/Clever/optimus.v2
 SOURCES := $(shell ls sources)
 SINKS := $(shell ls sinks)
 SUBPKG_NAMES := $(addprefix sources/, $(SOURCES)) $(addprefix sinks/, $(SINKS)) transformer transforms

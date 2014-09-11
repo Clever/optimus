@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"github.com/stretchr/testify/assert"
-	errorSource "gopkg.in/azylman/optimus.v2/sources/error"
-	"gopkg.in/azylman/optimus.v2/sources/json"
+	errorSource "gopkg.in/Clever/optimus.v2/sources/error"
+	"gopkg.in/Clever/optimus.v2/sources/json"
 	"testing"
 )
 

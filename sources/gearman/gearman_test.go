@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"gopkg.in/Clever/gearman.v1/job"
 	"gopkg.in/Clever/gearman.v1/packet"
-	"gopkg.in/azylman/optimus.v2"
-	"gopkg.in/azylman/optimus.v2/tests"
+	"gopkg.in/Clever/optimus.v2"
+	"gopkg.in/Clever/optimus.v2/tests"
 	"io"
 	"testing"
 )

@@ -5,7 +5,7 @@ import (
 	"gopkg.in/Clever/gearman.v1"
 	"gopkg.in/Clever/gearman.v1/job"
 	gearmanUtils "gopkg.in/Clever/gearman.v1/utils"
-	"gopkg.in/azylman/optimus.v2"
+	"gopkg.in/Clever/optimus.v2"
 )
 
 type table struct {

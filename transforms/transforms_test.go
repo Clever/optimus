@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/azylman/optimus.v2"
-	"gopkg.in/azylman/optimus.v2/sources/infinite"
-	"gopkg.in/azylman/optimus.v2/sources/slice"
-	"gopkg.in/azylman/optimus.v2/tests"
+	"gopkg.in/Clever/optimus.v2"
+	"gopkg.in/Clever/optimus.v2/sources/infinite"
+	"gopkg.in/Clever/optimus.v2/sources/slice"
+	"gopkg.in/Clever/optimus.v2/tests"
 	"testing"
 )
 

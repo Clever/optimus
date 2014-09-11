@@ -3,7 +3,7 @@ package csv
 import (
 	"encoding/csv"
 	"fmt"
-	"gopkg.in/azylman/optimus.v2"
+	"gopkg.in/Clever/optimus.v2"
 	"io"
 	"sort"
 )

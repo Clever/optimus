@@ -3,8 +3,8 @@ package csv
 import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/azylman/optimus.v2"
-	"gopkg.in/azylman/optimus.v2/tests"
+	"gopkg.in/Clever/optimus.v2"
+	"gopkg.in/Clever/optimus.v2/tests"
 	"testing"
 )
 

@@ -8,10 +8,10 @@ Here's an example program that performs a set of field and value mappings on a C
 	package optimus
 
 	import(
-		csvSource "gopkg.in/azylman/optimus.v1/sources/csv"
-		csvSink "gopkg.in/azylman/optimus.v1/sinks/csv"
-		"gopkg.in/azylman/optimus.v1"
-		"gopkg.in/azylman/optimus.v1/transforms"
+		csvSource "gopkg.in/azylman/optimus.v2/sources/csv"
+		csvSink "gopkg.in/azylman/optimus.v2/sinks/csv"
+		"gopkg.in/azylman/optimus.v2"
+		"gopkg.in/azylman/optimus.v2/transforms"
 		"os"
 	)
 
@@ -31,10 +31,10 @@ Here's one that uses chaining:
 	package optimus
 
 	import(
-		csvSource "gopkg.in/azylman/optimus.v1/sources/csv"
-		csvSink "gopkg.in/azylman/optimus.v1/sinks/csv"
-		"gopkg.in/azylman/optimus.v1"
-		"gopkg.in/azylman/optimus.v1/transformer"
+		csvSource "gopkg.in/azylman/optimus.v2/sources/csv"
+		csvSink "gopkg.in/azylman/optimus.v2/sinks/csv"
+		"gopkg.in/azylman/optimus.v2"
+		"gopkg.in/azylman/optimus.v2/transformer"
 		"os"
 	)
 

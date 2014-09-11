@@ -1,6 +1,6 @@
 # csv
 --
-    import "gopkg.in/azylman/optimus.v1/sources/csv"
+    import "gopkg.in/azylman/optimus.v2/sources/csv"
 
 
 ## Usage

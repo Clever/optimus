@@ -3,8 +3,8 @@ package json
 import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/azylman/optimus.v1"
-	"gopkg.in/azylman/optimus.v1/tests"
+	"gopkg.in/azylman/optimus.v2"
+	"gopkg.in/azylman/optimus.v2/tests"
 	"testing"
 )
 

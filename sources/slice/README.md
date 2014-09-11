@@ -1,6 +1,6 @@
 # slice
 --
-    import "gopkg.in/azylman/optimus.v1/sources/slice"
+    import "gopkg.in/azylman/optimus.v2/sources/slice"
 
 
 ## Usage

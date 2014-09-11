@@ -2,7 +2,7 @@ package tests
 
 import (
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/azylman/optimus.v1"
+	"gopkg.in/azylman/optimus.v2"
 	"testing"
 )
 

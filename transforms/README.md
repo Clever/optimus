@@ -1,6 +1,6 @@
 # transforms
 --
-    import "gopkg.in/azylman/optimus.v1/transforms"
+    import "gopkg.in/azylman/optimus.v2/transforms"
 
 
 ## Usage

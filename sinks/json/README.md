@@ -1,6 +1,6 @@
 # csv
 --
-    import "gopkg.in/azylman/optimus.v1/sinks/json"
+    import "gopkg.in/azylman/optimus.v2/sinks/json"
 
 
 ## Usage

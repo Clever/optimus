@@ -3,11 +3,11 @@ package transformer
 import (
 	"errors"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/azylman/optimus.v1"
-	"gopkg.in/azylman/optimus.v1/sources/infinite"
-	"gopkg.in/azylman/optimus.v1/sources/slice"
-	"gopkg.in/azylman/optimus.v1/tests"
-	"gopkg.in/azylman/optimus.v1/transforms"
+	"gopkg.in/azylman/optimus.v2"
+	"gopkg.in/azylman/optimus.v2/sources/infinite"
+	"gopkg.in/azylman/optimus.v2/sources/slice"
+	"gopkg.in/azylman/optimus.v2/tests"
+	"gopkg.in/azylman/optimus.v2/transforms"
 	"testing"
 )
 

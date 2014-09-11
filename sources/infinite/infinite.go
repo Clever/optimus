@@ -1,7 +1,7 @@
 package infinite
 
 import (
-	"gopkg.in/azylman/optimus.v1"
+	"gopkg.in/azylman/optimus.v2"
 )
 
 type infiniteTable struct {

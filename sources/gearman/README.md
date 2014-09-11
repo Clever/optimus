@@ -1,6 +1,6 @@
 # gearman
 --
-    import "gopkg.in/azylman/optimus.v1/sources/gearman"
+    import "gopkg.in/azylman/optimus.v2/sources/gearman"
 
 
 ## Usage

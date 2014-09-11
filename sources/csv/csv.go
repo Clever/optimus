@@ -2,7 +2,7 @@ package csv
 
 import (
 	"encoding/csv"
-	"gopkg.in/azylman/optimus.v1"
+	"gopkg.in/azylman/optimus.v2"
 	"io"
 )
 

@@ -67,6 +67,11 @@ func (t *Transformer) Concat(tables ...optimus.Table) *Transformer {
 	return t.Apply(transforms.Concat(tables...))
 }
 
+// Sink consumes all the Rows.
+func (t *Transformer) Sink(sink optimus.Sink) error {
+	return sink(t.table)
+}
+
 // New returns a Transformer that allows you to chain transformations on a Table.
 func New(table optimus.Table) *Transformer {
 	return &Transformer{table}

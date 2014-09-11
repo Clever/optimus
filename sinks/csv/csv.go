@@ -29,34 +29,36 @@ func convertRowToHeader(row optimus.Row) []string {
 
 // New writes all of the Rows in a Table to a CSV file. It assumes that all Rows have the same
 // headers. Columns are written in alphabetical order.
-func New(source optimus.Table, filename string) error {
-	fout, err := os.Create(filename)
-	defer fout.Close()
-	if err != nil {
-		return err
-	}
-	writer := csv.NewWriter(fout)
-	headers := []string{}
-	wroteHeader := false
-	for row := range source.Rows() {
-		if !wroteHeader {
-			headers = convertRowToHeader(row)
-			sort.Strings(headers)
-			if err := writer.Write(headers); err != nil {
-				return err
-			}
-			wroteHeader = true
-		}
-		if err := writer.Write(convertRowToRecord(row, headers)); err != nil {
+func New(filename string) optimus.Sink {
+	return func(source optimus.Table) error {
+		fout, err := os.Create(filename)
+		defer fout.Close()
+		if err != nil {
 			return err
 		}
+		writer := csv.NewWriter(fout)
+		headers := []string{}
+		wroteHeader := false
+		for row := range source.Rows() {
+			if !wroteHeader {
+				headers = convertRowToHeader(row)
+				sort.Strings(headers)
+				if err := writer.Write(headers); err != nil {
+					return err
+				}
+				wroteHeader = true
+			}
+			if err := writer.Write(convertRowToRecord(row, headers)); err != nil {
+				return err
+			}
+		}
+		if source.Err() != nil {
+			return source.Err()
+		}
+		writer.Flush()
+		if writer.Error() != nil {
+			return writer.Error()
+		}
+		return nil
 	}
-	if source.Err() != nil {
-		return source.Err()
-	}
-	writer.Flush()
-	if writer.Error() != nil {
-		return writer.Error()
-	}
-	return nil
 }

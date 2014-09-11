@@ -77,6 +77,13 @@ func (t *Transformer) Select(filter func(optimus.Row) (bool, error)) *Transforme
 ```
 Select Applies a Select transform.
 
+#### func (*Transformer) Sink
+
+```go
+func (t *Transformer) Sink(sink optimus.Sink) error
+```
+Sink consumes all the Rows.
+
 #### func (Transformer) Table
 
 ```go

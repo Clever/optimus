@@ -14,6 +14,9 @@ type Table interface {
 	Stop()
 }
 
+// A Sink function takes a Table and consumes all of its Rows.
+type Sink func(Table) error
+
 // Row is a representation of a line of data in a Table.
 type Row map[string]interface{}
 

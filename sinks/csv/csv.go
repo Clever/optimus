@@ -3,9 +3,10 @@ package csv
 import (
 	"encoding/csv"
 	"fmt"
-	"gopkg.in/Clever/optimus.v3"
 	"io"
 	"sort"
+
+	"gopkg.in/Clever/optimus.v3"
 )
 
 func convertRowToRecord(row optimus.Row, headers []string) []string {
@@ -30,8 +31,15 @@ func convertRowToHeader(row optimus.Row) []string {
 // New writes all of the Rows in a Table to a CSV file. It assumes that all Rows have the same
 // headers. Columns are written in alphabetical order.
 func New(out io.Writer) optimus.Sink {
+	return NewWithDelimiter(out, ',')
+}
+
+// NewWithDelimiter writes all of the Rows in a Table to a CSV file delimited as specified. It assumes
+// that all Rows have the same headers. Columns are written in alphabetical order.
+func NewWithDelimiter(out io.Writer, delimiter rune) optimus.Sink {
 	return func(source optimus.Table) error {
 		writer := csv.NewWriter(out)
+		writer.Comma = delimiter
 		headers := []string{}
 		wroteHeader := false
 		for row := range source.Rows() {

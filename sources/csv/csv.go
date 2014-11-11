@@ -2,8 +2,9 @@ package csv
 
 import (
 	"encoding/csv"
-	"gopkg.in/Clever/optimus.v3"
 	"io"
+
+	"gopkg.in/Clever/optimus.v3"
 )
 
 type table struct {
@@ -12,11 +13,12 @@ type table struct {
 	stopped bool
 }
 
-func (t *table) start(in io.Reader) {
+func (t *table) start(in io.Reader, delimiter rune) {
 	defer t.Stop()
 	defer close(t.rows)
 
 	reader := csv.NewReader(in)
+	reader.Comma = delimiter
 
 	headers, err := reader.Read()
 	if err != nil {
@@ -69,9 +71,14 @@ func convertLineToRow(line []string, headers []string) optimus.Row {
 
 // New returns a new Table that scans over the rows of a CSV.
 func New(in io.Reader) optimus.Table {
+	return NewWithDelimiter(in, ',')
+}
+
+// NewWithDelimiter returns a new Table that scans over the rows of a CSV delimited as specified.
+func NewWithDelimiter(in io.Reader, delimiter rune) optimus.Table {
 	table := &table{
 		rows: make(chan optimus.Row),
 	}
-	go table.start(in)
+	go table.start(in, delimiter)
 	return table
 }

@@ -2,8 +2,9 @@ package csv
 
 import (
 	"encoding/csv"
-	"gopkg.in/Clever/optimus.v3"
 	"io"
+
+	"gopkg.in/Clever/optimus.v3"
 )
 
 type table struct {
@@ -12,11 +13,9 @@ type table struct {
 	stopped bool
 }
 
-func (t *table) start(in io.Reader) {
+func (t *table) start(reader *csv.Reader) {
 	defer t.Stop()
 	defer close(t.rows)
-
-	reader := csv.NewReader(in)
 
 	headers, err := reader.Read()
 	if err != nil {
@@ -69,9 +68,14 @@ func convertLineToRow(line []string, headers []string) optimus.Row {
 
 // New returns a new Table that scans over the rows of a CSV.
 func New(in io.Reader) optimus.Table {
+	return NewWithCsvReader(csv.NewReader(in))
+}
+
+// NewWithCsvReader returns a new Table that scans over the rows from the csv reader.
+func NewWithCsvReader(reader *csv.Reader) optimus.Table {
 	table := &table{
 		rows: make(chan optimus.Row),
 	}
-	go table.start(in)
+	go table.start(reader)
 	return table
 }

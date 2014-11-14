@@ -2,6 +2,7 @@ package csv
 
 import (
 	"bytes"
+	csvEncoding "encoding/csv"
 	"errors"
 	"strings"
 	"testing"
@@ -27,9 +28,11 @@ func TestCSVSink(t *testing.T) {
 	assert.Equal(t, actual.String(), csvData)
 }
 
-func TestTabSink(t *testing.T) {
+func TestTabSync(t *testing.T) {
 	actual := &bytes.Buffer{}
-	assert.Nil(t, NewWithDelimiter(actual, '\t')(csv.New(bytes.NewBufferString(csvData))))
+	writer := csvEncoding.NewWriter(actual)
+	writer.Comma = '\t'
+	assert.Nil(t, NewWithCsvWriter(writer)(csv.New(bytes.NewBufferString(csvData))))
 	assert.Equal(t, actual.String(), tabData)
 }
 

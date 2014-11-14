@@ -13,12 +13,9 @@ type table struct {
 	stopped bool
 }
 
-func (t *table) start(in io.Reader, delimiter rune) {
+func (t *table) start(reader *csv.Reader) {
 	defer t.Stop()
 	defer close(t.rows)
-
-	reader := csv.NewReader(in)
-	reader.Comma = delimiter
 
 	headers, err := reader.Read()
 	if err != nil {
@@ -71,14 +68,14 @@ func convertLineToRow(line []string, headers []string) optimus.Row {
 
 // New returns a new Table that scans over the rows of a CSV.
 func New(in io.Reader) optimus.Table {
-	return NewWithDelimiter(in, ',')
+	return NewWithCsvReader(csv.NewReader(in))
 }
 
-// NewWithDelimiter returns a new Table that scans over the rows of a CSV delimited as specified.
-func NewWithDelimiter(in io.Reader, delimiter rune) optimus.Table {
+// NewWithCsvReader returns a new Table that scans over the rows from the csv reader.
+func NewWithCsvReader(reader *csv.Reader) optimus.Table {
 	table := &table{
 		rows: make(chan optimus.Row),
 	}
-	go table.start(in, delimiter)
+	go table.start(reader)
 	return table
 }

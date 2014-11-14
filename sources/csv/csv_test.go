@@ -2,6 +2,7 @@ package csv
 
 import (
 	"bytes"
+	"encoding/csv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,7 +30,9 @@ func TestCSVSource(t *testing.T) {
 }
 
 func TestTabSource(t *testing.T) {
-	table := NewWithDelimiter(bytes.NewBufferString(tabData), '\t')
+	reader := csv.NewReader(bytes.NewBufferString(tabData))
+	reader.Comma = '\t'
+	table := NewWithCsvReader(reader)
 	assert.Equal(t, expected, tests.GetRows(table))
 	assert.Nil(t, table.Err())
 }

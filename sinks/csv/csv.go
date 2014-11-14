@@ -31,15 +31,13 @@ func convertRowToHeader(row optimus.Row) []string {
 // New writes all of the Rows in a Table to a CSV file. It assumes that all Rows have the same
 // headers. Columns are written in alphabetical order.
 func New(out io.Writer) optimus.Sink {
-	return NewWithDelimiter(out, ',')
+	return NewWithCsvWriter(csv.NewWriter(out))
 }
 
-// NewWithDelimiter writes all of the Rows in a Table to a CSV file delimited as specified. It assumes
-// that all Rows have the same headers. Columns are written in alphabetical order.
-func NewWithDelimiter(out io.Writer, delimiter rune) optimus.Sink {
+// NewWithCsvWriter writes all of the Rows in a Table to a CSV file using the options in the CSV writer.
+// It assumes that all Rows have the same headers. Columns are written in alphabetical order.
+func NewWithCsvWriter(writer *csv.Writer) optimus.Sink {
 	return func(source optimus.Table) error {
-		writer := csv.NewWriter(out)
-		writer.Comma = delimiter
 		headers := []string{}
 		wroteHeader := false
 		for row := range source.Rows() {

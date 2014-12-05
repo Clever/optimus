@@ -51,6 +51,14 @@ func Join(rightTable optimus.Table, leftHeader string, rightHeader string, join 
 Join returns a TransformFunc that joins Rows with another table using the
 specified join type.
 
+#### func  JoinCustom
+
+```go
+func JoinCustom(rightTable optimus.Table, leftHeader string, rightHeader string, join joinType, fn func(optimus.Row, optimus.Row) optimus.Row) optimus.TransformFunc
+```
+JoinCustom returns a TransformFunc that joins Rows with another table using the
+specified join type and join function
+
 #### func  Map
 
 ```go

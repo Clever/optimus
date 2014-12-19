@@ -15,7 +15,7 @@ golint:
 
 README.md: *.go
 	@go get github.com/robertkrimen/godocdown/godocdown
-	@PATH=$(PATH):$(GOPATH)/bin godocdown -template=.godocdown.template $(PKG) > README.md
+	@$(GOPATH)/bin godocdown -template=.godocdown.template $(PKG) > README.md
 
 $(PKGS): golint docs
 	@go get -d -t $@

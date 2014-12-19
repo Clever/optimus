@@ -1,0 +1,19 @@
+{{ .Emit }}
+
+## Releasing
+To create a new Optimus version do the following:
+1. Download gitsem, a tool for semantic versioning with Git
+```
+go get github.com/Clever/gitsem
+```
+
+2. Run gitsem in the root directory of the master Optimus branch
+```
+gitsem <VERSION>
+```
+VERSION can one of ```newversion | patch | minor | major``` as documented at (https://github.com/Clever/gitsem)
+
+3. Push the changes to git
+```
+git push && git push --tags
+```

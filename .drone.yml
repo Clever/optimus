@@ -1,5 +1,7 @@
 image: go1.2
 script:
+  - mkdir -p $GOPATH/src/gopkg.in/Clever
+  - ln -s `pwd` $GOPATH/src/gopkg.in/Clever/optimus.v3
   - make test
 notify:
   email:

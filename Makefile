@@ -10,19 +10,21 @@ PKGS = $(PKG) $(SUBPKGS)
 
 test: docs $(PKGS)
 
-golint:
+$(GOPATH)/bin/golint:
 	@go get github.com/golang/lint/golint
 
-README.md: *.go
+$(GOPATH)/bin/godocdown:
 	@go get github.com/robertkrimen/godocdown/godocdown
-	@$(GOPATH)/bin godocdown -template=.godocdown.template $(PKG) > README.md
 
-$(PKGS): golint docs
+README.md: $(GOPATH)/bin/godocdown *.go
+	@$(GOPATH)/bin/godocdown -template=.godocdown.template $(PKG) > README.md
+
+$(PKGS): $(GOPATH)/bin/golint docs
 	@go get -d -t $@
 	@gofmt -w=true $(GOPATH)/src/$@*/**.go
 ifneq ($(NOLINT),1)
 	@echo "LINTING..."
-	@PATH=$(PATH):$(GOPATH)/bin golint $(GOPATH)/src/$@*/**.go
+	@$(GOPATH)/bin/golint $(GOPATH)/src/$@*/**.go
 	@echo ""
 endif
 ifeq ($(COVERAGE),1)
@@ -35,7 +37,5 @@ else
 endif
 
 docs: $(addsuffix /README.md, $(SUBPKG_NAMES)) README.md
-%/README.md: PATH := $(PATH):$(GOPATH)/bin
-%/README.md: %/*.go
-	@go get github.com/robertkrimen/godocdown/godocdown
-	@godocdown $(PKG)/$(shell dirname $@) > $@
+%/README.md: %/*.go $(GOPATH)/bin/godocdown
+	@$(GOPATH)/bin/godocdown $(PKG)/$(shell dirname $@) > $@

@@ -18,9 +18,6 @@ func (s sliceTable) Err() error {
 }
 
 func (s *sliceTable) Stop() {
-	if s.stopped {
-		return
-	}
 	s.stopped = true
 }
 

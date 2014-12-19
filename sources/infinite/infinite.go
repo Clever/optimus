@@ -18,9 +18,6 @@ func (i infiniteTable) Err() error {
 }
 
 func (i *infiniteTable) Stop() {
-	if i.stopped {
-		return
-	}
 	i.stopped = true
 }
 

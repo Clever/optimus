@@ -22,9 +22,6 @@ func (t table) Err() error {
 }
 
 func (t *table) Stop() {
-	if t.stopped {
-		return
-	}
 	t.stopped = true
 }
 

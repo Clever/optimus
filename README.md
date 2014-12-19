@@ -108,9 +108,9 @@ should receive the Rows from in and may send any number of Rows to out. It
 should not return until it has finished all work (received all the Rows it's
 going to receive, sent all the Rows it's going to send).
 
-## Version Management
+## Releasing
 To create a new Optimus version do the following:
-1. Get gitsem, a tool for semantic versioning with Git
+1. Download gitsem, a tool for semantic versioning with Git
 ```
 go get github.com/Clever/gitsem
 ```
@@ -119,10 +119,9 @@ go get github.com/Clever/gitsem
 ```
 gitsem <VERSION>
 ```
-VERSION can one of ```newversion | patch | minor | major``` as documented at https://github.com/Clever/gitsem
+VERSION can one of ```newversion | patch | minor | major``` as documented at (https://github.com/Clever/gitsem)
 
 3. Push the changes to git
 ```
-git push
-git push --tags
+git push && git push --tags
 ```

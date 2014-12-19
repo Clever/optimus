@@ -107,3 +107,22 @@ TransformFunc is a function that can be applied to a Table to transform it. It
 should receive the Rows from in and may send any number of Rows to out. It
 should not return until it has finished all work (received all the Rows it's
 going to receive, sent all the Rows it's going to send).
+
+## Version Management
+To create a new Optimus version do the following:
+1. Get gitsem, a tool for semantic versioning with Git
+```
+go get github.com/Clever/gitsem
+```
+
+2. Run gitsem in the root directory of the master Optimus branch
+```
+gitsem <VERSION>
+```
+VERSION can one of ```newversion | patch | minor | major``` as documented at https://github.com/Clever/gitsem
+
+3. Push the changes to git
+```
+git push
+git push --tags
+```

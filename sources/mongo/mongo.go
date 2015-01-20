@@ -14,7 +14,7 @@ import (
 	"gopkg.in/Clever/optimus.v3"
 )
 
-// Iter simulates the mgo.Iter interface so we can remain independent
+// Iter simulates the gopkg.in/mgo.v2.Iter interface so we can remain independent
 type Iter interface {
 	Next(result interface{}) bool
 	Err() error
@@ -27,7 +27,7 @@ func New(iter Iter) optimus.Table {
 	return s
 }
 
-// mongoSource type matches the
+// mongoSource type matches the gopkg.in/mgo.v2.Iter interface
 type mongoSource struct {
 	err     error
 	rows    chan optimus.Row
@@ -48,17 +48,17 @@ func (s *mongoSource) start(iter Iter) {
 	s.err = iter.Err()
 }
 
-// Rows returns the read side of the channel of optimus Rows from this mongo source
+// Rows implements the optimus.Table interface
 func (s *mongoSource) Rows() <-chan optimus.Row {
 	return s.rows
 }
 
-// Err returns the last set err from the source
+// Err implements the optimus.Table interface
 func (s *mongoSource) Err() error {
 	return s.err
 }
 
-// Stop sets the stopped flag on the source
+// Stop implements the optimus.Table interface
 func (s *mongoSource) Stop() {
 	s.stopped = true
 }

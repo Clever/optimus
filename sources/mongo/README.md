@@ -21,4 +21,4 @@ type Iter interface {
 }
 ```
 
-Iter simulates the mgo.Iter interface so we can remain independent
+Iter simulates the gopkg.in/mgo.v2.Iter interface so we can remain independent

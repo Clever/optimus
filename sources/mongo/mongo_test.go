@@ -92,22 +92,12 @@ var testData = []struct {
 // We should be able to get our rows/errors from a good and error iterator
 func TestSuccessRows(t *testing.T) {
 	t.Parallel()
-	data := testData[0]
-	// Build the optimusTable
-	sourceTable := New(data.GivenIter)
+	for _, data := range testData {
+		// Build the optimusTable
+		sourceTable := New(data.GivenIter)
 
-	// Assert the result rows and errors occur
-	assert.Equal(t, data.ExpectedRows, tests.GetRows(sourceTable))
-	assert.Equal(t, data.ExpectedErr, sourceTable.Err())
-}
-
-func TestErrorRows(t *testing.T) {
-	t.Parallel()
-	data := testData[1]
-	// Build the optimusTable
-	sourceTable := New(data.GivenIter)
-
-	// Assert the result rows and errors occur
-	assert.Equal(t, data.ExpectedRows, tests.GetRows(sourceTable))
-	assert.Equal(t, data.ExpectedErr, sourceTable.Err())
+		// Assert the result rows and errors occur
+		assert.Equal(t, data.ExpectedRows, tests.GetRows(sourceTable))
+		assert.Equal(t, data.ExpectedErr, sourceTable.Err())
+	}
 }

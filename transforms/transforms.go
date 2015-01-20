@@ -97,22 +97,6 @@ var JoinType = joinStruct{Left: joinType{0}, Inner: joinType{1}}
 
 // Join returns a TransformFunc that joins Rows with another table using the specified join type.
 func Join(rightTable optimus.Table, leftHeader string, rightHeader string, join joinType) optimus.TransformFunc {
-	return JoinCustom(rightTable, leftHeader, rightHeader, join, mergeRows)
-}
-
-func mergeRows(src optimus.Row, dst optimus.Row) optimus.Row {
-	output := optimus.Row{}
-	for k, v := range src {
-		output[k] = v
-	}
-	for k, v := range dst {
-		output[k] = v
-	}
-	return output
-}
-
-// JoinCustom returns a TransformFunc that joins Rows with another table using the specified join type and join function
-func JoinCustom(rightTable optimus.Table, leftHeader string, rightHeader string, join joinType, fn func(optimus.Row, optimus.Row) optimus.Row) optimus.TransformFunc {
 	hash := make(map[interface{}][]optimus.Row)
 
 	// Build hash from right table
@@ -140,7 +124,7 @@ func JoinCustom(rightTable optimus.Table, leftHeader string, rightHeader string,
 				// for each row for that hash value
 				for _, rightRow := range rightRows {
 					// join and send it to the out channel
-					out <- fn(leftRow, rightRow)
+					out <- mergeRows(leftRow, rightRow)
 				}
 			} else {
 				if join == JoinType.Left {
@@ -150,6 +134,17 @@ func JoinCustom(rightTable optimus.Table, leftHeader string, rightHeader string,
 		}
 		return nil
 	}
+}
+
+func mergeRows(src optimus.Row, dst optimus.Row) optimus.Row {
+	output := optimus.Row{}
+	for k, v := range src {
+		output[k] = v
+	}
+	for k, v := range dst {
+		output[k] = v
+	}
+	return output
 }
 
 // Reduce returns a TransformFunc that reduces all the Rows to a single Row.

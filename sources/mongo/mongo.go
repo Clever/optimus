@@ -1,49 +1,64 @@
 package mongo
 
+/*
+ Package mongo adapts a mgo iterator (or anything that implements
+ the interface) into a optimus.Table for consumption
+
+ example:
+   // Connect to mongo, get your collection then do the following:
+	 iter := collection.Find(nil).Limit(100).Iter()
+	 table := mongo.New(iter)
+*/
+
 import (
 	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/mgo.v2"
 )
 
-type table struct {
+// Iter simulates the mgo.Iter interface so we can remain independent
+type Iter interface {
+	Next(result interface{}) bool
+	Err() error
+}
+
+// New returns a new Table that iterates over all the results of a mongo query.
+func New(iter Iter) optimus.Table {
+	s := &mongoSource{rows: make(chan optimus.Row)}
+	go s.start(iter)
+	return s
+}
+
+// mongoSource type matches the
+type mongoSource struct {
 	err     error
 	rows    chan optimus.Row
 	stopped bool
 }
 
-func (t *table) start(q *mgo.Query) {
-	defer t.Stop()
-	defer close(t.rows)
-
-	i := q.Iter()
-	for !t.stopped {
+// start begins feeding rows into the rows channel
+func (s *mongoSource) start(iter Iter) {
+	defer s.Stop()
+	defer close(s.rows)
+	for !s.stopped {
 		r := optimus.Row{}
-		if !i.Next(&r) {
+		if !iter.Next(&r) {
 			break
 		}
-		t.rows <- r
+		s.rows <- r
 	}
-	t.err = i.Err()
+	s.err = iter.Err()
 }
 
-func (t table) Rows() <-chan optimus.Row {
-	return t.rows
+// Rows returns the read side of the channel of optimus Rows from this mongo source
+func (s *mongoSource) Rows() <-chan optimus.Row {
+	return s.rows
 }
 
-func (t table) Err() error {
-	return t.err
+// Err returns the last set err from the source
+func (s *mongoSource) Err() error {
+	return s.err
 }
 
-func (t *table) Stop() {
-	if t.stopped {
-		return
-	}
-	t.stopped = true
-}
-
-// New returns a new Table that iterates over all the results of a mongo query.
-func New(q *mgo.Query) optimus.Table {
-	t := &table{rows: make(chan optimus.Row)}
-	go t.start(q)
-	return t
+// Stop sets the stopped flag on the source
+func (s *mongoSource) Stop() {
+	s.stopped = true
 }

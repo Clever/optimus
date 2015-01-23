@@ -265,20 +265,18 @@ var transformEqualities = []tests.TableCompareConfig{
 }
 
 func TestJoinMergePairs(t *testing.T) {
-	expected := []optimus.Row{
-		{"header1": "value3", "header2": "value2", "header3": "value1"},
+	input := []optimus.Row{
+		{"left": optimus.Row{"k1": "v1", "k2": "v2"}},
+		{"left": optimus.Row{"k1": "v1", "k2": "v2"}, "right": optimus.Row{"k1": "v11", "k3": "v3"}},
 	}
-	leftTable := slice.New([]optimus.Row{
-		{"header1": "value1", "header2": "value2"},
-	})
-	rightTable := slice.New([]optimus.Row{
-		{"header3": "value1", "header1": "value3"},
-	})
+	expected := []optimus.Row{
+		{"k1": "v1", "k2": "v2"},
+		{"k1": "v11", "k2": "v2", "k3": "v3"},
+	}
 
-	combinedTable := optimus.Transform(leftTable, Join(rightTable, "header1", "header3", JoinType.Inner))
-
-	rows := tests.HasRows(t, combinedTable, 1)
-	assert.Equal(t, expected, rows)
+	for i, inp := range input {
+		assert.Equal(t, expected[i], mergePairs(inp))
+	}
 }
 
 func TestJoinErrors(t *testing.T) {

@@ -34,19 +34,21 @@ const (
 // Pair returns a TransformFunc that pairs all the elements in the table with another table, based
 // on the given hashing functions and join type.
 func Pair(rightTable optimus.Table, leftHash, rightHash RowHasher, join PairType) optimus.TransformFunc {
-	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
-		// Hash of everything in the right table
-		right := make(map[interface{}][]optimus.Row)
-		// Track whether or not rows in the right table were joined against
-		joined := make(map[interface{}]bool)
-		// The channel of paired rows from the left and right tables
-		pairedRows := make(chan optimus.Row)
+	// Hash of everything in the right table
+	right := make(map[interface{}][]optimus.Row)
+	// Track whether or not rows in the right table were joined against
+	joined := make(map[interface{}]bool)
 
+	// Start building the hash right away, because it could be slow.
+	hashResult := make(chan error)
+	go func() {
+		defer close(hashResult)
 		// Build the hash for the right table
 		for row := range rightTable.Rows() {
 			hash, err := rightHash(row)
 			if err != nil {
-				return err
+				hashResult <- err
+				return
 			}
 			if val := right[hash]; val == nil {
 				right[hash] = []optimus.Row{}
@@ -54,9 +56,15 @@ func Pair(rightTable optimus.Table, leftHash, rightHash RowHasher, join PairType
 			}
 			right[hash] = append(right[hash], row)
 		}
-		if err := rightTable.Err(); err != nil {
-			return rightTable.Err()
+		hashResult <- rightTable.Err()
+	}()
+
+	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		if err := <-hashResult; err != nil {
+			return err
 		}
+		// The channel of paired rows from the left and right tables
+		pairedRows := make(chan optimus.Row)
 
 		wg := errgroup.Group{}
 		// Pair the left table with the right table based on the hashes

@@ -104,7 +104,7 @@ function.
 #### func  Unique
 
 ```go
-func Unique(hash UniqueHash) optimus.TransformFunc
+func Unique(hash RowHasher) optimus.TransformFunc
 ```
 Unique returns a TransformFunc that returns Rows that are unique, according to
 the specified hash. No order is guaranteed for the unique row which is returned.
@@ -152,11 +152,3 @@ func KeyHasher(key string) RowHasher
 ```
 KeyHasher is a convenience function that returns a RowHasher that hashes based
 on the value of a key in the Row.
-
-#### type UniqueHash
-
-```go
-type UniqueHash RowHasher
-```
-
-UniqueHash is an alias for a RowHasher

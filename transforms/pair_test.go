@@ -16,16 +16,16 @@ var c = optimus.Row{"k5": "v5"}
 
 var joinTests = []struct {
 	left, right, expected []optimus.Row
-	leftHash, rightHash   RowHasher
+	leftID, rightID       RowIdentifier
 }{
 	// All of these tests use "k1" as the key, where none of the rows should match OTHER rows, only
 	// each other
 	{
-		left:      []optimus.Row{},
-		right:     []optimus.Row{},
-		expected:  []optimus.Row{},
-		leftHash:  KeyHasher("k1"),
-		rightHash: KeyHasher("k1"),
+		left:     []optimus.Row{},
+		right:    []optimus.Row{},
+		expected: []optimus.Row{},
+		leftID:   KeyIdentifier("k1"),
+		rightID:  KeyIdentifier("k1"),
 	},
 	{
 		left:  []optimus.Row{a},
@@ -33,8 +33,8 @@ var joinTests = []struct {
 		expected: []optimus.Row{
 			{"left": a, "right": a},
 		},
-		leftHash:  KeyHasher("k1"),
-		rightHash: KeyHasher("k1"),
+		leftID:  KeyIdentifier("k1"),
+		rightID: KeyIdentifier("k1"),
 	},
 	{
 		left:  []optimus.Row{a},
@@ -43,10 +43,10 @@ var joinTests = []struct {
 			{"left": a},
 			{"right": b},
 		},
-		leftHash:  KeyHasher("k1"),
-		rightHash: KeyHasher("k1"),
+		leftID:  KeyIdentifier("k1"),
+		rightID: KeyIdentifier("k1"),
 	},
-	// Trick test where they hash to nil on both sides
+	// Trick test where they identify to nil on both sides
 	{
 		left:  []optimus.Row{c, b},
 		right: []optimus.Row{b, c},
@@ -56,8 +56,8 @@ var joinTests = []struct {
 			{"right": b},
 			{"right": c},
 		},
-		leftHash:  KeyHasher("k1"),
-		rightHash: KeyHasher("k1"),
+		leftID:  KeyIdentifier("k1"),
+		rightID: KeyIdentifier("k1"),
 	},
 	{
 		left:  []optimus.Row{a, b},
@@ -66,8 +66,8 @@ var joinTests = []struct {
 			{"left": a, "right": a},
 			{"left": b},
 		},
-		leftHash:  KeyHasher("k1"),
-		rightHash: KeyHasher("k1"),
+		leftID:  KeyIdentifier("k1"),
+		rightID: KeyIdentifier("k1"),
 	},
 	{
 		left:  []optimus.Row{a},
@@ -76,8 +76,8 @@ var joinTests = []struct {
 			{"left": a, "right": a},
 			{"right": b},
 		},
-		leftHash:  KeyHasher("k1"),
-		rightHash: KeyHasher("k1"),
+		leftID:  KeyIdentifier("k1"),
+		rightID: KeyIdentifier("k1"),
 	},
 	{
 		left:  []optimus.Row{a, a},
@@ -87,8 +87,8 @@ var joinTests = []struct {
 			{"left": a, "right": a},
 			{"right": b},
 		},
-		leftHash:  KeyHasher("k1"),
-		rightHash: KeyHasher("k1"),
+		leftID:  KeyIdentifier("k1"),
+		rightID: KeyIdentifier("k1"),
 	},
 	{
 		left:  []optimus.Row{a, b},
@@ -98,8 +98,8 @@ var joinTests = []struct {
 			{"left": a, "right": a},
 			{"left": b},
 		},
-		leftHash:  KeyHasher("k1"),
-		rightHash: KeyHasher("k1"),
+		leftID:  KeyIdentifier("k1"),
+		rightID: KeyIdentifier("k1"),
 	},
 	{
 		left:  []optimus.Row{a, a},
@@ -110,18 +110,18 @@ var joinTests = []struct {
 			{"left": a, "right": a},
 			{"left": a, "right": a},
 		},
-		leftHash:  KeyHasher("k1"),
-		rightHash: KeyHasher("k1"),
+		leftID:  KeyIdentifier("k1"),
+		rightID: KeyIdentifier("k1"),
 	},
-	// Now let's get fancy and have one test with different hashes
+	// Now let's get fancy and have one test with different ids
 	{
 		left:  []optimus.Row{a},
 		right: []optimus.Row{b},
 		expected: []optimus.Row{
 			{"left": a, "right": b},
 		},
-		leftHash:  KeyHasher("k3"),
-		rightHash: KeyHasher("k2"),
+		leftID:  KeyIdentifier("k3"),
+		rightID: KeyIdentifier("k2"),
 	},
 }
 
@@ -142,7 +142,7 @@ func TestPairSuccess(t *testing.T) {
 			left := slice.New(joinTest.left)
 			right := slice.New(joinTest.right)
 
-			pair := Pair(right, joinTest.leftHash, joinTest.rightHash, joinFilter)
+			pair := Pair(right, joinTest.leftID, joinTest.rightID, joinFilter)
 			table := optimus.Transform(left, pair)
 
 			actual := tests.GetRows(table)
@@ -157,45 +157,45 @@ func TestPairErrorsRightTable(t *testing.T) {
 	left := slice.New([]optimus.Row{a, b, c})
 	right := errorSource.New(fmt.Errorf("garbage error"))
 
-	table := optimus.Transform(left, Pair(right, KeyHasher(""), KeyHasher(""), OuterJoin))
+	table := optimus.Transform(left, Pair(right, KeyIdentifier(""), KeyIdentifier(""), OuterJoin))
 	tests.Consumed(t, table)
 	tests.Consumed(t, right)
 	assert.EqualError(t, table.Err(), "garbage error")
 }
 
-func errHasher(err error) RowHasher {
+func errIdentifier(err error) RowIdentifier {
 	return func(row optimus.Row) (interface{}, error) {
 		return nil, err
 	}
 }
 
 var joinHasherErrors = []struct {
-	left, right         []optimus.Row
-	leftHash, rightHash RowHasher
-	expected            string
+	left, right     []optimus.Row
+	leftID, rightID RowIdentifier
+	expected        string
 }{
 	{
-		left:      []optimus.Row{a},
-		right:     []optimus.Row{a},
-		expected:  "left error",
-		leftHash:  errHasher(fmt.Errorf("left error")),
-		rightHash: KeyHasher("k1"),
+		left:     []optimus.Row{a},
+		right:    []optimus.Row{a},
+		expected: "left error",
+		leftID:   errIdentifier(fmt.Errorf("left error")),
+		rightID:  KeyIdentifier("k1"),
 	},
 	{
-		left:      []optimus.Row{a},
-		right:     []optimus.Row{a},
-		expected:  "left error",
-		leftHash:  KeyHasher("k1"),
-		rightHash: errHasher(fmt.Errorf("left error")),
+		left:     []optimus.Row{a},
+		right:    []optimus.Row{a},
+		expected: "left error",
+		leftID:   KeyIdentifier("k1"),
+		rightID:  errIdentifier(fmt.Errorf("left error")),
 	},
 }
 
-func TestPairErrorsRowHasher(t *testing.T) {
+func TestPairErrorsRowIdentifier(t *testing.T) {
 	for _, joinHasherError := range joinHasherErrors {
 		left := slice.New(joinHasherError.left)
 		right := slice.New(joinHasherError.right)
 
-		table := optimus.Transform(left, Pair(right, joinHasherError.leftHash, joinHasherError.rightHash, OuterJoin))
+		table := optimus.Transform(left, Pair(right, joinHasherError.leftID, joinHasherError.rightID, OuterJoin))
 		tests.Consumed(t, table)
 		tests.Consumed(t, right)
 		assert.EqualError(t, table.Err(), joinHasherError.expected)

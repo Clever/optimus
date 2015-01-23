@@ -107,7 +107,7 @@ func Join(rightTable optimus.Table, leftHeader string, rightHeader string, join 
 		}
 
 		unmergedOut := make(chan optimus.Row)
-		pairer := Pair(rightTable, KeyHasher(leftHeader), KeyHasher(rightHeader), filterFn)
+		pairer := Pair(rightTable, KeyIdentifier(leftHeader), KeyIdentifier(rightHeader), filterFn)
 
 		errs := make(chan error, 1)
 
@@ -200,7 +200,7 @@ func Concat(tables ...optimus.Table) optimus.TransformFunc {
 
 // Unique returns a TransformFunc that returns Rows that are unique, according to the specified hash.
 // No order is guaranteed for the unique row which is returned.
-func Unique(hash RowHasher) optimus.TransformFunc {
+func Unique(hash RowIdentifier) optimus.TransformFunc {
 	set := set.New()
 	return Select(func(row optimus.Row) (bool, error) {
 		hashedRow, err := hash(row)

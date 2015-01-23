@@ -13,9 +13,6 @@ with the fields from the right row.
 In later versions, the Join transform will be removed and Pair will be renamed
 Join.
 
-Until then, there's a PairType used as input to Pair and all the values of it
-are called Join. Deal with it.
-
 ## Usage
 
 ```go
@@ -87,10 +84,10 @@ Map returns a TransformFunc that transforms every row with the given function.
 #### func  Pair
 
 ```go
-func Pair(rightTable optimus.Table, leftHash, rightHash RowHasher, filterFn func(optimus.Row) (bool, error)) optimus.TransformFunc
+func Pair(rightTable optimus.Table, leftID, rightID RowIdentifier, filterFn func(optimus.Row) (bool, error)) optimus.TransformFunc
 ```
 Pair returns a TransformFunc that pairs all the elements in the table with
-another table, based on the given hashing functions and join type.
+another table, based on the given identifier functions and join type.
 
 #### func  Reduce
 
@@ -117,7 +114,7 @@ function.
 #### func  Unique
 
 ```go
-func Unique(hash RowHasher) optimus.TransformFunc
+func Unique(hash RowIdentifier) optimus.TransformFunc
 ```
 Unique returns a TransformFunc that returns Rows that are unique, according to
 the specified hash. No order is guaranteed for the unique row which is returned.
@@ -129,18 +126,19 @@ func Valuemap(mappings map[string]map[interface{}]interface{}) optimus.Transform
 ```
 Valuemap returns a TransformFunc that applies a value mapping to every Row.
 
-#### type RowHasher
+#### type RowIdentifier
 
 ```go
-type RowHasher func(optimus.Row) (interface{}, error)
+type RowIdentifier func(optimus.Row) (interface{}, error)
 ```
 
-RowHasher takes in a row and returns a hash for that Row. Used when Pairing.
+RowIdentifier takes in a row and returns something that uniquely identifies the
+Row.
 
-#### func  KeyHasher
+#### func  KeyIdentifier
 
 ```go
-func KeyHasher(key string) RowHasher
+func KeyIdentifier(key string) RowIdentifier
 ```
-KeyHasher is a convenience function that returns a RowHasher that hashes based
-on the value of a key in the Row.
+KeyIdentifier is a convenience function that returns a RowIdentifier that
+identifies the row based on the value of a key in the Row.

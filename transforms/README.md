@@ -140,7 +140,7 @@ const (
 #### type RowHasher
 
 ```go
-type RowHasher func(optimus.Row) interface{}
+type RowHasher func(optimus.Row) (interface{}, error)
 ```
 
 RowHasher takes in a row and returns a hash for that Row. Used when Pairing.

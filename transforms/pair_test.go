@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/Clever/optimus.v3/sources/error"
+	errorSource "gopkg.in/Clever/optimus.v3/sources/error"
 	"gopkg.in/Clever/optimus.v3/sources/slice"
 	"gopkg.in/Clever/optimus.v3/tests"
 	"testing"
@@ -196,10 +196,49 @@ func TestPairFiltering(t *testing.T) {
 
 func TestPairErrors(t *testing.T) {
 	left := slice.New([]optimus.Row{a, b, c})
-	right := error.New(fmt.Errorf("garbage error"))
+	right := errorSource.New(fmt.Errorf("garbage error"))
 
 	table := optimus.Transform(left, Pair(right, KeyHasher(""), KeyHasher(""), OuterJoin))
 	tests.Consumed(t, table)
 	tests.Consumed(t, right)
 	assert.EqualError(t, table.Err(), "garbage error")
+}
+
+func errHasher(err error) RowHasher {
+	return func(row optimus.Row) (interface{}, error) {
+		return nil, err
+	}
+}
+
+var joinHasherErrors = []struct {
+	left, right         []optimus.Row
+	leftHash, rightHash RowHasher
+	expected            string
+}{
+	{
+		left:      []optimus.Row{a},
+		right:     []optimus.Row{a},
+		expected:  "left error",
+		leftHash:  errHasher(fmt.Errorf("left error")),
+		rightHash: KeyHasher("k1"),
+	},
+	{
+		left:      []optimus.Row{a},
+		right:     []optimus.Row{a},
+		expected:  "left error",
+		leftHash:  KeyHasher("k1"),
+		rightHash: errHasher(fmt.Errorf("left error")),
+	},
+}
+
+func TestPairHasherErrors(t *testing.T) {
+	for _, joinHasherError := range joinHasherErrors {
+		left := slice.New(joinHasherError.left)
+		right := slice.New(joinHasherError.right)
+
+		table := optimus.Transform(left, Pair(right, joinHasherError.leftHash, joinHasherError.rightHash, OuterJoin))
+		tests.Consumed(t, table)
+		tests.Consumed(t, right)
+		assert.EqualError(t, table.Err(), joinHasherError.expected)
+	}
 }

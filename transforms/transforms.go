@@ -198,8 +198,8 @@ func Concat(tables ...optimus.Table) optimus.TransformFunc {
 	}
 }
 
-// UniqueHash takes an optimus.Row and returns a hashed value
-type UniqueHash func(optimus.Row) (interface{}, error)
+// UniqueHash is an alias for a RowHasher
+type UniqueHash RowHasher
 
 // Unique returns a TransformFunc that returns Rows that are unique, according to the specified hash.
 // No order is guaranteed for the unique row which is returned.

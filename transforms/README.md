@@ -156,7 +156,7 @@ on the value of a key in the Row.
 #### type UniqueHash
 
 ```go
-type UniqueHash func(optimus.Row) (interface{}, error)
+type UniqueHash RowHasher
 ```
 
-UniqueHash takes an optimus.Row and returns a hashed value
+UniqueHash is an alias for a RowHasher

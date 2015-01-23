@@ -97,51 +97,44 @@ var JoinType = joinStruct{Left: joinType{0}, Inner: joinType{1}}
 
 // Join returns a TransformFunc that joins Rows with another table using the specified join type.
 func Join(rightTable optimus.Table, leftHeader string, rightHeader string, join joinType) optimus.TransformFunc {
-	hash := make(map[interface{}][]optimus.Row)
-
-	// Build hash from right table
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-		for row := range rightTable.Rows() {
-			// Initialize if dne
-			if val := hash[row[rightHeader]]; val == nil {
-				hash[row[rightHeader]] = []optimus.Row{}
-			}
-			hash[row[rightHeader]] = append(hash[row[rightHeader]], row)
-		}
-	}()
-
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
-		<-done
-		if rightTable.Err() != nil {
-			return rightTable.Err()
+		var filterFn func(optimus.Row) (bool, error)
+		switch join {
+		case JoinType.Left:
+			filterFn = LeftJoin
+		case JoinType.Inner:
+			filterFn = InnerJoin
 		}
 
-		for leftRow := range in {
-			// if value is in the hash
-			if rightRows := hash[leftRow[leftHeader]]; rightRows != nil {
-				// for each row for that hash value
-				for _, rightRow := range rightRows {
-					// join and send it to the out channel
-					out <- mergeRows(leftRow, rightRow)
-				}
-			} else {
-				if join == JoinType.Left {
-					out <- leftRow
-				}
-			}
+		unmergedOut := make(chan optimus.Row)
+		pairer := Pair(rightTable, KeyIdentifier(leftHeader), KeyIdentifier(rightHeader), filterFn)
+
+		errs := make(chan error, 1)
+
+		go func() {
+			defer close(unmergedOut)
+			defer close(errs)
+			errs <- pairer(in, unmergedOut)
+		}()
+		for row := range unmergedOut {
+			out <- mergePairs(row)
 		}
-		return nil
+		return <-errs
 	}
 }
 
-func mergeRows(src optimus.Row, dst optimus.Row) optimus.Row {
+func mergePairs(pairs optimus.Row) optimus.Row {
+	// Assume left exists because that's how Join uses it
+	left := pairs["left"].(optimus.Row)
+	right := pairs["right"]
+	if right == nil {
+		return left
+	}
 	output := optimus.Row{}
-	for k, v := range src {
+	for k, v := range left {
 		output[k] = v
 	}
-	for k, v := range dst {
+	for k, v := range right.(optimus.Row) {
 		output[k] = v
 	}
 	return output
@@ -205,12 +198,9 @@ func Concat(tables ...optimus.Table) optimus.TransformFunc {
 	}
 }
 
-// UniqueHash takes an optimus.Row and returns a hashed value
-type UniqueHash func(optimus.Row) (interface{}, error)
-
 // Unique returns a TransformFunc that returns Rows that are unique, according to the specified hash.
 // No order is guaranteed for the unique row which is returned.
-func Unique(hash UniqueHash) optimus.TransformFunc {
+func Unique(hash RowIdentifier) optimus.TransformFunc {
 	set := set.New()
 	return Select(func(row optimus.Row) (bool, error) {
 		hashedRow, err := hash(row)

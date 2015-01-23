@@ -2,8 +2,32 @@
 --
     import "gopkg.in/Clever/optimus.v3/transforms"
 
+Package transforms provides a set of transformation functions that can be
+applied to optimus.Tables.
+
+For backwards-compatibility, there is a Pair transform and a Join transform.
+
+Join is the same as Pair, except that it overwrites the fields in the left row
+with the fields from the right row.
+
+In later versions, the Join transform will be removed and Pair will be renamed
+Join. The JoinType struct will also be removed in favor of the LeftJoin,
+OuterJoin, etc. functions used by Pair.
 
 ## Usage
+
+```go
+var (
+	// LeftJoin keeps any row where a Row was found in the left Table.
+	LeftJoin = mustHave("left")
+	// RightJoin keeps any row where a Row was found in the right Table.
+	RightJoin = mustHave("right")
+	// InnerJoin keeps any row where a Row was found in both Tables.
+	InnerJoin = mustHave("left", "right")
+	// OuterJoin keeps all rows.
+	OuterJoin = mustHave()
+)
+```
 
 ```go
 var JoinType = joinStruct{Left: joinType{0}, Inner: joinType{1}}
@@ -58,6 +82,14 @@ func Map(transform func(optimus.Row) (optimus.Row, error)) optimus.TransformFunc
 ```
 Map returns a TransformFunc that transforms every row with the given function.
 
+#### func  Pair
+
+```go
+func Pair(rightTable optimus.Table, leftID, rightID RowIdentifier, filterFn func(optimus.Row) (bool, error)) optimus.TransformFunc
+```
+Pair returns a TransformFunc that pairs all the elements in the table with
+another table, based on the given identifier functions and join type.
+
 #### func  Reduce
 
 ```go
@@ -83,7 +115,7 @@ function.
 #### func  Unique
 
 ```go
-func Unique(hash UniqueHash) optimus.TransformFunc
+func Unique(hash RowIdentifier) optimus.TransformFunc
 ```
 Unique returns a TransformFunc that returns Rows that are unique, according to
 the specified hash. No order is guaranteed for the unique row which is returned.
@@ -95,10 +127,19 @@ func Valuemap(mappings map[string]map[interface{}]interface{}) optimus.Transform
 ```
 Valuemap returns a TransformFunc that applies a value mapping to every Row.
 
-#### type UniqueHash
+#### type RowIdentifier
 
 ```go
-type UniqueHash func(optimus.Row) (interface{}, error)
+type RowIdentifier func(optimus.Row) (interface{}, error)
 ```
 
-UniqueHash takes an optimus.Row and returns a hashed value
+RowIdentifier takes in a row and returns something that uniquely identifies the
+Row.
+
+#### func  KeyIdentifier
+
+```go
+func KeyIdentifier(key string) RowIdentifier
+```
+KeyIdentifier is a convenience function that returns a RowIdentifier that
+identifies the row based on the value of a key in the Row.

@@ -125,25 +125,6 @@ var joinTests = []struct {
 	},
 }
 
-// First, test that we pair correctly by just using an OuterJoin so everything comes through.
-func TestPairSuccess(t *testing.T) {
-	for _, joinTest := range joinTests {
-		left := slice.New(joinTest.left)
-		right := slice.New(joinTest.right)
-
-		pair := Pair(right, joinTest.leftHash, joinTest.rightHash, OuterJoin)
-		table := optimus.Transform(left, pair)
-
-		actual := tests.GetRows(table)
-
-		assert.Equal(t, joinTest.expected, actual)
-		assert.Nil(t, table.Err())
-	}
-}
-
-// Second, test that we filter correctinly on not-outer join by running the same tests with
-// different join types, except filtering the expected array.
-
 var joinFilters = []struct {
 	joinType PairType
 	filter   func(optimus.Row) bool
@@ -166,9 +147,15 @@ var joinFilters = []struct {
 			return r["right"] != nil
 		},
 	},
+	{
+		joinType: OuterJoin,
+		filter: func(optimus.Row) bool {
+			return true
+		},
+	},
 }
 
-func TestPairFiltering(t *testing.T) {
+func TestPairSuccess(t *testing.T) {
 	filterRows := func(rows []optimus.Row, filter func(optimus.Row) bool) []optimus.Row {
 		out := []optimus.Row{}
 		for _, row := range rows {
@@ -194,7 +181,7 @@ func TestPairFiltering(t *testing.T) {
 	}
 }
 
-func TestPairErrors(t *testing.T) {
+func TestPairErrorsRightTable(t *testing.T) {
 	left := slice.New([]optimus.Row{a, b, c})
 	right := errorSource.New(fmt.Errorf("garbage error"))
 
@@ -231,7 +218,7 @@ var joinHasherErrors = []struct {
 	},
 }
 
-func TestPairHasherErrors(t *testing.T) {
+func TestPairErrorsRowHasher(t *testing.T) {
 	for _, joinHasherError := range joinHasherErrors {
 		left := slice.New(joinHasherError.left)
 		right := slice.New(joinHasherError.right)

@@ -98,16 +98,16 @@ var JoinType = joinStruct{Left: joinType{0}, Inner: joinType{1}}
 // Join returns a TransformFunc that joins Rows with another table using the specified join type.
 func Join(rightTable optimus.Table, leftHeader string, rightHeader string, join joinType) optimus.TransformFunc {
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
-		var joinType PairType
+		var filterFn func(optimus.Row) (bool, error)
 		switch join {
 		case JoinType.Left:
-			joinType = LeftJoin
+			filterFn = LeftJoin
 		case JoinType.Inner:
-			joinType = InnerJoin
+			filterFn = InnerJoin
 		}
 
 		unmergedOut := make(chan optimus.Row)
-		pairer := Pair(rightTable, KeyHasher(leftHeader), KeyHasher(rightHeader), joinType)
+		pairer := Pair(rightTable, KeyHasher(leftHeader), KeyHasher(rightHeader), filterFn)
 
 		errs := make(chan error, 1)
 

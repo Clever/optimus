@@ -125,41 +125,13 @@ var joinTests = []struct {
 	},
 }
 
-var joinFilters = []struct {
-	joinType PairType
-	filter   func(optimus.Row) bool
-}{
-	{
-		joinType: InnerJoin,
-		filter: func(r optimus.Row) bool {
-			return r["left"] != nil && r["right"] != nil
-		},
-	},
-	{
-		joinType: LeftJoin,
-		filter: func(r optimus.Row) bool {
-			return r["left"] != nil
-		},
-	},
-	{
-		joinType: RightJoin,
-		filter: func(r optimus.Row) bool {
-			return r["right"] != nil
-		},
-	},
-	{
-		joinType: OuterJoin,
-		filter: func(optimus.Row) bool {
-			return true
-		},
-	},
-}
+var joinFilters = []func(optimus.Row) (bool, error){LeftJoin, RightJoin, InnerJoin, OuterJoin}
 
 func TestPairSuccess(t *testing.T) {
-	filterRows := func(rows []optimus.Row, filter func(optimus.Row) bool) []optimus.Row {
+	filterRows := func(rows []optimus.Row, filterFn func(optimus.Row) (bool, error)) []optimus.Row {
 		out := []optimus.Row{}
 		for _, row := range rows {
-			if filter(row) {
+			if f, _ := filterFn(row); f {
 				out = append(out, row)
 			}
 		}
@@ -170,12 +142,12 @@ func TestPairSuccess(t *testing.T) {
 			left := slice.New(joinTest.left)
 			right := slice.New(joinTest.right)
 
-			pair := Pair(right, joinTest.leftHash, joinTest.rightHash, joinFilter.joinType)
+			pair := Pair(right, joinTest.leftHash, joinTest.rightHash, joinFilter)
 			table := optimus.Transform(left, pair)
 
 			actual := tests.GetRows(table)
 
-			assert.Equal(t, filterRows(joinTest.expected, joinFilter.filter), actual)
+			assert.Equal(t, filterRows(joinTest.expected, joinFilter), actual)
 			assert.Nil(t, table.Err())
 		}
 	}

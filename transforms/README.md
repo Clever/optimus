@@ -19,6 +19,19 @@ are called Join. Deal with it.
 ## Usage
 
 ```go
+var (
+	// LeftJoin keeps any row where a Row was found in the left Table.
+	LeftJoin = mustHave("left")
+	// RightJoin keeps any row where a Row was found in the right Table.
+	RightJoin = mustHave("right")
+	// InnerJoin keeps any row where a Row was found in both Tables.
+	InnerJoin = mustHave("left", "right")
+	// OuterJoin keeps all rows.
+	OuterJoin = mustHave()
+)
+```
+
+```go
 var JoinType = joinStruct{Left: joinType{0}, Inner: joinType{1}}
 ```
 Left: Always add row from Left table, even if no corresponding rows found in
@@ -74,7 +87,7 @@ Map returns a TransformFunc that transforms every row with the given function.
 #### func  Pair
 
 ```go
-func Pair(rightTable optimus.Table, leftHash, rightHash RowHasher, join PairType) optimus.TransformFunc
+func Pair(rightTable optimus.Table, leftHash, rightHash RowHasher, filterFn func(optimus.Row) (bool, error)) optimus.TransformFunc
 ```
 Pair returns a TransformFunc that pairs all the elements in the table with
 another table, based on the given hashing functions and join type.
@@ -115,27 +128,6 @@ the specified hash. No order is guaranteed for the unique row which is returned.
 func Valuemap(mappings map[string]map[interface{}]interface{}) optimus.TransformFunc
 ```
 Valuemap returns a TransformFunc that applies a value mapping to every Row.
-
-#### type PairType
-
-```go
-type PairType int
-```
-
-PairType is the type of join to use when Pairing
-
-```go
-const (
-	// LeftJoin keeps any row where a Row was found in the left Table.
-	LeftJoin PairType = iota
-	// RightJoin keeps any row where a Row was found in the right Table.
-	RightJoin
-	// InnerJoin keeps any row where a Row was found in both Tables.
-	InnerJoin
-	// OuterJoin keeps all rows.
-	OuterJoin
-)
-```
 
 #### type RowHasher
 

@@ -5,9 +5,6 @@ import (
 	"gopkg.in/Clever/optimus.v3"
 )
 
-// PairType is the type of join to use when Pairing
-type PairType int
-
 // RowHasher takes in a row and returns a hash for that Row.
 // Used when Pairing.
 type RowHasher func(optimus.Row) (interface{}, error)
@@ -20,15 +17,15 @@ func KeyHasher(key string) RowHasher {
 	}
 }
 
-const (
+var (
 	// LeftJoin keeps any row where a Row was found in the left Table.
-	LeftJoin PairType = iota
+	LeftJoin = mustHave("left")
 	// RightJoin keeps any row where a Row was found in the right Table.
-	RightJoin
+	RightJoin = mustHave("right")
 	// InnerJoin keeps any row where a Row was found in both Tables.
-	InnerJoin
+	InnerJoin = mustHave("left", "right")
 	// OuterJoin keeps all rows.
-	OuterJoin
+	OuterJoin = mustHave()
 )
 
 // mustHave takes in any amount of keys and returns a function that can be passed to Select
@@ -46,7 +43,7 @@ func mustHave(keys ...string) func(optimus.Row) (bool, error) {
 
 // Pair returns a TransformFunc that pairs all the elements in the table with another table, based
 // on the given hashing functions and join type.
-func Pair(rightTable optimus.Table, leftHash, rightHash RowHasher, join PairType) optimus.TransformFunc {
+func Pair(rightTable optimus.Table, leftHash, rightHash RowHasher, filterFn func(optimus.Row) (bool, error)) optimus.TransformFunc {
 	// Hash of everything in the right table
 	right := make(map[interface{}][]optimus.Row)
 	// Track whether or not rows in the right table were joined against
@@ -117,18 +114,7 @@ func Pair(rightTable optimus.Table, leftHash, rightHash RowHasher, join PairType
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			var filter func(optimus.Row) (bool, error)
-			switch join {
-			case OuterJoin:
-				filter = mustHave()
-			case InnerJoin:
-				filter = mustHave("right", "left")
-			case LeftJoin:
-				filter = mustHave("left")
-			case RightJoin:
-				filter = mustHave("right")
-			}
-			if err := Select(filter)(pairedRows, out); err != nil {
+			if err := Select(filterFn)(pairedRows, out); err != nil {
 				wg.Error(err)
 			}
 		}()

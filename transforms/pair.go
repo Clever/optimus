@@ -31,6 +31,19 @@ const (
 	OuterJoin
 )
 
+// mustHave takes in any amount of keys and returns a function that can be passed to Select
+// that returns true for any Row that has all of those keys.
+func mustHave(keys ...string) func(optimus.Row) (bool, error) {
+	return func(row optimus.Row) (bool, error) {
+		for _, key := range keys {
+			if row[key] == nil {
+				return false, nil
+			}
+		}
+		return true, nil
+	}
+}
+
 // Pair returns a TransformFunc that pairs all the elements in the table with another table, based
 // on the given hashing functions and join type.
 func Pair(rightTable optimus.Table, leftHash, rightHash RowHasher, join PairType) optimus.TransformFunc {
@@ -104,16 +117,6 @@ func Pair(rightTable optimus.Table, leftHash, rightHash RowHasher, join PairType
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			mustHave := func(keys ...string) func(optimus.Row) (bool, error) {
-				return func(row optimus.Row) (bool, error) {
-					for _, key := range keys {
-						if row[key] == nil {
-							return false, nil
-						}
-					}
-					return true, nil
-				}
-			}
 			var filter func(optimus.Row) (bool, error)
 			switch join {
 			case OuterJoin:

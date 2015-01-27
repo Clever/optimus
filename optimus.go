@@ -68,9 +68,6 @@ func (t *transformedTable) start(transform TransformFunc) {
 	doneChan := make(chan struct{})
 
 	stop := func() {
-		if t.stopped {
-			return
-		}
 		t.Stop()
 		drain(t.source.Rows())
 		drain(out)
@@ -113,8 +110,8 @@ func (t *transformedTable) start(transform TransformFunc) {
 		}
 	}()
 	for err := range errChan {
-		stop()
 		t.err = err
+		return
 	}
 	// Wait for all channels to finish
 	<-doneChan // Once to make sure we've consumed the output of the TransformFunc

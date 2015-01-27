@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/Clever/optimus.v3"
+	"gopkg.in/Clever/optimus.v3/sinks/discard"
 	errorTable "gopkg.in/Clever/optimus.v3/sources/error"
 	"gopkg.in/Clever/optimus.v3/sources/infinite"
 	"gopkg.in/Clever/optimus.v3/sources/slice"
@@ -400,13 +401,23 @@ func TestTransforms(t *testing.T) {
 // TestTransformError tests that the upstream Table had all of its data consumed in the case of an
 // error from a TableTransform.
 func TestTransformError(t *testing.T) {
-	in := infinite.New()
-	out := optimus.Transform(in, TableTransform(func(row optimus.Row, out chan<- optimus.Row) error {
-		return errors.New("some error")
-	}))
-	// Should receive no rows here because the first response was an error.
-	tests.Consumed(t, out)
-	// Should receive no rows here because the the transform should have consumed
-	// all the rows.
-	tests.Consumed(t, in)
+	for i := 0; i < 5; i++ {
+		in := infinite.New()
+		out := in
+		for j := 0; j < i; j++ {
+			out = optimus.Transform(out, Each(func(optimus.Row) error {
+				return nil
+			}))
+		}
+		out = optimus.Transform(out, TableTransform(func(row optimus.Row, out chan<- optimus.Row) error {
+			return errors.New("some error")
+		}))
+		for j := i; j < 5; j++ {
+			out = optimus.Transform(out, Each(func(optimus.Row) error {
+				return nil
+			}))
+		}
+		assert.EqualError(t, discard.Discard(out), "some error")
+		tests.Consumed(t, in)
+	}
 }

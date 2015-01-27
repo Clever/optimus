@@ -12,6 +12,7 @@ import (
 	"gopkg.in/Clever/optimus.v3/sources/csv"
 	errorSource "gopkg.in/Clever/optimus.v3/sources/error"
 	"gopkg.in/Clever/optimus.v3/sources/slice"
+	"gopkg.in/Clever/optimus.v3/tests"
 )
 
 var csvData = `header1,header2,header3
@@ -37,10 +38,10 @@ func TestTabSync(t *testing.T) {
 }
 
 func TestNilValues(t *testing.T) {
-	source := slice.New([]optimus.Row{{"field1": "val1", "field2": nil}})
+	rows := []optimus.Row{{"field1": "val1", "field2": nil}}
 	actual := &bytes.Buffer{}
-	assert.Nil(t, New(actual)(source))
-	assert.Equal(t, actual.String(), "field1,field2\nval1,\"\"\n")
+	assert.Nil(t, New(actual)(slice.New(rows)))
+	assert.Equal(t, tests.GetRows(csv.New(actual)), rows)
 }
 
 func TestAlphabetical(t *testing.T) {

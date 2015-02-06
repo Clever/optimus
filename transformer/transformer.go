@@ -67,6 +67,12 @@ func (t *Transformer) Concat(tables ...optimus.Table) *Transformer {
 	return t.Apply(transforms.Concat(tables...))
 }
 
+// Pair Applies a Pair transform.
+func (t *Transformer) Pair(rightTable optimus.Table, leftID, rightID transforms.RowIdentifier,
+	filterFn func(optimus.Row) (bool, error)) *Transformer {
+	return t.Apply(transforms.Pair(rightTable, leftID, rightID, filterFn))
+}
+
 // Sink consumes all the Rows.
 func (t *Transformer) Sink(sink optimus.Sink) error {
 	return sink(t.table)

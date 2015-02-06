@@ -156,6 +156,7 @@ func (f *File) genMethod(node ast.Node) bool {
 			continue
 		}
 		args, _ := parseFuncType(decl.Type)
+		// TODO: Distinguish between "a" and "an": http://stackoverflow.com/a/1288384/344612
 		method := fmt.Sprintf(`// %s Applies a %s transform.
 func (t *Transformer) %s(%s) *Transformer {`, decl.Name, decl.Name, decl.Name, args.String())
 		method += fmt.Sprintf("\nreturn t.Apply(transforms.%s(", decl.Name)

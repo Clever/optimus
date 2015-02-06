@@ -48,34 +48,6 @@ type Generator struct {
 	files []*File      // Files to scan
 }
 
-func (g *Generator) generate() {
-	for _, file := range g.files {
-		ast.Inspect(file.file, file.genDecl)
-	}
-	g.build()
-}
-
-func (g *Generator) build() {
-	for _, file := range g.files {
-		for _, method := range file.methods {
-			g.Printf("%s\n", method)
-		}
-	}
-}
-
-// format returns the gofmt-ed contents of the Generator's buffer.
-func (g *Generator) format() []byte {
-	src, err := format.Source(g.buf.Bytes())
-	if err != nil {
-		// Should never happen, but can arise when developing this code.
-		// The user can compile the output to see the error.
-		log.Printf("warning: internal error: invalid Go generated: %s", err)
-		log.Printf("warning: compile the package to analyze the error")
-		return g.buf.Bytes()
-	}
-	return src
-}
-
 func (g *Generator) Printf(format string, args ...interface{}) {
 	fmt.Fprintf(&g.buf, format, args...)
 }
@@ -108,7 +80,7 @@ func (g *Generator) parsePackage(directory string, names []string, text interfac
 			log.Fatalf("parsing package: %s: %s", name, err)
 		}
 		g.files = append(g.files, &File{
-			file:    parsedFile,
+			ast:     parsedFile,
 			methods: []string{},
 		})
 	}
@@ -117,10 +89,89 @@ func (g *Generator) parsePackage(directory string, names []string, text interfac
 	}
 }
 
+func (g *Generator) generate() {
+	for _, file := range g.files {
+		ast.Inspect(file.ast, file.genMethod)
+	}
+	g.build()
+}
+
+func (g *Generator) build() {
+	for _, file := range g.files {
+		for _, method := range file.methods {
+			g.Printf("%s\n", method)
+		}
+	}
+}
+
+// format returns the gofmt-ed contents of the Generator's buffer.
+func (g *Generator) format() []byte {
+	src, err := format.Source(g.buf.Bytes())
+	if err != nil {
+		// Should never happen, but can arise when developing this code.
+		// The user can compile the output to see the error.
+		log.Printf("warning: internal error: invalid Go generated: %s", err)
+		log.Printf("warning: compile the package to analyze the error")
+		return g.buf.Bytes()
+	}
+	return src
+}
+
+// prefixDirectory places the directory name on the beginning of each name in the list.
+func prefixDirectory(directory string, names []string) []string {
+	ret := make([]string, len(names))
+	for i, name := range names {
+		ret[i] = filepath.Join(directory, name)
+	}
+	return ret
+}
+
 // File holds a single parsed file and associated data.
 type File struct {
-	file    *ast.File // Parsed AST.
+	ast     *ast.File
 	methods []string
+}
+
+// genMethod processes one function declaration clause.
+func (f *File) genMethod(node ast.Node) bool {
+	decl, ok := node.(*ast.FuncDecl)
+	if !ok {
+		return true
+	}
+	for _, result := range decl.Type.Results.List {
+		ret, ok := result.Type.(*ast.SelectorExpr)
+		if !ok {
+			continue
+		}
+		ident, ok := ret.X.(*ast.Ident)
+		if !ok {
+			continue
+		}
+		if ident.Name != "optimus" || ret.Sel.Name != "TransformFunc" {
+			continue
+		}
+		if decl.Name.Name == "Join" {
+			// Join is broken because it has a private type in its signature. It's deprecated anyway
+			// so fine with it not being in Transformer.
+			continue
+		}
+		args, _ := parseFuncType(decl.Type)
+		method := fmt.Sprintf(`// %s Applies a %s transform.
+func (t *Transformer) %s(%s) *Transformer {`, decl.Name, decl.Name, decl.Name, args.String())
+		method += fmt.Sprintf("\nreturn t.Apply(transforms.%s(", decl.Name)
+		names := []string{}
+		for _, arg := range args {
+			if !arg.ellipsis {
+				names = append(names, *arg.name)
+			} else {
+				names = append(names, fmt.Sprintf("%s...", *arg.name))
+			}
+		}
+		method += fmt.Sprintf(strings.Join(names, ", "))
+		method += "))}"
+		f.methods = append(f.methods, method)
+	}
+	return true
 }
 
 type param struct {
@@ -146,15 +197,26 @@ func (p params) String() string {
 	return strings.Join(out, ", ")
 }
 
-func isPrimitive(typ string) bool {
-	for _, primitive := range []string{"bool", "byte", "complex128", "complex64", "error",
-		"float32", "float64", "int", "int8", "int16", "int32", "int64", "rune", "string",
-		"uint", "uint8", "uint16", "uint32", "uint64", "uintptr"} {
-		if typ == primitive {
-			return true
+func parseFuncType(funcType *ast.FuncType) (in, out params) {
+	in = parseFieldList(funcType.Params)
+	out = parseFieldList(funcType.Results)
+	return
+}
+
+func parseFieldList(fieldList *ast.FieldList) params {
+	out := params{}
+	for _, field := range fieldList.List {
+		typ := parseFieldType(field.Type)
+		_, ellipsis := field.Type.(*ast.Ellipsis)
+		if len(field.Names) != 0 {
+			for _, name := range field.Names {
+				out = append(out, param{name: &name.Name, typ: typ, ellipsis: ellipsis})
+			}
+		} else {
+			out = append(out, param{typ: typ, ellipsis: ellipsis})
 		}
 	}
-	return false
+	return out
 }
 
 func parseFieldType(field interface{}) string {
@@ -199,75 +261,13 @@ func parseFieldType(field interface{}) string {
 	panic(fmt.Errorf("unexpected type %T", field))
 }
 
-func parseFieldList(fieldList *ast.FieldList) params {
-	out := params{}
-	for _, field := range fieldList.List {
-		typ := parseFieldType(field.Type)
-		_, ellipsis := field.Type.(*ast.Ellipsis)
-		if len(field.Names) != 0 {
-			for _, name := range field.Names {
-				out = append(out, param{name: &name.Name, typ: typ, ellipsis: ellipsis})
-			}
-		} else {
-			out = append(out, param{typ: typ, ellipsis: ellipsis})
+func isPrimitive(typ string) bool {
+	for _, primitive := range []string{"bool", "byte", "complex128", "complex64", "error",
+		"float32", "float64", "int", "int8", "int16", "int32", "int64", "rune", "string",
+		"uint", "uint8", "uint16", "uint32", "uint64", "uintptr"} {
+		if typ == primitive {
+			return true
 		}
 	}
-	return out
-}
-
-func parseFuncType(funcType *ast.FuncType) (in, out params) {
-	in = parseFieldList(funcType.Params)
-	out = parseFieldList(funcType.Results)
-	return
-}
-
-// genDecl processes one declaration clause.
-func (f *File) genDecl(node ast.Node) bool {
-	decl, ok := node.(*ast.FuncDecl)
-	if !ok {
-		return true
-	}
-	for _, result := range decl.Type.Results.List {
-		ret, ok := result.Type.(*ast.SelectorExpr)
-		if !ok {
-			continue
-		}
-		ident, ok := ret.X.(*ast.Ident)
-		if !ok {
-			continue
-		}
-		if ident.Name != "optimus" || ret.Sel.Name != "TransformFunc" {
-			continue
-		}
-		if decl.Name.Name == "Join" {
-			// Join is broken because it has a private type in its signature. It's deprecated anyway
-			// so fine with it not being in Transformer.
-			continue
-		}
-		args, _ := parseFuncType(decl.Type)
-		method := fmt.Sprintf(`// %s Applies a %s transform.
-func (t *Transformer) %s(%s) *Transformer {`, decl.Name, decl.Name, decl.Name, args.String())
-		method += fmt.Sprintf("\nreturn t.Apply(transforms.%s(", decl.Name)
-		names := []string{}
-		for _, arg := range args {
-			if !arg.ellipsis {
-				names = append(names, *arg.name)
-			} else {
-				names = append(names, fmt.Sprintf("%s...", *arg.name))
-			}
-		}
-		method += fmt.Sprintf(strings.Join(names, ", "))
-		method += "))}"
-		f.methods = append(f.methods, method)
-	}
-	return true
-}
-
-// prefixDirectory places the directory name on the beginning of each name in the list.
-func prefixDirectory(directory string, names []string) []string {
-	ret := make([]string, len(names))
-	for i, name := range names {
-		ret[i] = filepath.Join(directory, name)
-	}
-	return ret
+	return false
 }

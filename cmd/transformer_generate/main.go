@@ -63,19 +63,18 @@ func (g *Generator) parsePackageDir(directory string) {
 	names = append(names, pkg.CgoFiles...)
 	names = append(names, pkg.SFiles...)
 	names = prefixDirectory(directory, names)
-	g.parsePackage(directory, names, nil)
+	g.parsePackage(directory, names)
 }
 
 // parsePackage analyzes the single package constructed from the named files.
-// If text is non-nil, it is a string to be used instead of the content of the file,
-// to be used for testing. parsePackage exits if there is an error.
-func (g *Generator) parsePackage(directory string, names []string, text interface{}) {
+// parsePackage exits if there is an error.
+func (g *Generator) parsePackage(directory string, names []string) {
 	fs := token.NewFileSet()
 	for _, name := range names {
 		if !strings.HasSuffix(name, ".go") {
 			continue
 		}
-		parsedFile, err := parser.ParseFile(fs, name, text, 0)
+		parsedFile, err := parser.ParseFile(fs, name, nil, 0)
 		if err != nil {
 			log.Fatalf("parsing package: %s: %s", name, err)
 		}

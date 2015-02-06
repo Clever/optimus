@@ -40,14 +40,14 @@ Concat Applies a Concat transform.
 ```go
 func (t *Transformer) Concurrently(fn optimus.TransformFunc, concurrency int) *Transformer
 ```
-Concurrently Applies a Concurrent transform.
+Concurrently Applies a Concurrently transform.
 
 #### func (*Transformer) Each
 
 ```go
-func (t *Transformer) Each(transform func(optimus.Row) error) *Transformer
+func (t *Transformer) Each(fn func(optimus.Row) error) *Transformer
 ```
-Each Applies an Each transform.
+Each Applies a Each transform.
 
 #### func (*Transformer) Fieldmap
 
@@ -74,7 +74,7 @@ Pair Applies a Pair transform.
 #### func (*Transformer) Reduce
 
 ```go
-func (t *Transformer) Reduce(fn func(optimus.Row, optimus.Row) error) *Transformer
+func (t *Transformer) Reduce(fn func(accum optimus.Row, item optimus.Row) error) *Transformer
 ```
 Reduce Applies a Reduce transform.
 
@@ -119,6 +119,13 @@ Table returns the terminating Table in a Transformer chain.
 func (t *Transformer) TableTransform(transform func(optimus.Row, chan<- optimus.Row) error) *Transformer
 ```
 TableTransform Applies a TableTransform transform.
+
+#### func (*Transformer) Unique
+
+```go
+func (t *Transformer) Unique(hash transforms.RowIdentifier) *Transformer
+```
+Unique Applies a Unique transform.
 
 #### func (*Transformer) Valuemap
 

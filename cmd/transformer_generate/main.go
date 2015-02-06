@@ -35,39 +35,28 @@ import (
 `)
 	g.generate()
 
-	// Format the output.
-	src := g.format()
-
 	// Write to file.
-	if err := ioutil.WriteFile(outputName, src, 0644); err != nil {
+	if err := ioutil.WriteFile(outputName, g.format(), 0644); err != nil {
 		log.Fatalf("writing output: %s", err)
 	}
-}
-
-type Package struct {
-	dir   string
-	name  string
-	files []*File
 }
 
 // Generator holds the state of the analysis. Primarily used to buffer
 // the output for format.Source.
 type Generator struct {
-	buf bytes.Buffer // Accumulated output.
-	pkg *Package     // Package we are scanning.
+	buf   bytes.Buffer // Accumulated output.
+	files []*File      // Files to scan
 }
 
 func (g *Generator) generate() {
-	for _, file := range g.pkg.files {
-		if file.file != nil {
-			ast.Inspect(file.file, file.genDecl)
-		}
+	for _, file := range g.files {
+		ast.Inspect(file.file, file.genDecl)
 	}
 	g.build()
 }
 
 func (g *Generator) build() {
-	for _, file := range g.pkg.files {
+	for _, file := range g.files {
 		for _, method := range file.methods {
 			g.Printf("%s\n", method)
 		}
@@ -100,9 +89,6 @@ func (g *Generator) parsePackageDir(directory string) {
 	var names []string
 	names = append(names, pkg.GoFiles...)
 	names = append(names, pkg.CgoFiles...)
-	// TODO: Need to think about constants in test files. Maybe write type_string_test.go
-	// in a separate pass? For later.
-	// names = append(names, pkg.TestGoFiles...) // These are also in the "foo" package.
 	names = append(names, pkg.SFiles...)
 	names = prefixDirectory(directory, names)
 	g.parsePackage(directory, names, nil)
@@ -112,9 +98,6 @@ func (g *Generator) parsePackageDir(directory string) {
 // If text is non-nil, it is a string to be used instead of the content of the file,
 // to be used for testing. parsePackage exits if there is an error.
 func (g *Generator) parsePackage(directory string, names []string, text interface{}) {
-	var files []*File
-	var astFiles []*ast.File
-	g.pkg = new(Package)
 	fs := token.NewFileSet()
 	for _, name := range names {
 		if !strings.HasSuffix(name, ".go") {
@@ -124,24 +107,18 @@ func (g *Generator) parsePackage(directory string, names []string, text interfac
 		if err != nil {
 			log.Fatalf("parsing package: %s: %s", name, err)
 		}
-		astFiles = append(astFiles, parsedFile)
-		files = append(files, &File{
+		g.files = append(g.files, &File{
 			file:    parsedFile,
-			pkg:     g.pkg,
 			methods: []string{},
 		})
 	}
-	if len(astFiles) == 0 {
+	if len(g.files) == 0 {
 		log.Fatalf("%s: no buildable Go files", directory)
 	}
-	g.pkg.name = astFiles[0].Name.Name
-	g.pkg.files = files
-	g.pkg.dir = directory
 }
 
 // File holds a single parsed file and associated data.
 type File struct {
-	pkg     *Package  // Package to which this file belongs.
 	file    *ast.File // Parsed AST.
 	methods []string
 }
@@ -286,24 +263,8 @@ func (t *Transformer) %s(%s) *Transformer {`, decl.Name, decl.Name, decl.Name, a
 	return true
 }
 
-// Value represents a declared constant.
-type Value struct {
-	name string // The name of the constant.
-	// The value is stored as a bit pattern alone. The boolean tells us
-	// whether to interpret it as an int64 or a uint64; the only place
-	// this matters is when sorting.
-	// Much of the time the str field is all we need; it is printed
-	// by Value.String.
-	value  uint64 // Will be converted to int64 when needed.
-	signed bool   // Whether the constant is a signed type.
-	str    string // The string representation given by the "go/exact" package.
-}
-
 // prefixDirectory places the directory name on the beginning of each name in the list.
 func prefixDirectory(directory string, names []string) []string {
-	if directory == "." {
-		return names
-	}
 	ret := make([]string, len(names))
 	for i, name := range names {
 		ret[i] = filepath.Join(directory, name)

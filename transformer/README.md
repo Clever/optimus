@@ -63,6 +63,14 @@ func (t *Transformer) Map(transform func(optimus.Row) (optimus.Row, error)) *Tra
 ```
 Map Applies a Map transform.
 
+#### func (*Transformer) Pair
+
+```go
+func (t *Transformer) Pair(rightTable optimus.Table, leftID, rightID transforms.RowIdentifier,
+	filterFn func(optimus.Row) (bool, error)) *Transformer
+```
+Pair Applies a Pair transform.
+
 #### func (*Transformer) Reduce
 
 ```go

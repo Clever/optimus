@@ -1,10 +1,11 @@
 package json
 
 import (
-	"bufio"
 	"encoding/json"
-	"gopkg.in/Clever/optimus.v3"
 	"io"
+
+	"gopkg.in/Clever/optimus.v3"
+	"gopkg.in/Clever/optimus.v3/scanner"
 )
 
 type table struct {
@@ -35,7 +36,7 @@ func (t *table) start(in io.Reader) {
 	defer t.Stop()
 	defer close(t.rows)
 
-	scanner := bufio.NewScanner(in)
+	scanner := scanner.NewScanner(in)
 	for scanner.Scan() {
 		if t.stopped {
 			break

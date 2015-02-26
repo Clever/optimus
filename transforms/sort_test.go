@@ -1,6 +1,7 @@
 package transforms
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/Clever/optimus.v3"
 	"gopkg.in/Clever/optimus.v3/sources/slice"
@@ -8,25 +9,38 @@ import (
 	"testing"
 )
 
-func byStringKey(key string) func(optimus.Row, optimus.Row) bool {
-	return func(i, j optimus.Row) bool {
-		k := i[key].(string)
-		l := j[key].(string)
-		return k < l
+func byStringKey(key string) func(optimus.Row, optimus.Row) (bool, error) {
+	return func(i, j optimus.Row) (bool, error) {
+		k, ok := i[key].(string)
+		if !ok {
+			return false, fmt.Errorf("%s wasn't a string, had value: %#v", key, i[key])
+		}
+		l, ok := j[key].(string)
+		if !ok {
+			return false, fmt.Errorf("%s wasn't a string, had value: %#v", key, j[key])
+		}
+		return k < l, nil
 	}
 }
 
-func byIntKey(key string) func(optimus.Row, optimus.Row) bool {
-	return func(i, j optimus.Row) bool {
-		k := i[key].(int)
-		l := j[key].(int)
-		return k < l
+func byIntKey(key string) func(optimus.Row, optimus.Row) (bool, error) {
+	return func(i, j optimus.Row) (bool, error) {
+		k, ok := i[key].(int)
+		if !ok {
+			return false, fmt.Errorf("%s wasn't an int, had value: %#v", key, i[key])
+		}
+		l, ok := j[key].(int)
+		if !ok {
+			return false, fmt.Errorf("%s wasn't an int, had value: %#v", key, j[key])
+		}
+		return k < l, nil
 	}
 }
 
 var sortTests = []struct {
 	input, output []optimus.Row
-	less          func(optimus.Row, optimus.Row) bool
+	less          func(optimus.Row, optimus.Row) (bool, error)
+	err           error
 }{
 	{
 		input:  []optimus.Row{{"a": "q"}, {"a": "b", "b": "d"}, {"a": "c"}},
@@ -38,6 +52,12 @@ var sortTests = []struct {
 		output: []optimus.Row{{"a": 1}, {"a": 2, "b": "d"}, {"a": 4}},
 		less:   byIntKey("a"),
 	},
+	{
+		input:  []optimus.Row{{"a": "4"}, {"a": "4", "b": "4"}},
+		output: []optimus.Row{},
+		less:   byIntKey("a"),
+		err:    fmt.Errorf(`a wasn't an int, had value: "4"`),
+	},
 }
 
 func TestSort(t *testing.T) {
@@ -48,7 +68,11 @@ func TestSort(t *testing.T) {
 
 		actual := tests.GetRows(table)
 
-		assert.Equal(t, sortTest.output, actual)
-		assert.Nil(t, table.Err())
+		if sortTest.err != nil {
+			assert.Equal(t, sortTest.err, table.Err())
+		} else {
+			assert.Equal(t, actual, sortTest.output)
+			assert.Nil(t, table.Err())
+		}
 	}
 }

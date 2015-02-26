@@ -74,7 +74,7 @@ func (t *Transformer) Pair(rightTable optimus.Table, leftID, rightID transforms.
 }
 
 // Sort Applies a Sort transform.
-func (t *Transformer) Sort(less func(i, j optimus.Row) bool) *Transformer {
+func (t *Transformer) Sort(less func(i, j optimus.Row) (bool, error)) *Transformer {
 	return t.Apply(transforms.Sort(less))
 }
 

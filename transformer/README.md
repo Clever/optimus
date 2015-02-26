@@ -95,7 +95,7 @@ Sink consumes all the Rows.
 #### func (*Transformer) Sort
 
 ```go
-func (t *Transformer) Sort(less func(i, j optimus.Row) bool) *Transformer
+func (t *Transformer) Sort(less func(i, j optimus.Row) (bool, error)) *Transformer
 ```
 Sort Applies a Sort transform.
 

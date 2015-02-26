@@ -104,6 +104,14 @@ func Select(filter func(optimus.Row) (bool, error)) optimus.TransformFunc
 ```
 Select returns a TransformFunc that removes any rows that don't pass the filter.
 
+#### func  Sort
+
+```go
+func Sort(less func(i, j optimus.Row) bool) optimus.TransformFunc
+```
+Sort takes in a function that reports whether the row i should sort before row
+j. It outputs the rows in sorted order. The sort is not guaranteed to be stable.
+
 #### func  TableTransform
 
 ```go

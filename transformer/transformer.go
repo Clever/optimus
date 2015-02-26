@@ -73,6 +73,11 @@ func (t *Transformer) Pair(rightTable optimus.Table, leftID, rightID transforms.
 	return t.Apply(transforms.Pair(rightTable, leftID, rightID, filterFn))
 }
 
+// Sort Applies a Sort transform.
+func (t *Transformer) Sort(less func(i, j optimus.Row) bool) *Transformer {
+	return t.Apply(transforms.Sort(less))
+}
+
 // Sink consumes all the Rows.
 func (t *Transformer) Sink(sink optimus.Sink) error {
 	return sink(t.table)

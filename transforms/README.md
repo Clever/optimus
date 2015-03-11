@@ -112,6 +112,14 @@ func Sort(less func(i, j optimus.Row) (bool, error)) optimus.TransformFunc
 Sort takes in a function that reports whether the row i should sort before row
 j. It outputs the rows in sorted order. The sort is not guaranteed to be stable.
 
+#### func  StableSort
+
+```go
+func StableSort(less func(i, j optimus.Row) (bool, error)) optimus.TransformFunc
+```
+StableSort takes in a function that reports whether the row i should sort before
+row j. It outputs the rows in stably sorted order.
+
 #### func  TableTransform
 
 ```go

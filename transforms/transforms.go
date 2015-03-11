@@ -1,9 +1,10 @@
 package transforms
 
 import (
+	"sync"
+
 	"gopkg.in/Clever/optimus.v3"
 	"gopkg.in/fatih/set.v0"
-	"sync"
 )
 
 // TableTransform returns a TransformFunc that applies the given transform function.

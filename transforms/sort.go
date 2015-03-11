@@ -1,8 +1,9 @@
 package transforms
 
 import (
-	"gopkg.in/Clever/optimus.v3"
 	"sort"
+
+	"gopkg.in/Clever/optimus.v3"
 )
 
 type rows struct {
@@ -25,15 +26,13 @@ func (r *rows) Swap(i, j int) {
 	r.rows[i], r.rows[j] = r.rows[j], r.rows[i]
 }
 
-// Sort takes in a function that reports whether the row i should sort before row j.
-// It outputs the rows in sorted order. The sort is not guaranteed to be stable.
-func Sort(less func(i, j optimus.Row) (bool, error)) optimus.TransformFunc {
-	rows := &rows{rows: []optimus.Row{}, less: less}
+func sorter(sorter func(sort.Interface), less func(optimus.Row, optimus.Row) (bool, error)) optimus.TransformFunc {
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		rows := &rows{rows: []optimus.Row{}, less: less}
 		for row := range in {
 			rows.rows = append(rows.rows, row)
 		}
-		sort.Sort(rows)
+		sorter(rows)
 		if rows.err != nil {
 			return rows.err
 		}
@@ -42,4 +41,16 @@ func Sort(less func(i, j optimus.Row) (bool, error)) optimus.TransformFunc {
 		}
 		return nil
 	}
+}
+
+// Sort takes in a function that reports whether the row i should sort before row j.
+// It outputs the rows in sorted order. The sort is not guaranteed to be stable.
+func Sort(less func(i, j optimus.Row) (bool, error)) optimus.TransformFunc {
+	return sorter(sort.Sort, less)
+}
+
+// StableSort takes in a function that reports whether the row i should sort before row j.
+// It outputs the rows in stably sorted order.
+func StableSort(less func(i, j optimus.Row) (bool, error)) optimus.TransformFunc {
+	return sorter(sort.Stable, less)
 }

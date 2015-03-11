@@ -2,11 +2,12 @@ package transforms
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/Clever/optimus.v3"
 	"gopkg.in/Clever/optimus.v3/sources/slice"
 	"gopkg.in/Clever/optimus.v3/tests"
-	"testing"
 )
 
 func byStringKey(key string) func(optimus.Row, optimus.Row) (bool, error) {
@@ -62,17 +63,54 @@ var sortTests = []struct {
 
 func TestSort(t *testing.T) {
 	for _, sortTest := range sortTests {
-		input := slice.New(sortTest.input)
-		sort := Sort(sortTest.less)
-		table := optimus.Transform(input, sort)
+		for _, sort := range []optimus.TransformFunc{Sort(sortTest.less), StableSort(sortTest.less)} {
+			input := slice.New(sortTest.input)
+			table := optimus.Transform(input, sort)
 
-		actual := tests.GetRows(table)
+			actual := tests.GetRows(table)
 
-		if sortTest.err != nil {
-			assert.Equal(t, sortTest.err, table.Err())
-		} else {
-			assert.Equal(t, actual, sortTest.output)
-			assert.Nil(t, table.Err())
+			if sortTest.err != nil {
+				assert.Equal(t, sortTest.err, table.Err())
+			} else {
+				assert.Equal(t, actual, sortTest.output)
+				assert.Nil(t, table.Err())
+			}
 		}
 	}
+}
+
+func TestStable(t *testing.T) {
+	input := []optimus.Row{
+		{"c": "a", "b": "a"},
+		{"c": "a", "b": "b"},
+		{"c": "a", "b": "c"},
+		{"c": "a", "b": "d"},
+		{"c": "a", "b": "e"},
+		{"c": "a", "b": "f"},
+		{"c": "a", "b": "g"},
+		{"c": "a", "b": "h"},
+		{"c": "a", "b": "i"},
+		{"c": "a", "b": "j"},
+		{"c": "a", "b": "k"},
+		{"c": "a", "b": "l"},
+		{"c": "a", "b": "m"},
+		{"c": "a", "b": "n"},
+		{"c": "a", "b": "o"},
+		{"c": "a", "b": "p"},
+		{"c": "a", "b": "q"},
+		{"c": "a", "b": "r"},
+		{"c": "a", "b": "s"},
+		{"c": "a", "b": "t"},
+		{"c": "a", "b": "u"},
+		{"c": "a", "b": "v"},
+		{"c": "a", "b": "w"},
+		{"c": "a", "b": "x"},
+		{"c": "a", "b": "y"},
+		{"c": "a", "b": "z"},
+	}
+
+	table := optimus.Transform(slice.New(input), StableSort(byStringKey("c")))
+	actual := tests.GetRows(table)
+	assert.Nil(t, table.Err())
+	assert.Equal(t, actual, input)
 }

@@ -1,10 +1,9 @@
 package transforms
 
 import (
-	"sync"
-
 	"gopkg.in/Clever/optimus.v3"
 	"gopkg.in/fatih/set.v0"
+	"sync"
 )
 
 // TableTransform returns a TransformFunc that applies the given transform function.
@@ -214,4 +213,30 @@ func Unique(hash RowIdentifier) optimus.TransformFunc {
 		}
 		return false, nil
 	})
+}
+
+// GroupBy returns a TransformFunc that returns Rows of Rows grouped by their identifier.
+// The identifier must be comparable.
+// Each output row is one group of rows. The output row has two fields: id, which is the identifier
+// for that group, and rows, which is the slice of Rows that share that identifier. For example,
+// one output row in a grouping by the "group" field might look like:
+// optimus.Row{"id": "a", "rows": []optimus.Row{{"group": "a", "val": 2"}, {"group": "a", "val": 3}}}
+func GroupBy(identifier RowIdentifier) optimus.TransformFunc {
+	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		groups := map[interface{}][]optimus.Row{}
+		for row := range in {
+			val, err := identifier(row)
+			if err != nil {
+				return err
+			}
+			if groups[val] == nil {
+				groups[val] = []optimus.Row{}
+			}
+			groups[val] = append(groups[val], row)
+		}
+		for id, rows := range groups {
+			out <- optimus.Row{"id": id, "rows": rows}
+		}
+		return nil
+	}
 }

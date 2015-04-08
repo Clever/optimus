@@ -67,6 +67,19 @@ func Fieldmap(mappings map[string][]string) optimus.TransformFunc
 ```
 Fieldmap returns a TransformFunc that applies a field mapping to every Row.
 
+#### func  GroupBy
+
+```go
+func GroupBy(identifier RowIdentifier) optimus.TransformFunc
+```
+GroupBy returns a TransformFunc that returns Rows of Rows grouped by their
+identifier. The identifier must be comparable. Each output row is one group of
+rows. The output row has two fields: id, which is the identifier for that group,
+and rows, which is the slice of Rows that share that identifier. For example,
+one output row in a grouping by the "group" field might look like:
+optimus.Row{"id": "a", "rows": []optimus.Row{{"group": "a", "val": 2"},
+{"group": "a", "val": 3}}}
+
 #### func  Join
 
 ```go

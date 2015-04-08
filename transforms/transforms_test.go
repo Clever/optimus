@@ -362,6 +362,44 @@ func TestUniqueErrorForInvalidHeader(t *testing.T) {
 	}
 }
 
+func TestGroupBy(t *testing.T) {
+	transform := GroupBy(KeyIdentifier("group"))
+	input := []optimus.Row{
+		{"group": "1", "key": "a"},
+		{"group": 2, "key": "d"},
+		{"group": "3", "key": "g"},
+		{"group": "1", "key": 1},
+		{"group": 2, "key": 2},
+		{"group": "3", "key": 3},
+		{"group": "1", "key": 'b'},
+		{"group": 2, "key": 'e'},
+		{"group": "3", "key": 'h'},
+		{"group": "hello", "key": "world"},
+		{"group": "hello", "val": "gopher"},
+	}
+	expected := []optimus.Row{
+		{"id": "1", "rows": []optimus.Row{input[0], input[3], input[6]}},
+		{"id": 2, "rows": []optimus.Row{input[1], input[4], input[7]}},
+		{"id": "3", "rows": []optimus.Row{input[2], input[5], input[8]}},
+		{"id": "hello", "rows": []optimus.Row{input[9], input[10]}},
+	}
+
+	// groupBy makes no guarantees about what order the groups are outputted in.
+	// Let's manually sort them based on the group name.
+	sortByGroup := func(in []optimus.Row) []optimus.Row {
+		out := make([]optimus.Row, len(in), len(in))
+		indexMap := map[interface{}]int{"1": 0, 2: 1, "3": 2, "hello": 3}
+		for _, row := range in {
+			out[indexMap[row["id"]]] = row
+		}
+		return out
+	}
+
+	actualTable := optimus.Transform(slice.New(input), transform)
+	actual := tests.HasRows(t, actualTable, 4)
+	assert.Equal(t, expected, sortByGroup(actual))
+}
+
 type multiHeader struct {
 	val1 interface{}
 	val2 interface{}

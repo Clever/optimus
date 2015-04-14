@@ -78,6 +78,11 @@ func (t *Transformer) Sort(less func(i, j optimus.Row) (bool, error)) *Transform
 	return t.Apply(transforms.Sort(less))
 }
 
+// StableSort Applies a StableSort transform.
+func (t *Transformer) StableSort(less func(i, j optimus.Row) (bool, error)) *Transformer {
+	return t.Apply(transforms.StableSort(less))
+}
+
 // Sink consumes all the Rows.
 func (t *Transformer) Sink(sink optimus.Sink) error {
 	return sink(t.table)

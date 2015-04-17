@@ -6,7 +6,7 @@ SUBPKG_NAMES := $(addprefix sources/, $(SOURCES)) $(addprefix sinks/, $(SINKS)) 
 SUBPKGS = $(addprefix $(PKG)/, $(SUBPKG_NAMES))
 PKGS = $(PKG) $(SUBPKGS)
 
-.PHONY: test golint README
+.PHONY: test golint README.md
 
 test: docs $(PKGS)
 

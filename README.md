@@ -108,8 +108,23 @@ should receive the Rows from in and may send any number of Rows to out. It
 should not return until it has finished all work (received all the Rows it's
 going to receive, sent all the Rows it's going to send).
 
+## Development
+You should develop Go packages from inside your Go path.
+For `optimus`, that means that you should be in `$GOPATH/src/gopkg.in/Clever/optimus.v3`.
+```
+# Example
+cd $GOPATH/src/gopkg.in/Clever
+git clone git@github.com:Clever/optimus.git optimus.v3
+```
+
 ## Releasing
 To create a new Optimus version do the following:
+
+0. If releasing a major version, update all references to old version
+```
+git grep optimus.v
+```
+
 1. Download gitsem, a tool for semantic versioning with Git
 ```
 go get github.com/Clever/gitsem

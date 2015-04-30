@@ -7,7 +7,7 @@
 
 ```go
 var Discard = func(t optimus.Table) error {
-	for _ = range t {
+	for _ = range t.Rows() {
 	}
 	return t.Err()
 }

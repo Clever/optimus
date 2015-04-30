@@ -99,6 +99,13 @@ func (t *Transformer) Sort(less func(i, j optimus.Row) (bool, error)) *Transform
 ```
 Sort Applies a Sort transform.
 
+#### func (*Transformer) StableSort
+
+```go
+func (t *Transformer) StableSort(less func(i, j optimus.Row) (bool, error)) *Transformer
+```
+StableSort Applies a StableSort transform.
+
 #### func (Transformer) Table
 
 ```go

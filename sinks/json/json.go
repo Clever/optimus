@@ -2,13 +2,15 @@ package csv
 
 import (
 	"encoding/json"
-	"gopkg.in/Clever/optimus.v3"
 	"io"
+
+	"gopkg.in/Clever/optimus.v3"
 )
 
 // New writes all of the Rows in a Table as newline-separate JSON objects.
 func New(out io.Writer) optimus.Sink {
 	return func(source optimus.Table) error {
+		defer source.Stop()
 		for row := range source.Rows() {
 			obj, err := json.Marshal(row)
 			if err != nil {

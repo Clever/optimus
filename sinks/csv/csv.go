@@ -38,6 +38,7 @@ func New(out io.Writer) optimus.Sink {
 // It assumes that all Rows have the same headers. Columns are written in alphabetical order.
 func NewWithCsvWriter(writer *csv.Writer) optimus.Sink {
 	return func(source optimus.Table) error {
+		defer source.Stop()
 		headers := []string{}
 		wroteHeader := false
 		for row := range source.Rows() {

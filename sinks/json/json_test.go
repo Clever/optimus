@@ -3,10 +3,11 @@ package csv
 import (
 	"bytes"
 	"errors"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	errorSource "gopkg.in/Clever/optimus.v3/sources/error"
 	"gopkg.in/Clever/optimus.v3/sources/json"
-	"testing"
 )
 
 var jsonData = `{"header1":"field1","header2":"field2","header3":"field3"}
@@ -21,5 +22,7 @@ func TestJSONSink(t *testing.T) {
 }
 
 func TestJSONSinkError(t *testing.T) {
-	assert.EqualError(t, New(&bytes.Buffer{})(errorSource.New(errors.New("failed"))), "failed")
+	source := errorSource.New(errors.New("failed"))
+	assert.EqualError(t, New(&bytes.Buffer{})(source), "failed")
+	assert.True(t, source.Stopped)
 }

@@ -52,5 +52,7 @@ func TestAlphabetical(t *testing.T) {
 }
 
 func TestCSVSinkError(t *testing.T) {
-	assert.EqualError(t, New(&bytes.Buffer{})(errorSource.New(errors.New("failed"))), "failed")
+	source := errorSource.New(errors.New("failed"))
+	assert.EqualError(t, New(&bytes.Buffer{})(source), "failed")
+	assert.True(t, source.Stopped)
 }

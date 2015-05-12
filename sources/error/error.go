@@ -4,24 +4,27 @@ import (
 	"gopkg.in/Clever/optimus.v3"
 )
 
-type errorTable struct {
-	rows chan optimus.Row
-	err  error
+type ErrorTable struct {
+	rows    chan optimus.Row
+	err     error
+	Stopped bool
 }
 
-func (e errorTable) Err() error {
+func (e *ErrorTable) Err() error {
 	return e.err
 }
 
-func (e errorTable) Rows() <-chan optimus.Row {
+func (e *ErrorTable) Rows() <-chan optimus.Row {
 	return e.rows
 }
 
-func (e errorTable) Stop() {}
+func (e *ErrorTable) Stop() {
+	e.Stopped = true
+}
 
 // New returns a new Table that returns a given error. Primarily used for testing purposes.
-func New(err error) optimus.Table {
-	table := &errorTable{err: err, rows: make(chan optimus.Row)}
+func New(err error) *ErrorTable {
+	table := &ErrorTable{err: err, rows: make(chan optimus.Row)}
 	close(table.rows)
 	return table
 }

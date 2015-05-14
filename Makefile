@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-PKG := gopkg.in/Clever/optimus.v3
+PKG := github.com/Clever/optimus
 SOURCES := $(shell ls sources)
 SINKS := $(shell ls sinks)
 SUBPKG_NAMES := $(addprefix sources/, $(SOURCES)) $(addprefix sinks/, $(SINKS)) transformer transforms

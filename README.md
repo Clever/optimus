@@ -41,7 +41,7 @@ CSV file:
     	step1 := optimus.Transform(begin, transforms.Fieldmap(fieldMappings))
     	step2 := optimus.Transform(step1, transforms.Valuemap(valueMappings))
     	end := optimus.Transform(step2, transforms.Map(arbitraryTransformFunction))
-    	csvSink.New(out)(end)
+	_ = csvSink.New(out)(end)
     }
 
 Here's one that uses chaining:

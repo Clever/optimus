@@ -1,4 +1,4 @@
-package csv
+package json
 
 import (
 	"encoding/json"

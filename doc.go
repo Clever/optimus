@@ -33,7 +33,7 @@ Here's an example program that performs a set of field and value mappings on a C
 		step1 := optimus.Transform(begin, transforms.Fieldmap(fieldMappings))
 		step2 := optimus.Transform(step1, transforms.Valuemap(valueMappings))
 		end := optimus.Transform(step2, transforms.Map(arbitraryTransformFunction))
-		csvSink.New(out)(end)
+		_ = csvSink.New(out)(end)
 	}
 
 Here's one that uses chaining:

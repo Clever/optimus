@@ -2,14 +2,16 @@ package gearman
 
 import (
 	"fmt"
+	"io"
+	"testing"
+	"time"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gopkg.in/Clever/gearman.v1/job"
 	"gopkg.in/Clever/gearman.v1/packet"
 	"gopkg.in/Clever/optimus.v3"
 	"gopkg.in/Clever/optimus.v3/tests"
-	"io"
-	"testing"
 )
 
 type mockClient struct {
@@ -54,6 +56,10 @@ func TestGearmanSource(t *testing.T) {
 		{"field1": "value2"},
 	}
 	go func() {
+		// Wait until a packet has been submitted
+		for len(c.chans) == 0 {
+			time.Sleep(time.Millisecond)
+		}
 		packets := c.chans[0]
 		packets <- handlePacket("", packet.WorkData, [][]byte{[]byte("1")})
 		packets <- handlePacket("", packet.WorkData, [][]byte{[]byte("2")})
@@ -71,6 +77,10 @@ func TestGearmanSourceFail(t *testing.T) {
 		return nil, nil
 	})
 	go func() {
+		// Wait until a packet has been submitted
+		for len(c.chans) == 0 {
+			time.Sleep(time.Millisecond)
+		}
 		packets := c.chans[0]
 		packets <- handlePacket("", packet.WorkWarning, [][]byte{[]byte("1")})
 		packets <- handlePacket("", packet.WorkFail, nil)

@@ -8,7 +8,7 @@ PKGS = $(PKG) $(SUBPKGS)
 
 .PHONY: test docs $(PKGS)
 
-test: docs $(PKGS)
+test: docs transformer/gen.go $(PKGS)
 
 $(GOPATH)/bin/golint:
 	@go get github.com/golang/lint/golint
@@ -39,3 +39,6 @@ endif
 docs: $(addsuffix /README.md, $(SUBPKG_NAMES)) README.md
 %/README.md: %/*.go $(GOPATH)/bin/godocdown
 	@$(GOPATH)/bin/godocdown $(PKG)/$(shell dirname $@) > $@
+
+transformer/gen.go: transforms/*.go cmd/transformer_generate/*.go
+	go run $(GOPATH)/src/$(PKG)/cmd/transformer_generate/*.go

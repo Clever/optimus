@@ -1,10 +1,5 @@
 package transformer
 
-import (
-	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/Clever/optimus.v3/transforms"
-)
-
 // A Transformer allows you to easily chain multiple transforms on a table.
 type Transformer struct {
 	table optimus.Table

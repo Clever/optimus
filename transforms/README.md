@@ -60,6 +60,25 @@ func Each(fn func(optimus.Row) error) optimus.TransformFunc
 Each returns a TransformFunc that makes no changes to the table, but calls the
 given function on every Row.
 
+#### func  Explode
+
+```go
+func Explode(keyToExplode string) optimus.TransformFunc
+```
+Explode returns a TransformFunc that takes a row that contains an array
+in the specified key and returns a duplicate of the row for each value in the array.
+For example, exploding on "school" for:
+```go
+optimus.Row{"id": "a", "school": []string{"Jones Elementary", "Cedar Middle"}}
+```
+becomes
+```go
+[]optimus.Row{
+    {"id": "a", "school": "Jones Elementary"},
+    {"id": "a", "school": "Cedar Middle"},
+}
+```
+
 #### func  Fieldmap
 
 ```go

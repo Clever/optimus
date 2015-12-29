@@ -263,6 +263,33 @@ var transformEqualities = []tests.TableCompareConfig{
 			})
 		},
 	},
+	{
+		Name: "Explode",
+		Actual: func(optimus.Table, interface{}) optimus.Table {
+            explodeInput := []optimus.Row{
+                {"header1": "value1", "header2": []string{"valueA", "valueB","valueC"}},
+                {"header1": "value3", "header2": []string{"valueD", "valueE","valueF"}},
+                {"header1": "value5", "header2": []string{"valueG", "valueH","valueI"}},
+                //non-slice values should pass through unaltered
+                {"header1": "value7", "header2": "valueJ"},
+            }
+			return optimus.Transform(slice.New(explodeInput), Explode("header2"))
+		},
+		Expected: func(optimus.Table, interface{}) optimus.Table {
+			return slice.New([]optimus.Row{
+				{"header1": "value1", "header2": "valueA"},
+				{"header1": "value1", "header2": "valueB"},
+				{"header1": "value1", "header2": "valueC"},
+				{"header1": "value3", "header2": "valueD"},
+				{"header1": "value3", "header2": "valueE"},
+				{"header1": "value3", "header2": "valueF"},
+				{"header1": "value5", "header2": "valueG"},
+				{"header1": "value5", "header2": "valueH"},
+				{"header1": "value5", "header2": "valueI"},
+				{"header1": "value7", "header2": "valueJ"},
+			})
+		},
+	},
 }
 
 func TestJoinMergePairs(t *testing.T) {

@@ -4,6 +4,7 @@ import (
 	"gopkg.in/Clever/optimus.v3"
 	"gopkg.in/fatih/set.v0"
 	"sync"
+    "reflect"
 )
 
 // TableTransform returns a TransformFunc that applies the given transform function.
@@ -16,6 +17,48 @@ func TableTransform(transform func(optimus.Row, chan<- optimus.Row) error) optim
 		}
 		return nil
 	}
+}
+
+// Explode returns a TransformFunc that takes a row that contains an array
+// in the specified key and returns a duplicate of the row for each value in the array.
+// For example, exploding on "school" for:
+// optimus.Row{"id": "a", "school": []string{"Jones Elementary", "Cedar Middle"}}
+// becomes
+// []optimus.Row{
+//     {"id": "a", "school": "Jones Elementary"},
+//     {"id": "a", "school": "Cedar Middle"},
+// }
+func Explode(keyToExplode string) optimus.TransformFunc {
+	return TableTransform(func(row optimus.Row, out chan<- optimus.Row) error {
+        objToExplode := row[keyToExplode]
+
+        switch reflect.TypeOf(objToExplode).Kind() {
+            case reflect.Slice:
+                valToExplode := reflect.ValueOf(objToExplode)
+                //Walk over the slice and "explode" it
+                for i := 0; i < valToExplode.Len(); i++ {
+                    //Copy the row, except for the new exploded value
+                    newRow := optimus.Row{}
+                    for key, val := range row {
+                        if key != keyToExplode {
+                            newRow[key] = val
+                        } else {
+                            //Still a getting the element of a value is still a value
+                            newVal := valToExplode.Index(i)
+                            //Casting the value object back into a normal interface{} object
+                            newRow[key] = newVal.Interface()
+                        }
+                    }
+                    //Output the new row
+                    out <- newRow
+                }
+                return nil
+            default:
+                //If the key doesn't point to a slice, don't complain, just no-op
+                out <- row
+                return nil
+        }
+	})
 }
 
 // Select returns a TransformFunc that removes any rows that don't pass the filter.

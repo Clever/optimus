@@ -79,6 +79,7 @@ func addProtocol(row optimus.Row) (optimus.Row, error) {
 }
 
 func main() {
+	log.Printf("Filtering on 'ssl'=true and this regex: '%s'", cleverRegex)
 	// create open csv "source" file and json "sink" file
 	inputFile, err := os.Open(inputFilename)
 	fatalIfErr(err)
@@ -99,7 +100,8 @@ func main() {
 	// set up and start the transform
 	err = transformer.New(cSource).
 		// start by counting how many we read
-		Each(func(d optimus.Row) error {
+		Each(func(r optimus.Row) error {
+		log.Println("BEFORE: ", r)
 		beforeCounter++
 		return nil
 	}).
@@ -108,7 +110,8 @@ func main() {
 		// then let's just append "https" onto those urls
 		Map(addProtocol).
 		// finish by counting how many we end up writing
-		Each(func(d optimus.Row) error {
+		Each(func(r optimus.Row) error {
+		log.Println("AFTER: ", r)
 		afterCounter++
 		return nil
 	}).

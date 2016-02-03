@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -27,7 +28,7 @@ It's possible make an even simpler example, but this is a little more interestin
 var (
 	inputFilename  = filepath.Join("examples", "urls.csv")
 	outputFilename = filepath.Join("examples", "urls.json")
-	cleverRegex, _ = regexp.Compile("clever.com.*")
+	cleverRegex    = regexp.MustCompile(`(\w*\.)?clever.com`)
 )
 
 // helper function to keep things clean
@@ -37,13 +38,20 @@ func fatalIfErr(err error) {
 	}
 }
 
-// filterItems will only output SSL=true URL=/clever.com.*/ entries
+// selectOnlyCleverSSL will only output entries where ssl is true
+// and the host is either clever.com or a subdomain
 // if SSL or URL are missing, don't bother erroring and instead drop the row
-func filterItems(row optimus.Row) (bool, error) {
-	url, ok := row["url"]
-	if !ok || !cleverRegex.MatchString(url.(string)) {
+func selectOnlyCleverSSL(row optimus.Row) (bool, error) {
+	rawURL, ok := row["url"]
+	if !ok {
 		return false, nil
 	}
+	parsedURL, err := url.Parse(rawURL.(string))
+	if err != nil || !cleverRegex.MatchString(parsedURL.Host) {
+		return false, nil
+	}
+
+	// yes, yes, you could parse it from the protocol, but this is an example!
 	ssl, err := strconv.ParseBool(row["ssl"].(string))
 	if err != nil || ssl == false {
 		return false, nil
@@ -106,7 +114,7 @@ func main() {
 		return nil
 	}).
 		// as a simple case, let's only match "clever.com" hosts with SSL true
-		Select(filterItems).
+		Select(selectOnlyCleverSSL).
 		// then let's just append "https" onto those urls
 		Map(addProtocol).
 		// finish by counting how many we end up writing

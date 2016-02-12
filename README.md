@@ -19,6 +19,13 @@ output, such as a CSV.
 
 ### Example
 
+For runnable examples, see the [examples directory](https://github.com/Clever/optimus/tree/master/examples).
+
+Available examples and how to run them:
+```go
+go run examples/simple_url.go
+```
+
 Here's an example program that performs a set of field and value mappings on a
 CSV file:
 

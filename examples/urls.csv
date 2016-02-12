@@ -1,0 +1,6 @@
+url,ssl,count
+https://google.com/baz,true,8
+https://clever.com/foo,true,5
+http://facebook.com,false,10
+https://api.clever.com/bar,true,2
+http://www.clever.info/bar,false,3

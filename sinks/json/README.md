@@ -1,4 +1,4 @@
-# csv
+# json
 --
     import "gopkg.in/Clever/optimus.v3/sinks/json"
 

@@ -16,6 +16,9 @@ provided for common transformations (e.g. Map).
 Lastly, a set of Sink functions are provided that will "sink" a table into some
 output, such as a CSV.
 
+#### Illustration
+
+![Simple Illustration of the Optimus Flow](./flow.png)
 
 ### Example
 

@@ -1,41 +1,18 @@
+include golang.mk
+.DEFAULT_GOAL := test # override default goal set in library makefile
+
 SHELL := /bin/bash
 PKG := gopkg.in/Clever/optimus.v3
-SOURCES := $(shell ls sources)
-SINKS := $(shell ls sinks)
-SUBPKG_NAMES := $(addprefix sources/, $(SOURCES)) $(addprefix sinks/, $(SINKS)) transformer transforms
-SUBPKGS = $(addprefix $(PKG)/, $(SUBPKG_NAMES))
-PKGS = $(PKG) $(SUBPKGS)
+PKGS := $(shell go list ./... | grep -v /vendor)
 
 .PHONY: test docs $(PKGS)
+$(eval $(call golang-version-check,1.5))
 
-test: docs $(PKGS)
+all: test
 
-$(GOPATH)/bin/golint:
-	@go get github.com/golang/lint/golint
+test: $(PKGS)
+$(PKGS): golang-test-all-strict-deps
+	$(call golang-test-all-strict,$@)
 
-$(GOPATH)/bin/godocdown:
-	@go get github.com/robertkrimen/godocdown/godocdown
-
-README.md: $(GOPATH)/bin/godocdown *.go
-	@$(GOPATH)/bin/godocdown -template=.godocdown.template $(PKG) > README.md
-
-$(PKGS): $(GOPATH)/bin/golint docs
-	@go get -d -t $@
-	@gofmt -w=true $(GOPATH)/src/$@*/**.go
-ifneq ($(NOLINT),1)
-	@echo "LINTING..."
-	@$(GOPATH)/bin/golint $(GOPATH)/src/$@*/**.go
-	@echo ""
-endif
-ifeq ($(COVERAGE),1)
-	@go test -cover -coverprofile=$(GOPATH)/src/$@/c.out $@ -test.v
-	@go tool cover -html=$(GOPATH)/src/$@/c.out
-else
-	@echo "TESTING..."
-	@go test $@ -test.v
-	@echo ""
-endif
-
-docs: $(addsuffix /README.md, $(SUBPKG_NAMES)) README.md
-%/README.md: %/*.go $(GOPATH)/bin/godocdown
-	@$(GOPATH)/bin/godocdown $(PKG)/$(shell dirname $@) > $@
+vendor: golang-godep-vendor-deps
+	$(call golang-godep-vendor,$(PKGS))

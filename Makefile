@@ -12,6 +12,7 @@ all: test
 
 test: $(PKGS)
 $(PKGS): golang-test-all-strict-deps
+	go get -t $@
 	$(call golang-test-all-strict,$@)
 
 vendor: golang-godep-vendor-deps

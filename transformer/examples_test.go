@@ -94,18 +94,18 @@ http://www.clever.info/bar,false,3
 	err := New(cSource).
 		// start by counting how many we read
 		Each(func(r optimus.Row) error {
-		beforeCounter++
-		return nil
-	}).
+			beforeCounter++
+			return nil
+		}).
 		// as a simple case, let's only match "clever.com" hosts with SSL true
 		Select(selectOnlyCleverSSL).
 		// then let's just append "https" onto those urls
 		Map(addProtocol).
 		// finish by counting how many we end up writing
 		Each(func(r optimus.Row) error {
-		afterCounter++
-		return nil
-	}).
+			afterCounter++
+			return nil
+		}).
 		// set up the sink
 		Sink(jSink)
 

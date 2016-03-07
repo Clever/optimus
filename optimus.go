@@ -1,5 +1,7 @@
 package optimus
 
+import "sync"
+
 // Table is a representation of a table of data.
 type Table interface {
 	// Rows returns a channel that provides the Rows in the table.
@@ -34,22 +36,28 @@ type transformedTable struct {
 	source  Table
 	err     error
 	rows    chan Row
+	m       sync.Mutex
 	stopped bool
 }
 
-func (t transformedTable) Rows() <-chan Row {
+func (t *transformedTable) Rows() <-chan Row {
 	return t.rows
 }
 
-func (t transformedTable) Err() error {
+func (t *transformedTable) Err() error {
 	return t.err
 }
 
 func (t *transformedTable) Stop() {
-	if t.stopped {
+	t.m.Lock()
+	stopped := t.stopped
+	t.m.Unlock()
+	if stopped {
 		return
 	}
+	t.m.Lock()
 	t.stopped = true
+	t.m.Unlock()
 	t.source.Stop()
 }
 
@@ -89,7 +97,10 @@ func (t *transformedTable) start(transform TransformFunc) {
 			doneChan <- struct{}{}
 		}()
 		for row := range out {
-			if t.stopped {
+			t.m.Lock()
+			stopped := t.stopped
+			t.m.Unlock()
+			if stopped {
 				continue
 			}
 			t.rows <- row
@@ -103,7 +114,10 @@ func (t *transformedTable) start(transform TransformFunc) {
 		}()
 		defer close(in)
 		for row := range t.source.Rows() {
-			if t.stopped {
+			t.m.Lock()
+			stopped := t.stopped
+			t.m.Unlock()
+			if stopped {
 				continue
 			}
 			in <- row

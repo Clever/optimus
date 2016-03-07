@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"sync"
 
 	"gopkg.in/Clever/optimus.v3"
 )
@@ -11,6 +12,7 @@ import (
 type table struct {
 	err     error
 	rows    chan optimus.Row
+	m       sync.Mutex
 	stopped bool
 }
 
@@ -30,7 +32,10 @@ func (t *table) start(reader *csv.Reader) {
 
 	reader.FieldsPerRecord = len(headers)
 	for {
-		if t.stopped {
+		t.m.Lock()
+		stopped := t.stopped
+		t.m.Unlock()
+		if stopped {
 			break
 		}
 		line, err := reader.Read()
@@ -42,16 +47,18 @@ func (t *table) start(reader *csv.Reader) {
 	}
 }
 
-func (t table) Rows() <-chan optimus.Row {
+func (t *table) Rows() <-chan optimus.Row {
 	return t.rows
 }
 
-func (t table) Err() error {
+func (t *table) Err() error {
 	return t.err
 }
 
 func (t *table) Stop() {
+	t.m.Lock()
 	t.stopped = true
+	t.m.Unlock()
 }
 
 func (t *table) handleErr(err error) {

@@ -1,9 +1,10 @@
 package tests
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/Clever/optimus.v3"
-	"testing"
 )
 
 // Stop tests that a Table correctly implements Stop.
@@ -27,6 +28,7 @@ func HasRows(t *testing.T, table optimus.Table, expected int) []optimus.Row {
 	return rows
 }
 
+// GetRows returns a slice of all the rows in a table
 func GetRows(table optimus.Table) []optimus.Row {
 	rows := []optimus.Row{}
 	for row := range table.Rows() {
@@ -35,6 +37,7 @@ func GetRows(table optimus.Table) []optimus.Row {
 	return rows
 }
 
+// TableCompareConfig contains a config for comparing two tables in a set of tests
 type TableCompareConfig struct {
 	Name     string
 	Source   func() optimus.Table
@@ -44,6 +47,7 @@ type TableCompareConfig struct {
 	Error    error
 }
 
+// CompareTables takes in a config of comparisons and runs them
 func CompareTables(t *testing.T, configs []TableCompareConfig) {
 	for _, config := range configs {
 		if config.Source == nil {
@@ -56,8 +60,8 @@ func CompareTables(t *testing.T, configs []TableCompareConfig) {
 		if config.Expected != nil {
 			expected := GetRows(config.Expected(config.Source(), config.Arg))
 			for idx, expectedRow := range expected {
-				for field_name, _ := range expectedRow {
-					assert.Equal(t, expected[idx][field_name], actual[idx][field_name], "%s failed", config.Name)
+				for fieldName := range expectedRow {
+					assert.Equal(t, expected[idx][fieldName], actual[idx][fieldName], "%s failed", config.Name)
 				}
 			}
 		} else if config.Error != nil {

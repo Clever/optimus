@@ -10,5 +10,6 @@ notify:
     webhook_url: $$slack_webhook
 script:
 - mkdir -p $GOPATH/src/gopkg.in/Clever
-- ln -s `pwd` $GOPATH/src/gopkg.in/Clever/optimus.v3
+- mv `pwd` $GOPATH/src/gopkg.in/Clever/optimus.v3
+- cd $GOPATH/src/gopkg.in/Clever/optimus.v3
 - make test

@@ -6,7 +6,7 @@ PKG := gopkg.in/Clever/optimus.v3
 PKGS := $(shell go list $(PKG)/... | grep -v /vendor)
 # NOTE: We have a poorly named type that we choose to not fix as it would break backwards compatibility.
 # In 4.0, this type will be renamed and all packages will be tested strictly.
-LAX_PKGS := $(PKG)/sources/error
+LAX_PKGS := $(addprefix $(PKG),/sources/error /transformer)
 STRICT_PKGS := $(filter-out $(LAX_PKGS),$(PKGS))
 
 .PHONY: test docs $(PKGS)

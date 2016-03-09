@@ -1,9 +1,10 @@
 package transforms
 
 import (
+	"sync"
+
 	"gopkg.in/Clever/optimus.v3"
 	"gopkg.in/fatih/set.v0"
-	"sync"
 )
 
 // TableTransform returns a TransformFunc that applies the given transform function.
@@ -91,6 +92,7 @@ type joinType struct {
 	int
 }
 
+// JoinType describes the type of join.
 // Left: Always add row from Left table, even if no corresponding rows found in Right table)
 // Inner: Only add row from Left table if corresponding row(s) found in Right table)
 var JoinType = joinStruct{Left: joinType{0}, Inner: joinType{1}}

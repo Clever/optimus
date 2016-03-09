@@ -2,6 +2,8 @@ package gearman
 
 import (
 	"fmt"
+	"sync"
+
 	"gopkg.in/Clever/gearman.v1"
 	"gopkg.in/Clever/gearman.v1/job"
 	gearmanUtils "gopkg.in/Clever/gearman.v1/utils"
@@ -10,20 +12,23 @@ import (
 
 type table struct {
 	rows    chan optimus.Row
-	stopped bool
 	err     error
+	m       sync.Mutex
+	stopped bool
 }
 
 func (t *table) Rows() <-chan optimus.Row {
 	return t.rows
 }
 
-func (t table) Err() error {
+func (t *table) Err() error {
 	return t.err
 }
 
 func (t *table) Stop() {
+	t.m.Lock()
 	t.stopped = true
+	t.m.Unlock()
 }
 
 type getData struct {

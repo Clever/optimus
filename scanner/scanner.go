@@ -68,7 +68,7 @@ var (
 )
 
 const (
-	// Maximum size used to buffer a token. The actual maximum token size
+	// MaxScanTokenSize is the maximum size used to buffer a token. The actual maximum token size
 	// may be smaller as the buffer may need to include, for instance, a newline.
 	// NOTE: This has been updated to be large enough to store a single MongoDB doc.
 	MaxScanTokenSize         = 16 * 1024 * 1024

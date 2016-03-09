@@ -3,6 +3,7 @@ package gearman
 import (
 	"fmt"
 	"io"
+	"sync"
 	"testing"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 
 type mockClient struct {
 	*mock.Mock
+	m     sync.Mutex
 	chans []chan *packet.Packet
 }
 
@@ -26,7 +28,13 @@ func (c *mockClient) Close() error {
 func (c *mockClient) Submit(fn string, payload []byte, data, warnings io.WriteCloser) (job.Job, error) {
 	_ = c.Mock.Called(fn, payload, data, warnings)
 	packetChan := make(chan *packet.Packet)
-	c.chans = append(c.chans, packetChan)
+	c.m.Lock()
+	chans := c.chans
+	c.m.Unlock()
+	chans = append(chans, packetChan)
+	c.m.Lock()
+	c.chans = chans
+	c.m.Unlock()
 	j := job.New("", data, warnings, packetChan)
 	return j, nil
 }
@@ -40,6 +48,13 @@ func handlePacket(handle string, kind int, arguments [][]byte) *packet.Packet {
 		Type:      packet.Type(kind),
 		Arguments: arguments,
 	}
+}
+
+func getChans(c *mockClient) []chan *packet.Packet {
+	c.m.Lock()
+	chans := c.chans
+	c.m.Unlock()
+	return chans
 }
 
 func TestGearmanSource(t *testing.T) {
@@ -57,10 +72,10 @@ func TestGearmanSource(t *testing.T) {
 	}
 	go func() {
 		// Wait until a packet has been submitted
-		for len(c.chans) == 0 {
+		for len(getChans(c)) == 0 {
 			time.Sleep(time.Millisecond)
 		}
-		packets := c.chans[0]
+		packets := getChans(c)[0]
 		packets <- handlePacket("", packet.WorkData, [][]byte{[]byte("1")})
 		packets <- handlePacket("", packet.WorkData, [][]byte{[]byte("2")})
 		packets <- handlePacket("", packet.WorkComplete, nil)
@@ -78,10 +93,10 @@ func TestGearmanSourceFail(t *testing.T) {
 	})
 	go func() {
 		// Wait until a packet has been submitted
-		for len(c.chans) == 0 {
+		for len(getChans(c)) == 0 {
 			time.Sleep(time.Millisecond)
 		}
-		packets := c.chans[0]
+		packets := getChans(c)[0]
 		packets <- handlePacket("", packet.WorkWarning, [][]byte{[]byte("1")})
 		packets <- handlePacket("", packet.WorkFail, nil)
 	}()

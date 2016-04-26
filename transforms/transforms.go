@@ -1,6 +1,7 @@
 package transforms
 
 import (
+	"fmt"
 	"sync"
 
 	"gopkg.in/Clever/optimus.v3"
@@ -61,6 +62,9 @@ func Fieldmap(mappings map[string][]string) optimus.TransformFunc {
 		for key, vals := range mappings {
 			for _, val := range vals {
 				if oldRowVal, ok := row[key]; ok {
+					if _, ok := newRow[val]; ok {
+						return nil, fmt.Errorf("Multiple Fieldmap exists for %s", val)
+					}
 					newRow[val] = oldRowVal
 				}
 			}

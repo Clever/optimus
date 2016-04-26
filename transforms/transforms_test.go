@@ -271,7 +271,7 @@ func TestMultipleFieldmapError(t *testing.T) {
 		Fieldmap(map[string][]string{"header1": {"header4"}, "header2": {"header4"}}))
 
 	tests.HasRows(t, table, 0)
-	assert.EqualError(t, table.Err(), "Multiple Fieldmap exists for header4")
+	assert.EqualError(t, table.Err(), "Detected multiple mappings to the same value for key header4")
 }
 
 func TestJoinMergePairs(t *testing.T) {

@@ -62,6 +62,22 @@ func Fieldmap(mappings map[string][]string) optimus.TransformFunc {
 		for key, vals := range mappings {
 			for _, val := range vals {
 				if oldRowVal, ok := row[key]; ok {
+					newRow[val] = oldRowVal
+				}
+			}
+		}
+		return newRow, nil
+	})
+}
+
+// SafeFieldmap returns a TransformFunc that applies a field mapping to every Row.
+// Exactly like Fieldmap except this one will error for multiple mappings to the same value.
+func SafeFieldmap(mappings map[string][]string) optimus.TransformFunc {
+	return Map(func(row optimus.Row) (optimus.Row, error) {
+		newRow := optimus.Row{}
+		for key, vals := range mappings {
+			for _, val := range vals {
+				if oldRowVal, ok := row[key]; ok {
 					if _, ok := newRow[val]; ok {
 						return nil, fmt.Errorf("Detected multiple mappings to the same value for key %s", val)
 					}

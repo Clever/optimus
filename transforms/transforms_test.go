@@ -268,7 +268,7 @@ var transformEqualities = []tests.TableCompareConfig{
 
 func TestMultipleFieldmapError(t *testing.T) {
 	table := optimus.Transform(defaultSource(),
-		Fieldmap(map[string][]string{"header1": {"header4"}, "header2": {"header4"}}))
+		SafeFieldmap(map[string][]string{"header1": {"header4"}, "header2": {"header4"}}))
 
 	tests.HasRows(t, table, 0)
 	assert.EqualError(t, table.Err(), "Detected multiple mappings to the same value for key header4")

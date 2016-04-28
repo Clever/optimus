@@ -3,6 +3,8 @@ package transforms
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/Clever/optimus.v3"
 	"gopkg.in/Clever/optimus.v3/sinks/discard"
@@ -10,7 +12,6 @@ import (
 	"gopkg.in/Clever/optimus.v3/sources/infinite"
 	"gopkg.in/Clever/optimus.v3/sources/slice"
 	"gopkg.in/Clever/optimus.v3/tests"
-	"testing"
 )
 
 var defaultInput = func() []optimus.Row {
@@ -263,6 +264,14 @@ var transformEqualities = []tests.TableCompareConfig{
 			})
 		},
 	},
+}
+
+func TestMultipleFieldmapError(t *testing.T) {
+	table := optimus.Transform(defaultSource(),
+		SafeFieldmap(map[string][]string{"header1": {"header4"}, "header2": {"header4"}}))
+
+	tests.HasRows(t, table, 0)
+	assert.EqualError(t, table.Err(), "Detected multiple mappings to the same value for key header4")
 }
 
 func TestJoinMergePairs(t *testing.T) {

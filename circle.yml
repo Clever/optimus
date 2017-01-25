@@ -6,12 +6,9 @@ machine:
   - docker
 checkout:
   post:
-  - $HOME/ci-scripts/circleci/golang-move-project
+  - $HOME/ci-scripts/circleci/golang-move-project gopkg.in/Clever/optimus.v3
 test:
   override:
-  - mkdir -p $GOPATH/src/gopkg.in/Clever
-  - mv `pwd` $GOPATH/src/gopkg.in/Clever/optimus.v3
-  - cd $GOPATH/src/gopkg.in/Clever/optimus.v3
   - make test
   post:
   - $HOME/ci-scripts/circleci/report-card $RC_DOCKER_USER $RC_DOCKER_PASS "$RC_DOCKER_EMAIL" $RC_GITHUB_TOKEN

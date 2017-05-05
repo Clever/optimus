@@ -281,7 +281,7 @@ func (p passthroughTable) Stop() {}
 
 // BypassTransforms effectively wraps a slice of transform funcs with a gate to conditionally
 // apply the transforms only if they match the filter.
-func BypassTransforms(doApply RowFilter, optionalTransforms []optimus.TransformFunc) optimus.TransformFunc {
+func BypassTransforms(doBypass RowFilter, optionalTransforms []optimus.TransformFunc) optimus.TransformFunc {
 	outboundRows := make(chan optimus.Row)
 
 	// setup an optimus pipeline to process rows through all the provided optional transforms
@@ -298,13 +298,12 @@ func BypassTransforms(doApply RowFilter, optionalTransforms []optimus.TransformF
 
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
 		for row := range in {
-			if !doApply(row) {
+			if doBypass(row) {
 				out <- row
 				continue
 			}
 			passthroughChan <- row
-			x := <-outboundRows
-			out <- x
+			out <- <-outboundRows
 		}
 		return nil
 	}

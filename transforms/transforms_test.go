@@ -487,9 +487,9 @@ func TestBypassTransforms(t *testing.T) {
 
 	skipFn := func(r optimus.Row) bool {
 		if r["a"].(int) < 2 {
-			return false
+			return true
 		}
-		return true
+		return false
 	}
 
 	buf := &bytes.Buffer{}

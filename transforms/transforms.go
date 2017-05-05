@@ -262,3 +262,50 @@ func GroupBy(identifier RowIdentifier) optimus.TransformFunc {
 		return nil
 	}
 }
+
+// RowFilter is meant to return `true` if a section is meant to be filtered out.
+type RowFilter func(optimus.Row) bool
+
+// passthroughTable is a super simple optimus table that just passes rows through
+type passthroughTable struct {
+	c chan optimus.Row
+}
+
+func (p passthroughTable) Rows() <-chan optimus.Row {
+	return p.c
+}
+func (p passthroughTable) Err() error {
+	return nil
+}
+func (p passthroughTable) Stop() {}
+
+// BypassTransforms effectively wraps a slice of transform funcs with a gate to conditionally
+// apply the transforms only if they match the filter.
+func BypassTransforms(doApply RowFilter, optionalTransforms []optimus.TransformFunc) optimus.TransformFunc {
+	outboundRows := make(chan optimus.Row)
+
+	// setup an optimus pipeline to process rows through all the provided optional transforms
+	passthroughChan := make(chan optimus.Row)
+	tempTable := optimus.Table(passthroughTable{c: passthroughChan})
+	for _, t := range optionalTransforms {
+		tempTable = optimus.Transform(tempTable, t)
+	}
+	go func() {
+		for sunkRow := range tempTable.Rows() {
+			outboundRows <- sunkRow
+		}
+	}()
+
+	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		for row := range in {
+			if !doApply(row) {
+				out <- row
+				continue
+			}
+			passthroughChan <- row
+			x := <-outboundRows
+			out <- x
+		}
+		return nil
+	}
+}

@@ -267,12 +267,10 @@ func GroupBy(identifier RowIdentifier) optimus.TransformFunc {
 type RowFilter func(optimus.Row) bool
 
 // passthroughTable is a super simple optimus table that just passes rows through
-type passthroughTable struct {
-	c chan optimus.Row
-}
+type passthroughTable chan optimus.Row
 
 func (p passthroughTable) Rows() <-chan optimus.Row {
-	return p.c
+	return p
 }
 func (p passthroughTable) Err() error {
 	return nil
@@ -286,7 +284,7 @@ func BypassTransforms(doBypass RowFilter, optionalTransforms []optimus.Transform
 
 	// setup an optimus pipeline to process rows through all the provided optional transforms
 	passthroughChan := make(chan optimus.Row)
-	tempTable := optimus.Table(passthroughTable{c: passthroughChan})
+	tempTable := optimus.Table(passthroughTable(passthroughChan))
 	for _, t := range optionalTransforms {
 		tempTable = optimus.Transform(tempTable, t)
 	}
@@ -297,6 +295,7 @@ func BypassTransforms(doBypass RowFilter, optionalTransforms []optimus.Transform
 	}()
 
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+		defer close(passthroughChan)
 		for row := range in {
 			if doBypass(row) {
 				out <- row

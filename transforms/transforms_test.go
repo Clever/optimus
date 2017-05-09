@@ -1,6 +1,7 @@
 package transforms
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"testing"
@@ -8,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/Clever/optimus.v3"
 	"gopkg.in/Clever/optimus.v3/sinks/discard"
+	jsonSink "gopkg.in/Clever/optimus.v3/sinks/json"
 	errorTable "gopkg.in/Clever/optimus.v3/sources/error"
 	"gopkg.in/Clever/optimus.v3/sources/infinite"
 	"gopkg.in/Clever/optimus.v3/sources/slice"
@@ -467,4 +469,38 @@ func TestTransformError(t *testing.T) {
 		assert.EqualError(t, discard.Discard(out), "some error")
 		tests.Consumed(t, in)
 	}
+}
+
+func TestBypassTransforms(t *testing.T) {
+	tbl := slice.New([]optimus.Row{
+		{"a": 1},
+		{"a": 2},
+		{"a": 3},
+	})
+
+	optionalTransforms := []optimus.TransformFunc{
+		Map(func(r optimus.Row) (optimus.Row, error) {
+			r["foo"] = "bar"
+			return r, nil
+		}),
+	}
+
+	skipFn := func(r optimus.Row) bool {
+		if r["a"].(int) < 2 {
+			return true
+		}
+		return false
+	}
+
+	buf := &bytes.Buffer{}
+	sink := jsonSink.New(buf)
+
+	wrappedTransforms := BypassTransforms(skipFn, optionalTransforms)
+	assert.Nil(t, sink(optimus.Transform(tbl, wrappedTransforms)))
+
+	expectedResult := `{"a":1}
+{"a":2,"foo":"bar"}
+{"a":3,"foo":"bar"}
+`
+	assert.Equal(t, expectedResult, buf.String())
 }

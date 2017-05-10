@@ -485,6 +485,16 @@ func TestBypassTransforms(t *testing.T) {
 		}),
 	}
 
+	first := Map(func(r optimus.Row) (optimus.Row, error) {
+		r["done"] = false
+		return r, nil
+	})
+
+	final := Map(func(r optimus.Row) (optimus.Row, error) {
+		r["done"] = true
+		return r, nil
+	})
+
 	skipFn := func(r optimus.Row) bool {
 		if r["a"].(int) < 2 {
 			return true
@@ -496,11 +506,20 @@ func TestBypassTransforms(t *testing.T) {
 	sink := jsonSink.New(buf)
 
 	wrappedTransforms := BypassTransforms(skipFn, optionalTransforms)
-	assert.Nil(t, sink(optimus.Transform(tbl, wrappedTransforms)))
+	allTransforms := []optimus.TransformFunc{
+		first,
+		wrappedTransforms,
+		final,
+	}
+	for _, t := range allTransforms {
+		tbl = optimus.Transform(tbl, t)
+	}
 
-	expectedResult := `{"a":1}
-{"a":2,"foo":"bar"}
-{"a":3,"foo":"bar"}
+	assert.Nil(t, sink(tbl))
+
+	expectedResult := `{"a":1,"done":true}
+{"a":2,"done":true,"foo":"bar"}
+{"a":3,"done":true,"foo":"bar"}
 `
 	assert.Equal(t, expectedResult, buf.String())
 }

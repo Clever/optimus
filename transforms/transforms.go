@@ -280,30 +280,38 @@ func (p passthroughTable) Stop() {}
 // BypassTransforms effectively wraps a slice of transform funcs with a gate to conditionally
 // apply the transforms only if they match the filter.
 func BypassTransforms(doBypass RowFilter, optionalTransforms []optimus.TransformFunc) optimus.TransformFunc {
-	outboundRows := make(chan optimus.Row)
-
-	// setup an optimus pipeline to process rows through all the provided optional transforms
-	passthroughChan := make(chan optimus.Row)
-	tempTable := optimus.Table(passthroughTable(passthroughChan))
-	for _, t := range optionalTransforms {
-		tempTable = optimus.Transform(tempTable, t)
-	}
-	go func() {
-		for sunkRow := range tempTable.Rows() {
-			outboundRows <- sunkRow
-		}
-	}()
-
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
-		defer close(passthroughChan)
+		// setup an optimus pipeline to process rows through all the provided optional transforms
+		passthroughChan := make(chan optimus.Row, 0)
+		tempTable := optimus.Table(passthroughTable(passthroughChan))
+		for _, t := range optionalTransforms {
+			tempTable = optimus.Transform(tempTable, t)
+		}
+
+		// we do not have any guarantees about how many rows will be outputted so we
+		// pass all the rows through until we have consumed all of them.
+		doneChan := make(chan bool)
+		go func() {
+			for sunkRow := range tempTable.Rows() {
+				out <- sunkRow
+			}
+			doneChan <- true
+		}()
+
 		for row := range in {
 			if doBypass(row) {
 				out <- row
 				continue
 			}
 			passthroughChan <- row
-			out <- <-outboundRows
 		}
+
+		// we've consumed all the input rows and passed them through so now we can close the
+		// passthroughChan to trigger the bypass transforms to stop executing
+		close(passthroughChan)
+
+		// wait for all the rows from the bypass transforms to be consumed
+		<-doneChan
 		return nil
 	}
 }

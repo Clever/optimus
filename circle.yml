@@ -12,5 +12,11 @@ test:
   - make test
   post:
   - $HOME/ci-scripts/circleci/report-card $RC_DOCKER_USER $RC_DOCKER_PASS "$RC_DOCKER_EMAIL" $RC_GITHUB_TOKEN
+deployment:
+  master:
+    owner: Clever
+    commands:
+    - $HOME/ci-scripts/circleci/github-release $GH_RELEASE_TOKEN
+    branch: master
 general:
   build_dir: ../.go_workspace/src/gopkg.in/Clever/optimus.v3

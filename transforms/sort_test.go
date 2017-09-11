@@ -24,13 +24,13 @@ func byStringKey(key string) func(optimus.Row, optimus.Row) (bool, error) {
 	}
 }
 
-func byIntKey(key string) func(optimus.Row, optimus.Row) (bool, error) {
+func byFloat64Key(key string) func(optimus.Row, optimus.Row) (bool, error) {
 	return func(i, j optimus.Row) (bool, error) {
-		k, ok := i[key].(int)
+		k, ok := i[key].(float64)
 		if !ok {
 			return false, fmt.Errorf("%s wasn't an int, had value: %#v", key, i[key])
 		}
-		l, ok := j[key].(int)
+		l, ok := j[key].(float64)
 		if !ok {
 			return false, fmt.Errorf("%s wasn't an int, had value: %#v", key, j[key])
 		}
@@ -53,10 +53,12 @@ var successTests = []sortTestCase{
 		less:   byStringKey("a"),
 	},
 	{
-		desc:   "number sorting",
-		input:  []optimus.Row{{"a": "4"}, {"a": "2", "b": "d"}, {"a": "1"}},
-		output: []optimus.Row{{"a": "1"}, {"a": "2", "b": "d"}, {"a": "4"}},
-		less:   byStringKey("a"),
+		desc: "number sorting",
+		// NOTE: we use float64 because that is what json.Unmarshal returns for number
+		// types which part of the compressed sort transform.
+		input:  []optimus.Row{{"a": float64(4)}, {"a": float64(2), "b": "d"}, {"a": float64(1)}},
+		output: []optimus.Row{{"a": float64(1)}, {"a": float64(2), "b": "d"}, {"a": float64(4)}},
+		less:   byFloat64Key("a"),
 	},
 }
 
@@ -68,7 +70,7 @@ func TestSort(t *testing.T) {
 		}{
 			{desc: "regular sort", sorter: Sort(sortTest.less)},
 			{desc: "stable sort", sorter: StableSort(sortTest.less)},
-			{desc: "compressed stable sort", sorter: StableCompressedSort(GetKey("a"))},
+			{desc: "compressed stable sort", sorter: StableCompressedSort(KeyIdentifier("a"))},
 		} {
 			t.Run(sortTest.desc, func(t *testing.T) {
 				t.Run(sort.desc, func(t *testing.T) {
@@ -76,8 +78,8 @@ func TestSort(t *testing.T) {
 					table := optimus.Transform(input, sort.sorter)
 
 					actual := tests.GetRows(table)
-					assert.Equal(t, actual, sortTest.output)
 					assert.NoError(t, table.Err())
+					assert.Equal(t, sortTest.output, actual)
 				})
 			})
 		}
@@ -88,7 +90,7 @@ var errorTests = []sortTestCase{
 	{
 		input:  []optimus.Row{{"a": "4"}, {"a": "4", "b": "4"}},
 		output: []optimus.Row{},
-		less:   byIntKey("a"),
+		less:   byFloat64Key("a"),
 		err:    fmt.Errorf(`a wasn't an int, had value: "4"`),
 	},
 }
@@ -144,7 +146,7 @@ func TestStable(t *testing.T) {
 }
 
 func TestStableCompressed(t *testing.T) {
-	table := optimus.Transform(slice.New(stableInput), StableCompressedSort(GetKey("c")))
+	table := optimus.Transform(slice.New(stableInput), StableCompressedSort(KeyIdentifier("c")))
 	actual := tests.GetRows(table)
 	assert.Nil(t, table.Err())
 	assert.Equal(t, actual, stableInput)

@@ -2,7 +2,6 @@ package transforms
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 
 	"gopkg.in/Clever/optimus.v3"
@@ -58,7 +57,7 @@ func StableSort(less func(i, j optimus.Row) (bool, error)) optimus.TransformFunc
 }
 
 type compressedRow struct {
-	key  string
+	key  interface{}
 	blob []byte
 }
 
@@ -67,16 +66,34 @@ type compressedSorter struct {
 	err  error
 }
 
-func (r *compressedSorter) Len() int           { return len(r.rows) }
-func (r *compressedSorter) Less(i, j int) bool { return r.rows[i].key < r.rows[j].key }
-func (r *compressedSorter) Swap(i, j int)      { r.rows[i], r.rows[j] = r.rows[j], r.rows[i] }
+func (r *compressedSorter) Len() int { return len(r.rows) }
 
-func compressedSort(sorter func(sort.Interface), getKey func(optimus.Row) (string, error)) optimus.TransformFunc {
+// NOTE: we cannot test this panic because Optimus transforms operate in a seperate goroutine
+// that is not propagated back up to the main goroutine.
+//
+// > A panic cannot be recovered by a different goroutine.
+// https://github.com/golang/go/wiki/PanicAndRecover
+func (r *compressedSorter) Less(i, j int) bool {
+	switch key1 := r.rows[i].key.(type) {
+	case int:
+		return key1 < r.rows[j].key.(int)
+	case float64:
+		return key1 < r.rows[j].key.(float64)
+	case string:
+		return key1 < r.rows[j].key.(string)
+	default:
+		panic("RowIdentifier functions for StableCompressedSort must return an int/float64/string.")
+	}
+}
+
+func (r *compressedSorter) Swap(i, j int) { r.rows[i], r.rows[j] = r.rows[j], r.rows[i] }
+
+func compressedSort(sorter func(sort.Interface), getKeyVal RowIdentifier) optimus.TransformFunc {
 	return func(in <-chan optimus.Row, out chan<- optimus.Row) error {
 		rows := &compressedSorter{rows: []compressedRow{}}
 		for row := range in {
 			// obtain the key for the row and retain the key + blob while sorting
-			key, err := getKey(row)
+			keyVal, err := getKeyVal(row)
 			if err != nil {
 				return err
 			}
@@ -87,7 +104,7 @@ func compressedSort(sorter func(sort.Interface), getKey func(optimus.Row) (strin
 			}
 
 			rows.rows = append(rows.rows, compressedRow{
-				key:  key,
+				key:  keyVal,
 				blob: rowBlob,
 			})
 		}
@@ -108,23 +125,9 @@ func compressedSort(sorter func(sort.Interface), getKey func(optimus.Row) (strin
 	}
 }
 
-// StableCompressedSort takes in a function that reports whether the row i should sort before row j.
+// StableCompressedSort sorts an Optimus table based on the provided RowIdentifier. If the
+// RowIdentifier returns values that are not an int, float64 or string, the function will panic.
 // It outputs the rows in stably sorted order.
-func StableCompressedSort(getKey func(optimus.Row) (string, error)) optimus.TransformFunc {
+func StableCompressedSort(getKey RowIdentifier) optimus.TransformFunc {
 	return compressedSort(sort.Stable, getKey)
-}
-
-// GetKey is utility function for Optimus' StableCompressedSort functionality.
-func GetKey(key string) func(optimus.Row) (string, error) {
-	return func(r optimus.Row) (string, error) {
-		// Don't crash on empty objects
-		if r[key] == nil {
-			return "", nil
-		}
-		k, ok := r[key].(string)
-		if !ok {
-			return "", fmt.Errorf("%s wasn't a string, had value: %#v", key, r[key])
-		}
-		return k, nil
-	}
 }

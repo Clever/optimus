@@ -10,7 +10,7 @@ LAX_PKGS := $(addprefix $(PKG),/sources/error /transformer)
 STRICT_PKGS := $(filter-out $(LAX_PKGS),$(PKGS))
 
 .PHONY: test docs $(PKGS)
-$(eval $(call golang-version-check,1.8))
+$(eval $(call golang-version-check,1.9))
 
 all: test
 
@@ -22,5 +22,7 @@ $(LAX_PKGS): golang-test-all-deps
 	go get -t $@
 	$(call golang-test-all,$@)
 
-vendor: golang-godep-vendor-deps
-	$(call golang-godep-vendor,$(PKGS))
+
+
+install_deps: golang-dep-vendor-deps
+	$(call golang-dep-vendor)

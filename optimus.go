@@ -62,7 +62,7 @@ func (t *transformedTable) Stop() {
 }
 
 func drain(c <-chan Row) {
-	for _ = range c {
+	for range c {
 		// Drain everything left in the channel
 	}
 }

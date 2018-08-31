@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: /go/src/github.com/Clever/optimus
+    working_directory: /go/src/gopkg.in/Clever/optimus.v3
     docker:
     - image: circleci/golang:1.10.3-stretch
     - image: circleci/mongo:3.2.20-jessie-ram

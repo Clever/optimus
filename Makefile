@@ -22,7 +22,5 @@ $(LAX_PKGS): golang-test-all-deps
 	go get -t $@
 	$(call golang-test-all,$@)
 
-
-
 install_deps: golang-dep-vendor-deps
 	$(call golang-dep-vendor)

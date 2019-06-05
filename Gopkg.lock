@@ -27,19 +27,40 @@
 
 [[projects]]
   name = "github.com/stretchr/testify"
-  packages = ["assert","mock"]
+  packages = [
+    "assert",
+    "mock"
+  ]
   revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
   version = "v1.1.4"
 
 [[projects]]
   name = "gopkg.in/Clever/gearman.v1"
-  packages = [".","job","packet","scanner","utils"]
+  packages = [
+    ".",
+    "job",
+    "packet",
+    "scanner",
+    "utils"
+  ]
   revision = "a3c727cd3b480eb7c795c18c9be081cafcbcffae"
   version = "v1.0.0"
 
 [[projects]]
   name = "gopkg.in/Clever/optimus.v3"
-  packages = [".","scanner","sinks/discard","sinks/json","sources/csv","sources/error","sources/infinite","sources/json","sources/slice","tests","transforms"]
+  packages = [
+    ".",
+    "scanner",
+    "sinks/discard",
+    "sinks/json",
+    "sources/csv",
+    "sources/error",
+    "sources/infinite",
+    "sources/json",
+    "sources/slice",
+    "tests",
+    "transforms"
+  ]
   revision = "85c30b690ecbc7f9c707c640ff0bf82492f887ff"
   version = "v3.7.4"
 
@@ -52,6 +73,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "dd38df53076d33e7c0a020bb750a3841aba7da6169ac9eca43635fd946877609"
+  inputs-digest = "63bb2c30afdc76b5e540a503c1ab9ff579b2862f3dbc14743cff2b2c8a54da91"
   solver-name = "gps-cdcl"
   solver-version = 1

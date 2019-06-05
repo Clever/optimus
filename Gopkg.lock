@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
-  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
-  version = "v1.1.0"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -20,10 +20,10 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/stretchr/objx"
   packages = ["."]
-  revision = "1a9d0bb9f541897e62256577b352fdbc1fb4fd94"
+  revision = "477a77ecc69700c7cdeb1fa9e129548e1c1c393c"
+  version = "v0.1.1"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -31,8 +31,8 @@
     "assert",
     "mock"
   ]
-  revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
-  version = "v1.1.4"
+  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
+  version = "v1.3.0"
 
 [[projects]]
   name = "gopkg.in/Clever/gearman.v1"
@@ -61,8 +61,8 @@
     "tests",
     "transforms"
   ]
-  revision = "85c30b690ecbc7f9c707c640ff0bf82492f887ff"
-  version = "v3.7.4"
+  revision = "f3e95739ebf17266b0173cb6ea961bbf97fcaa53"
+  version = "v3.8.0"
 
 [[projects]]
   name = "gopkg.in/fatih/set.v0"

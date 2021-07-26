@@ -2,12 +2,13 @@ package transforms
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"gopkg.in/Clever/optimus.v3"
-	errorSource "gopkg.in/Clever/optimus.v3/sources/error"
-	"gopkg.in/Clever/optimus.v3/sources/slice"
-	"gopkg.in/Clever/optimus.v3/tests"
 	"testing"
+
+	"github.com/Clever/optimus/v4"
+	errorSource "github.com/Clever/optimus/v4/sources/error"
+	"github.com/Clever/optimus/v4/sources/slice"
+	"github.com/Clever/optimus/v4/tests"
+	"github.com/stretchr/testify/assert"
 )
 
 var a = optimus.Row{"k1": "v1", "k3": "v3"}

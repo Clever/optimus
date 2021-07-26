@@ -7,12 +7,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Clever/optimus/v4"
+	"github.com/Clever/optimus/v4/sources/csv"
+	errorSource "github.com/Clever/optimus/v4/sources/error"
+	"github.com/Clever/optimus/v4/sources/slice"
+	"github.com/Clever/optimus/v4/tests"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/Clever/optimus.v3/sources/csv"
-	errorSource "gopkg.in/Clever/optimus.v3/sources/error"
-	"gopkg.in/Clever/optimus.v3/sources/slice"
-	"gopkg.in/Clever/optimus.v3/tests"
 )
 
 var csvData = `header1,header2,header3

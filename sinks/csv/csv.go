@@ -6,7 +6,7 @@ import (
 	"io"
 	"sort"
 
-	"gopkg.in/Clever/optimus.v3"
+	"github.com/Clever/optimus/v4"
 )
 
 func convertRowToRecord(row optimus.Row, headers []string) []string {

@@ -1,8 +1,9 @@
 package infinite
 
 import (
-	"gopkg.in/Clever/optimus.v3/tests"
 	"testing"
+
+	"github.com/Clever/optimus/v4/tests"
 )
 
 func TestStop(t *testing.T) {

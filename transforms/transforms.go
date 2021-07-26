@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"gopkg.in/Clever/optimus.v3"
+	"github.com/Clever/optimus/v4"
 	"gopkg.in/fatih/set.v0"
 )
 

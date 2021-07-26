@@ -1,7 +1,7 @@
 package error
 
 import (
-	"gopkg.in/Clever/optimus.v3"
+	"github.com/Clever/optimus/v4"
 )
 
 // ErrorTable implemements an Optimus Table

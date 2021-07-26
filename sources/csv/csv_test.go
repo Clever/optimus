@@ -5,9 +5,9 @@ import (
 	"encoding/csv"
 	"testing"
 
+	"github.com/Clever/optimus/v4"
+	"github.com/Clever/optimus/v4/tests"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/Clever/optimus.v3/tests"
 )
 
 var csvData = `header1,header2,header3

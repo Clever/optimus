@@ -1,6 +1,6 @@
 # csv
 --
-    import "gopkg.in/Clever/optimus.v3/sources/csv"
+    import "github.com/Clever/optimus/v4/sources/csv"
 
 
 ## Usage

@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Clever/optimus/v4"
+	"github.com/Clever/optimus/v4/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gopkg.in/Clever/gearman.v1/job"
 	"gopkg.in/Clever/gearman.v1/packet"
-	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/Clever/optimus.v3/tests"
 )
 
 type mockClient struct {

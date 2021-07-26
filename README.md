@@ -1,6 +1,6 @@
 # optimus
 --
-    import "gopkg.in/Clever/optimus.v3"
+    import "github.com/Clever/optimus/v4"
 
 Package optimus provides interfaces and methods for lazily, concurrently
 manipulating collections of data.
@@ -25,10 +25,10 @@ CSV file:
     package optimus
 
     import(
-    	csvSource "gopkg.in/Clever/optimus.v3/sources/csv"
-    	csvSink "gopkg.in/Clever/optimus.v3/sinks/csv"
-    	"gopkg.in/Clever/optimus.v3"
-    	"gopkg.in/Clever/optimus.v3/transforms"
+    	csvSource "github.com/Clever/optimus/v4/sources/csv"
+    	csvSink "github.com/Clever/optimus/v4/sinks/csv"
+    	"github.com/Clever/optimus/v4"
+    	"github.com/Clever/optimus/v4/transforms"
     	"os"
     )
 
@@ -49,10 +49,10 @@ Here's one that uses chaining:
     package optimus
 
     import(
-    	csvSource "gopkg.in/Clever/optimus.v3/sources/csv"
-    	csvSink "gopkg.in/Clever/optimus.v3/sinks/csv"
-    	"gopkg.in/Clever/optimus.v3"
-    	"gopkg.in/Clever/optimus.v3/transformer"
+    	csvSource "github.com/Clever/optimus/v4/sources/csv"
+    	csvSink "github.com/Clever/optimus/v4/sinks/csv"
+    	"github.com/Clever/optimus/v4"
+    	"github.com/Clever/optimus/v4/transformer"
     	"os"
     )
 
@@ -123,7 +123,7 @@ going to receive, sent all the Rows it's going to send).
 
 ## Development
 You should develop Go packages from inside your Go path.
-For `optimus`, that means that you should be in `$GOPATH/src/gopkg.in/Clever/optimus.v3`.
+For `optimus`, that means that you should be in `$GOPATH/src/github.com/Clever/optimus/v4`.
 ```
 # Example
 cd $GOPATH/src/gopkg.in/Clever

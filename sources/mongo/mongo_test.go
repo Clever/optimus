@@ -3,11 +3,12 @@ package mongo
 import (
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/Clever/optimus.v3/tests"
 	"reflect"
 	"testing"
+
+	"github.com/Clever/optimus/v4"
+	"github.com/Clever/optimus/v4/tests"
+	"github.com/stretchr/testify/assert"
 )
 
 // mongoIter is a "successful" iterator over some docs

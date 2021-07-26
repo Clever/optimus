@@ -1,8 +1,8 @@
 package transforms
 
 import (
+	"github.com/Clever/optimus/v4"
 	"github.com/facebookgo/errgroup"
-	"gopkg.in/Clever/optimus.v3"
 )
 
 // RowIdentifier takes in a row and returns something that uniquely identifies the Row.

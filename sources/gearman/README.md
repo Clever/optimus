@@ -1,6 +1,6 @@
 # gearman
 --
-    import "gopkg.in/Clever/optimus.v3/sources/gearman"
+    import "github.com/Clever/optimus/v4/sources/gearman"
 
 
 ## Usage

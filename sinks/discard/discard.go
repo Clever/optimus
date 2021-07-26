@@ -1,7 +1,7 @@
 package discard
 
 import (
-	"gopkg.in/Clever/optimus.v3"
+	"github.com/Clever/optimus/v4"
 )
 
 // Discard is a Sink that discards all the Rows in the Table and returns any error.

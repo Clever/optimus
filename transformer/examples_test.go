@@ -7,9 +7,9 @@ import (
 	"regexp"
 	"strconv"
 
-	"gopkg.in/Clever/optimus.v3"
-	jsonSink "gopkg.in/Clever/optimus.v3/sinks/json"
-	csvSource "gopkg.in/Clever/optimus.v3/sources/csv"
+	"github.com/Clever/optimus/v4"
+	jsonSink "github.com/Clever/optimus/v4/sinks/json"
+	csvSource "github.com/Clever/optimus/v4/sources/csv"
 )
 
 /*
@@ -31,12 +31,12 @@ http://www.clever.info/bar,false,3
 `
 	// create the "source" we pull from
 	// note that this automatically handles the conversion from a CSV row to an optimus "row"
-	cSource := csvSource.New(bytes.NewBufferString(data)) // gopkg.in/Clever/optimus.v3/sources/csv
+	cSource := csvSource.New(bytes.NewBufferString(data)) // github.com/Clever/optimus/v4/sources/csv
 
 	// create the "sink" we push to
 	// note that this automatically handles marshalling to JSON
 	var output bytes.Buffer
-	jSink := jsonSink.New(&output) // gopkg.in/Clever/optimus.v3/sinks/json
+	jSink := jsonSink.New(&output) // github.com/Clever/optimus/v4/sinks/json
 
 	// let's set up some counting variables for fun
 	beforeCounter := 0

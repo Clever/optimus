@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Clever/optimus/v4"
+	"github.com/Clever/optimus/v4/sinks/discard"
+	jsonSink "github.com/Clever/optimus/v4/sinks/json"
+	errorTable "github.com/Clever/optimus/v4/sources/error"
+	"github.com/Clever/optimus/v4/sources/infinite"
+	"github.com/Clever/optimus/v4/sources/slice"
+	"github.com/Clever/optimus/v4/tests"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/Clever/optimus.v3/sinks/discard"
-	jsonSink "gopkg.in/Clever/optimus.v3/sinks/json"
-	errorTable "gopkg.in/Clever/optimus.v3/sources/error"
-	"gopkg.in/Clever/optimus.v3/sources/infinite"
-	"gopkg.in/Clever/optimus.v3/sources/slice"
-	"gopkg.in/Clever/optimus.v3/tests"
 )
 
 var defaultInput = func() []optimus.Row {

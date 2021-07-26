@@ -2,27 +2,24 @@ include golang.mk
 .DEFAULT_GOAL := test # override default goal set in library makefile
 
 SHELL := /bin/bash
-PKG := gopkg.in/Clever/optimus.v3
+PKG := github.com/Clever/optimus/v4
 PKGS := $(shell go list $(PKG)/... | grep -v /vendor)
 # NOTE: We have a poorly named type that we choose to not fix as it would break backwards compatibility.
-# In 4.0, this type will be renamed and all packages will be tested strictly.
+# In 5.0, this type will be renamed and all packages will be tested strictly.
 LAX_PKGS := $(addprefix $(PKG),/sources/error /transformer)
 STRICT_PKGS := $(filter-out $(LAX_PKGS),$(PKGS))
 
-.PHONY: test docs $(PKGS)
-$(eval $(call golang-version-check,1.10))
+.PHONY: test docs install_deps $(PKGS)
+$(eval $(call golang-version-check,1.16))
 
 all: test
 
-test: $(STRICT_PKGS) $(LAX_PKGS)
+test: install_deps $(STRICT_PKGS) $(LAX_PKGS)
 $(STRICT_PKGS): golang-test-all-strict-deps
-	go get -t $@
 	$(call golang-test-all-strict,$@)
 $(LAX_PKGS): golang-test-all-deps
-	go get -t $@
 	$(call golang-test-all,$@)
 
 
-
-install_deps: golang-dep-vendor-deps
-	$(call golang-dep-vendor)
+install_deps:
+	go mod vendor

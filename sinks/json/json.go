@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"gopkg.in/Clever/optimus.v3"
+	"github.com/Clever/optimus/v4"
 )
 
 // New writes all of the Rows in a Table as newline-separate JSON objects.

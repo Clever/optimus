@@ -6,7 +6,7 @@ import (
 	"io"
 	"sync"
 
-	"gopkg.in/Clever/optimus.v3"
+	"github.com/Clever/optimus/v4"
 )
 
 type table struct {

@@ -3,7 +3,7 @@ package infinite
 import (
 	"sync"
 
-	"gopkg.in/Clever/optimus.v3"
+	"github.com/Clever/optimus/v4"
 )
 
 type infiniteTable struct {

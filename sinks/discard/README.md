@@ -1,6 +1,6 @@
 # discard
 --
-    import "gopkg.in/Clever/optimus.v3/sinks/discard"
+    import "github.com/Clever/optimus/v4/sinks/discard"
 
 
 ## Usage

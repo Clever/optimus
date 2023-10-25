@@ -10,7 +10,7 @@ LAX_PKGS := $(addprefix $(PKG),/sources/error /transformer)
 STRICT_PKGS := $(filter-out $(LAX_PKGS),$(PKGS))
 
 .PHONY: test docs install_deps $(PKGS)
-$(eval $(call golang-version-check,1.16))
+$(eval $(call golang-version-check,1.21))
 
 all: test
 

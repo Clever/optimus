@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/go/src/github.com/Clever/optimus
     docker:
-    - image: cimg/go:1.16
+    - image: cimg/go:1.21
     - image: circleci/mongo:3.2.20-jessie-ram
     environment:
       GOPRIVATE: github.com/Clever/*

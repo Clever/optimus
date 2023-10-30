@@ -2,13 +2,14 @@ package transformer
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
-	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/Clever/optimus.v3/sources/infinite"
-	"gopkg.in/Clever/optimus.v3/sources/slice"
-	"gopkg.in/Clever/optimus.v3/tests"
-	"gopkg.in/Clever/optimus.v3/transforms"
 	"testing"
+
+	"github.com/Clever/optimus/v4"
+	"github.com/Clever/optimus/v4/sources/infinite"
+	"github.com/Clever/optimus/v4/sources/slice"
+	"github.com/Clever/optimus/v4/tests"
+	"github.com/Clever/optimus/v4/transforms"
+	"github.com/stretchr/testify/assert"
 )
 
 var defaultInput = func() []optimus.Row {

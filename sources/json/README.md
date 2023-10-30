@@ -1,6 +1,6 @@
 # json
 --
-    import "gopkg.in/Clever/optimus.v3/sources/json"
+    import "github.com/Clever/optimus/v4/sources/json"
 
 
 ## Usage

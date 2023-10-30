@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"sort"
 
-	"gopkg.in/Clever/optimus.v3"
+	"github.com/Clever/optimus/v4"
 )
 
 type rows struct {

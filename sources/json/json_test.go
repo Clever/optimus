@@ -2,10 +2,11 @@ package json
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/assert"
-	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/Clever/optimus.v3/tests"
 	"testing"
+
+	"github.com/Clever/optimus/v4"
+	"github.com/Clever/optimus/v4/tests"
+	"github.com/stretchr/testify/assert"
 )
 
 var jsonData = `{"header1":"field1","header2":"field2","header3":"field3"}

@@ -3,8 +3,8 @@ package tests
 import (
 	"testing"
 
+	"github.com/Clever/optimus/v4"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/Clever/optimus.v3"
 )
 
 // Stop tests that a Table correctly implements Stop.

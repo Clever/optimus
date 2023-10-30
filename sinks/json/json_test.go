@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
+	errorSource "github.com/Clever/optimus/v4/sources/error"
+	"github.com/Clever/optimus/v4/sources/json"
 	"github.com/stretchr/testify/assert"
-	errorSource "gopkg.in/Clever/optimus.v3/sources/error"
-	"gopkg.in/Clever/optimus.v3/sources/json"
 )
 
 var jsonData = `{"header1":"field1","header2":"field2","header3":"field3"}

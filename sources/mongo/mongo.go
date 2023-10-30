@@ -11,7 +11,7 @@ package mongo
 */
 
 import (
-	"gopkg.in/Clever/optimus.v3"
+	"github.com/Clever/optimus/v4"
 )
 
 // Iter simulates the gopkg.in/mgo.v2.Iter interface so we can remain independent

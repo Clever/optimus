@@ -1,8 +1,8 @@
 package transformer
 
 import (
-	"gopkg.in/Clever/optimus.v3"
-	"gopkg.in/Clever/optimus.v3/transforms"
+	"github.com/Clever/optimus/v4"
+	"github.com/Clever/optimus/v4/transforms"
 )
 
 // A Transformer allows you to easily chain multiple transforms on a table.

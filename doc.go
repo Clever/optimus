@@ -9,18 +9,17 @@ Several implementations of TransformFuncs are provided for common transformation
 
 Lastly, a set of Sink functions are provided that will "sink" a table into some output, such as a CSV.
 
-
-Example
+# Example
 
 Here's an example program that performs a set of field and value mappings on a CSV file:
 
 	package optimus
 
 	import(
-		csvSource "gopkg.in/Clever/optimus.v3/sources/csv"
-		csvSink "gopkg.in/Clever/optimus.v3/sinks/csv"
-		"gopkg.in/Clever/optimus.v3"
-		"gopkg.in/Clever/optimus.v3/transforms"
+		csvSource "github.com/Clever/optimus/v4/sources/csv"
+		csvSink "github.com/Clever/optimus/v4/sinks/csv"
+		"github.com/Clever/optimus/v4"
+		"github.com/Clever/optimus/v4/transforms"
 		"os"
 	)
 
@@ -41,10 +40,10 @@ Here's one that uses chaining:
 	package optimus
 
 	import(
-		csvSource "gopkg.in/Clever/optimus.v3/sources/csv"
-		csvSink "gopkg.in/Clever/optimus.v3/sinks/csv"
-		"gopkg.in/Clever/optimus.v3"
-		"gopkg.in/Clever/optimus.v3/transformer"
+		csvSource "github.com/Clever/optimus/v4/sources/csv"
+		csvSink "github.com/Clever/optimus/v4/sinks/csv"
+		"github.com/Clever/optimus/v4"
+		"github.com/Clever/optimus/v4/transformer"
 		"os"
 	)
 
@@ -56,6 +55,5 @@ Here's one that uses chaining:
 		transformer.New(csvSource.New(f)).Fieldmap(fieldMappings).Valuemap(
 			valueMappings).Map(arbitraryTransformFunction).Sink(csvSink.New(out))
 	}
-
 */
 package optimus

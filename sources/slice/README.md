@@ -1,6 +1,6 @@
 # slice
 --
-    import "gopkg.in/Clever/optimus.v3/sources/slice"
+    import "github.com/Clever/optimus/v4/sources/slice"
 
 
 ## Usage

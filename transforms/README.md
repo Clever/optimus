@@ -1,6 +1,6 @@
 # transforms
 --
-    import "gopkg.in/Clever/optimus.v3/transforms"
+    import "github.com/Clever/optimus/v4/transforms"
 
 Package transforms provides a set of transformation functions that can be
 applied to optimus.Tables.

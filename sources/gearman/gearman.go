@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/Clever/optimus/v4"
 	"gopkg.in/Clever/gearman.v1"
 	"gopkg.in/Clever/gearman.v1/job"
 	gearmanUtils "gopkg.in/Clever/gearman.v1/utils"
-	"gopkg.in/Clever/optimus.v3"
 )
 
 type table struct {

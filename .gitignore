@@ -24,3 +24,5 @@ _testmain.go
 
 sinks/csv/test_write.csv
 examples/urls.json
+
+vendor

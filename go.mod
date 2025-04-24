@@ -1,6 +1,6 @@
 module github.com/Clever/optimus/v4
 
-go 1.21
+go 1.24
 
 require (
 	github.com/facebookgo/errgroup v0.0.0-20160209021148-779c8d7ef069

@@ -38,6 +38,8 @@ type transformedTable struct {
 	rows    chan Row
 	m       sync.Mutex
 	stopped bool
+	// done is closed by Stop so that goroutines blocked on a send can give up.
+	done chan struct{}
 }
 
 func (t *transformedTable) Rows() <-chan Row {
@@ -50,13 +52,12 @@ func (t *transformedTable) Err() error {
 
 func (t *transformedTable) Stop() {
 	t.m.Lock()
-	stopped := t.stopped
-	t.m.Unlock()
-	if stopped {
+	if t.stopped {
+		t.m.Unlock()
 		return
 	}
-	t.m.Lock()
 	t.stopped = true
+	close(t.done)
 	t.m.Unlock()
 	t.source.Stop()
 }
@@ -73,12 +74,15 @@ func (t *transformedTable) start(transform TransformFunc) {
 	in := make(chan Row)
 	out := make(chan Row)
 	errChan := make(chan error)
-	doneChan := make(chan struct{})
+	var wg sync.WaitGroup
 
 	stop := func() {
 		t.Stop()
+		go drain(in) // unblocks the source copier if the transform has already returned
 		drain(t.source.Rows())
 		drain(out)
+		// The copiers must be finished before t.rows is closed, or they may send on a closed channel.
+		wg.Wait()
 		close(t.rows)
 	}
 	defer stop()
@@ -92,10 +96,9 @@ func (t *transformedTable) start(transform TransformFunc) {
 		}
 	}()
 	// Copy from the TransformFunc's out channel to the Table's out channel, then signal done
+	wg.Add(2)
 	go func() {
-		defer func() {
-			doneChan <- struct{}{}
-		}()
+		defer wg.Done()
 		for row := range out {
 			t.m.Lock()
 			stopped := t.stopped
@@ -103,15 +106,16 @@ func (t *transformedTable) start(transform TransformFunc) {
 			if stopped {
 				continue
 			}
-			t.rows <- row
+			select {
+			case t.rows <- row:
+			case <-t.done:
+			}
 		}
 	}()
 
 	// Copy from the Table's source to the TransformFunc's in channel, then signal done
 	go func() {
-		defer func() {
-			doneChan <- struct{}{}
-		}()
+		defer wg.Done()
 		defer close(in)
 		for row := range t.source.Rows() {
 			t.m.Lock()
@@ -120,16 +124,18 @@ func (t *transformedTable) start(transform TransformFunc) {
 			if stopped {
 				continue
 			}
-			in <- row
+			select {
+			case in <- row:
+			case <-t.done:
+			}
 		}
 	}()
 	for err := range errChan {
 		t.err = err
 		return
 	}
-	// Wait for all channels to finish
-	<-doneChan // Once to make sure we've consumed the output of the TransformFunc
-	<-doneChan // Once to make sure we've consumed the output of the source Table
+	// Wait for both copiers to finish: the output of the TransformFunc and of the source Table
+	wg.Wait()
 	if t.source.Err() != nil {
 		t.err = t.source.Err()
 	}
@@ -139,6 +145,7 @@ func newTransformedTable(source Table, transform TransformFunc) Table {
 	table := &transformedTable{
 		source: source,
 		rows:   make(chan Row),
+		done:   make(chan struct{}),
 	}
 	go table.start(transform)
 	return table

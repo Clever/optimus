@@ -523,3 +523,19 @@ func TestBypassTransforms(t *testing.T) {
 `
 	assert.Equal(t, expectedResult, buf.String())
 }
+
+// TestTransformErrorAfterEmit tests that a TransformFunc returning an error right after sending
+// rows doesn't race with (or panic on) closing the Table's rows channel.
+func TestTransformErrorAfterEmit(t *testing.T) {
+	for i := 0; i < 200; i++ {
+		out := optimus.Transform(slice.New(defaultInput()), func(in <-chan optimus.Row, out chan<- optimus.Row) error {
+			for row := range in {
+				out <- row
+			}
+			out <- optimus.Row{"extra": true}
+			return errors.New("some error")
+		})
+		tests.GetRows(out)
+		assert.EqualError(t, out.Err(), "some error")
+	}
+}
